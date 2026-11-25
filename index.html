@@ -1079,7 +1079,7 @@ async function start(){
  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
  const SK='cpl_sess';try{if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange((ev,ss)=>{try{if(ss&&ss.refresh_token)localStorage.setItem(SK,JSON.stringify({access_token:ss.access_token,refresh_token:ss.refresh_token}));else if(ev==='SIGNED_OUT')localStorage.removeItem(SK)}catch(e){}})}catch(e){}
  $('lgf').onsubmit=async e=>{e.preventDefault();$('lge').textContent='';const{error}=await sb.auth.signInWithPassword({email:$('lgm').value.trim(),password:$('lgp').value});if(error)$('lge').textContent='อีเมลหรือรหัสผ่านไม่ถูกต้อง';else enter()};
- $('lo').onclick=async()=>{try{localStorage.removeItem(SK)}catch(e){}await sb.auth.signOut();location.reload()};
+ $('lo').onclick=async()=>{try{localStorage.removeItem(SK)}catch(e){}await (()=>{try{localStorage.removeItem('gtk')}catch(e){}return sb.auth.signOut()})();location.reload()};
  $('rg').onchange=()=>{if($('rg').value==='pm'){const d=new Date(),p=new Date(d.getFullYear(),d.getMonth()-1,1);$('vm').value=p.getFullYear()+'-'+String(p.getMonth()+1).padStart(2,'0')}reload()};$('pvs').onchange=e=>pvApply(e.target.value);
  let{data}=await sb.auth.getSession();if(!data.session&&sb.auth.setSession){try{const b=JSON.parse(localStorage.getItem(SK)||'null');if(b&&b.refresh_token){const r=await sb.auth.setSession(b);if(r&&r.data&&r.data.session)data=r.data}}catch(e){}}if(data.session)enter();
 }
@@ -1563,12 +1563,12 @@ function nDayPop(d){const l=nDay(d),dt=new Date(d+'T00:00:00');const wd=[TT('อ
 let NPPL=[],NPEO=null,NOLD=null;
 function nGc(){const f=$('nf'),on=f.gc.checked,m=(NOLD&&NOLD.meet)||{};$('n_mu').classList.toggle('hid',on);const l=$('n_gcl');l.classList.toggle('hid',!(on&&m.gid));if(on&&m.gid)l.innerHTML=`${m.url?esc(nUrl(m.url).replace(/^https?:\/\//,''))+' · ':''}<a href="${esc(m.glink||'#')}" target="_blank" rel="noopener">Google Calendar</a>`}
 const GCID='282710709616-anh3icr9g0aukmfg592g75ied4bot50j.apps.googleusercontent.com',GAPI='https://www.googleapis.com/calendar/v3/calendars/primary/events';
-let GTK='',GTX=0,GTC=null,GLP=null,GME=null;try{const v=JSON.parse(sessionStorage.getItem('gtk')||'{}');if(v.t&&v.x>Date.now()){GTK=v.t;GTX=v.x}}catch(e){}
+let GTK='',GTX=0,GTC=null,GLP=null,GME=null;try{const v=JSON.parse(localStorage.getItem('gtk')||'{}');if(v.t&&v.x>Date.now()){GTK=v.t;GTX=v.x}}catch(e){}
 function gLoad(){if(window.google&&google.accounts&&google.accounts.oauth2)return Promise.resolve();if(GLP)return GLP;GLP=new Promise((ok,no)=>{const x=document.createElement('script');x.src='https://accounts.google.com/gsi/client';x.async=true;x.onload=()=>ok();x.onerror=()=>{GLP=null;no(new Error('Google'))};document.head.append(x)});return GLP}
 async function gTok(){if(GTK&&Date.now()<GTX)return GTK;await gLoad();let em='';try{const{data}=await sb.auth.getSession();em=(data&&data.session&&data.session.user&&data.session.user.email)||''}catch(e){}
- return new Promise((ok,no)=>{if(!GTC)GTC=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'https://www.googleapis.com/auth/calendar.events',callback:()=>{}});
-  GTC.callback=r=>{if(r&&r.access_token){GTK=r.access_token;GTX=Date.now()+((+r.expires_in||3600)-120)*1000;try{sessionStorage.setItem('gtk',JSON.stringify({t:GTK,x:GTX}))}catch(e){}ok(GTK)}else no(new Error((r&&(r.error_description||r.error))||'Google'))};
-  GTC.error_callback=e=>no(new Error((e&&(e.message||e.type))||'Google'));GTC.requestAccessToken(em?{hint:em,login_hint:em}:{})})}
+ return new Promise((ok,no)=>{if(!GTC)GTC=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'https://www.googleapis.com/auth/calendar.events',prompt:'',hd:'cpl-inter.com',login_hint:em||undefined,callback:()=>{}});
+  GTC.callback=r=>{if(r&&r.access_token){GTK=r.access_token;GTX=Date.now()+((+r.expires_in||3600)-120)*1000;try{localStorage.setItem('gtk',JSON.stringify({t:GTK,x:GTX}));if(r.hd||em)localStorage.setItem('gtkem',em)}catch(e){}ok(GTK)}else no(new Error((r&&(r.error_description||r.error))||'Google'))};
+  GTC.error_callback=e=>no(new Error((e&&(e.message||e.type))||'Google'));GTC.requestAccessToken(em?{prompt:'',login_hint:em}:{prompt:''})})}
 async function gApi(method,path,body){const t=await gTok();const r=await fetch(GAPI+path,{method,headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});if(r.status===204||(method==='DELETE'&&(r.status===404||r.status===410)))return {};const j=await r.json().catch(()=>({}));if(!r.ok){if(r.status===401){GTK='';GTX=0}throw new Error((j.error&&j.error.message)||('HTTP '+r.status))}return j}
 async function gEmails(ppl){if(!GME){const r=await sb.rpc('meet_emails');if(r.error)throw new Error(r.error.message);GME=r.data||[]}const out=new Set();
  (ppl||[]).forEach(x=>{if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x))out.add(x.toLowerCase());else GME.filter(p=>x==='ทุกคน'||(x.startsWith('ทีม ')?p.team===x.slice(4):p.name===x)).forEach(p=>p.email&&out.add(String(p.email).toLowerCase()))});return [...out]}
