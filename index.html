@@ -3767,7 +3767,7 @@ document.body.appendChild(pp);document.body.appendChild(b);set(cur);
 </script>
 <script>
 (function(){
-const _arSC=applyRoleUI;applyRoleUI=function(p){_arSC(p);if(p&&p.role==='sales'&&p.team==='C'){['tF'].forEach(id=>{const el=$(id);if(el)el.classList.add('hid')})}};
+
 })();
 </script>
 <style>
@@ -5248,7 +5248,12 @@ Object.assign(EN,{'แผนวันนี้':'Today','Clients':'Clients','ว
 #socd .soc-sw input{position:absolute;opacity:0;pointer-events:none}
 #socd .soc-sw i{width:40px;height:24px;border-radius:999px;background:var(--bd);position:relative;flex:none;transition:background .15s}
 #socd .soc-sw i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:999px;background:#fff;transition:left .15s}
-#socd .soc-sw input:checked+i{background:var(--pr)}#socd .soc-sw input:checked+i::after{left:19px}
+#socd .soc-sw input:checked+i{background:var(--pr)}
+#soc_okw{grid-template-columns:1fr 1fr}.soc-cbx{grid-column:1/-1;border:1.5px solid rgba(0,150,214,.28);background:rgba(0,150,214,.05);border-radius:14px;padding:12px 14px}.soc-cbx.hid{display:none}.soc-cbx .f{margin:0 0 10px}
+.soc-qk{display:flex;gap:6px;flex-wrap:wrap}.soc-qk button{border:0;border-radius:99px;padding:6px 12px;background:var(--card);font-size:12.5px;cursor:pointer;color:inherit;box-shadow:inset 0 0 0 1px var(--bd)}.soc-qk button.on{background:var(--pr);color:#fff;box-shadow:none}
+.soc-cb2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.soc-cb2 .f{margin:0}.soc-cb2 input{background:var(--card)!important}
+.soc-cbn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.soc-cbn .soc-qk{margin-left:auto}.soc-cbn.off .soc-qk{opacity:.4;pointer-events:none}
+.soc-sw0{display:inline-flex;align-items:center;gap:8px;cursor:pointer;position:relative;font-size:13.5px}.soc-sw0 b{font-weight:600}.soc-sw0 input{position:absolute;opacity:0;pointer-events:none}.soc-sw0 i{width:40px;height:24px;border-radius:999px;background:var(--bd);position:relative;flex:none;transition:background .15s}.soc-sw0 i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:999px;background:#fff;transition:left .15s}.soc-sw0 input:checked+i{background:#34a853}.soc-sw0 input:checked+i::after{left:19px}#socd .soc-sw input:checked+i::after{left:19px}
 @media(max-width:760px){#socd .soc-g{grid-template-columns:minmax(0,1fr)}#socd .soc-l{border-right:0;border-bottom:1px solid var(--bd)}}
 #socd .soc-og{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;background:var(--card)}#socd .soc-og b{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:8px}#socd .soc-og b::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--ac)}#socd .soc-og dl{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 12px;margin:0;font-size:13px}#socd .soc-og dt{color:var(--mu)}#socd .soc-og dd{margin:0;overflow-wrap:anywhere}
 #socd .soc-hs{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--bd);font-size:13px}#socd .soc-hs:first-of-type{border-top:0}
@@ -5272,7 +5277,7 @@ Object.assign(EN,{'แผนวันนี้':'Today','Clients':'Clients','ว
 <div class="soc-r"><h3 style="margin:0">บันทึกผลการโทร</h3>
 <div><div class="f" style="margin-bottom:6px">ผลการโทร<b class="rq">*</b></div><div class="soc-rs" id="soc_rs"><label class="r-ok"><input type="radio" name="res" value="ok"><span><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></i>ติดต่อได้</span></label><label class="r-noans"><input type="radio" name="res" value="noans"><span><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i>ไม่รับสาย</span></label><label class="r-bad"><input type="radio" name="res" value="bad"><span><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></i>ติดต่อไม่ได้</span></label><label class="r-online"><input type="radio" name="res" value="online"><span><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1M16 11l2 2 4-4"/></svg></i>ลูกค้า Online</span></label></div></div>
 <div class="f" id="soc_tpw">โอกาสปิดการขาย<b class="rq">*</b><div id="soc_tpk"></div></div>
-<div class="g" id="soc_okw"><label class="f">สถานะ<b class="rq">*</b><select name="st"><option value="int">สนใจ</option><option value="cb">โทรกลับ</option><option value="no">ไม่สนใจ</option><option value="dnc">ขอไม่ให้ติดต่อ</option></select></label><label class="f" id="soc_cbw">โทรกลับวันที่<input name="cb" type="text" data-dmy placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10"></label></div>
+<div class="g" id="soc_okw"><label class="f">สถานะ<b class="rq">*</b><select name="st"><option value="int">สนใจ</option><option value="cb">โทรกลับ</option><option value="no">ไม่สนใจ</option><option value="dnc">ขอไม่ให้ติดต่อ</option></select></label><div id="soc_cbw" class="soc-cbx"><div class="f">ลูกค้าให้โทรกลับ<div class="soc-qk"><button type="button" data-qk="30">อีก 30 นาที</button><button type="button" data-qk="60">อีก 1 ชม.</button><button type="button" data-qk="d14">บ่ายนี้ 14:00</button><button type="button" data-qk="t10">พรุ่งนี้ 10:00</button></div></div><div class="soc-cb2"><label class="f">วันที่<b class="rq">*</b><input name="cb" type="text" data-dmy placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10"></label><label class="f">เวลา<b class="rq">*</b><input name="cbt" type="time"></label></div><div class="soc-cbn"><label class="soc-sw0"><input type="checkbox" name="cbn" role="switch"><i></i><b>แจ้งเตือน</b></label><div class="soc-qk" id="soc_cbr"><button type="button" data-r="0">ตรงเวลา</button><button type="button" data-r="10">ก่อน 10 นาที</button><button type="button" data-r="30">ก่อน 30 นาที</button></div></div></div></div>
 <label class="f">ผลการคุย<textarea name="note" rows="3" maxlength="600"></textarea></label>
 <label class="soc-sw" id="soc_tgw"><span>เพิ่มเข้า Clients</span><input type="checkbox" name="tg" role="switch"><i></i></label>
 <label class="f hid" id="soc_asw">ผู้รับผิดชอบ<select name="as"></select></label>
@@ -5346,7 +5351,12 @@ const X='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="cur
 ['socd','soid','socs'].forEach(id=>{const d=$(id);if(!d||d.querySelector(':scope>.dlgx'))return;const b=document.createElement('button');b.type='button';b.className='dlgx';b.title=b.ariaLabel=TT('ปิด','Close');b.innerHTML=X;b.onclick=()=>d.close();d.append(b)});
 /* call dialog */
 const cf=$('socf'),cd=$('socd');let CUR=null;
-const syncC=()=>{const r=(cf.querySelector('input[name=res]:checked')||{}).value,st=cf.st.value;$('soc_okw').classList.toggle('hid',r!=='ok');$('soc_cbw').classList.toggle('hid',st!=='cb');$('soc_tgw').classList.toggle('hid',!(r==='ok'&&st==='int'));$('soc_tpw').classList.remove('hid');{const q=$('soc_tpw').querySelector('.rq');if(q)q.classList.toggle('hid',!(r==='ok'&&['int','cb'].includes(st)))}};
+function cbSetR(v){cf.dataset.cbr=v;$('soc_cbr').querySelectorAll('[data-r]').forEach(b=>b.classList.toggle('on',+b.dataset.r===+v))}
+$('soc_cbw').addEventListener('click',e=>{const r=e.target.closest('[data-r]');if(r){cbSetR(+r.dataset.r);return}const q=e.target.closest('[data-qk]');if(!q)return;const k=q.dataset.qk,d=new Date(),p=v=>String(v).padStart(2,'0');
+ if(k==='30'||k==='60'){d.setMinutes(d.getMinutes()+ +k)}else if(k==='d14'){d.setHours(14,0,0,0)}else{d.setDate(d.getDate()+1);d.setHours(10,0,0,0)}
+ cf.cb.value=p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();cf.cbt.value=p(d.getHours())+':'+p(d.getMinutes());$('soc_cbw').querySelectorAll('[data-qk]').forEach(b=>b.classList.toggle('on',b===q))});
+window.soCallOpen=async id=>{if(!SO.calls||!SO.calls.some(z=>String(z.id)===String(id)))await callsLoad();return cOpen(id)};window.soCallsLoad=callsLoad;
+const syncC=()=>{$('soc_cbw').querySelector('.soc-cbn').classList.toggle('off',!cf.cbn.checked);const r=(cf.querySelector('input[name=res]:checked')||{}).value,st=cf.st.value;$('soc_okw').classList.toggle('hid',r!=='ok');$('soc_cbw').classList.toggle('hid',st!=='cb');$('soc_tgw').classList.toggle('hid',!(r==='ok'&&st==='int'));$('soc_tpw').classList.remove('hid');{const q=$('soc_tpw').querySelector('.rq');if(q)q.classList.toggle('hid',!(r==='ok'&&['int','cb'].includes(st)))}};
 cf.addEventListener('change',e=>{if(e.target.name==='st'&&e.target.value==='int')cf.tg.checked=true;syncC()});
 async function unlock(){if(CUR&&CUR.calling_by===me()){CUR.calling_by=null;CUR.calling_at=null;try{await sb.from('so_calls').update({calling_by:null,calling_at:null}).eq('id',CUR.id)}catch(e){}}}
 cd.addEventListener('close',()=>{unlock();if(onC())soRender()});
@@ -5363,7 +5373,7 @@ async function cOpen(id){const c=SO.calls.find(z=>String(z.id)===String(id));if(
  if(c.status==='online')cf.querySelector('input[value=online]').checked=true;else if(['int','cb','no','dnc'].includes(c.status)){cf.querySelector('input[value=ok]').checked=true;cf.st.value=c.status}
  {const d=c.data||{},kv=[[TT('วันที่ได้ Lead','Lead date'),d.date?fmtD(d.date):''],[TT('เซลล์เดิม','Previous sales'),[d.team_n,d.sales].filter(Boolean).join(' · ')],['Ads',d.ads],[TT('บริการที่ถาม','Service asked'),(d.svc||[]).join(', ')],[TT('ใบเสนอราคา','Quotation'),d.quo],[TT('เหตุผลที่ไม่สนใจ','Reason'),d.reason],[TT('โน้ตเซลล์เดิม','Previous notes'),d.note]].filter(x=>x[1]);
   $('soc_og').innerHTML=isOn(c)&&kv.length?`<div class="soc-og"><b>${E(TT('ข้อมูลจาก Lead Online','From the Online Lead'))}</b><dl>${kv.map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl></div>`:''}
- cf.cb.value=c.callback_date?fmtD(c.callback_date):'';cf.note.value=c.note||'';{const t=(c.data||{}).temp;cf.querySelectorAll('input[name=tp]').forEach(i=>i.checked=i.value===t)}
+ cf.cb.value=c.callback_date?fmtD(c.callback_date):'';{const dd=c.data||{};cf.cbt.value=dd.cbt||'';cf.cbn.checked=dd.cbr!==null&&dd.cbr!==-1;cbSetR(dd.cbr==null||dd.cbr===-1?10:+dd.cbr);$('soc_cbw').querySelectorAll('[data-qk]').forEach(b=>b.classList.remove('on'))}cf.note.value=c.note||'';{const t=(c.data||{}).temp;cf.querySelectorAll('input[name=tp]').forEach(i=>i.checked=i.value===t)}
  $('soc_asw').classList.toggle('hid',!boss());if(boss()){const o=[...new Set([...salesFor('C'),...(c.assignee?[c.assignee]:[])])];cf.as.innerHTML='<option value=""></option>'+o.map(s=>`<option${s===c.assignee?' selected':''}>${E(s)}</option>`).join('')}
  syncC();$('soc_hs').innerHTML='';cd.showModal();
  const h=await sb.from('so_call_logs').select('*').eq('call_id',id).order('created_at',{ascending:false}).limit(30);const L=h.data||[];
@@ -5372,18 +5382,21 @@ async function cOpen(id){const c=SO.calls.find(z=>String(z.id)===String(id));if(
 cf.addEventListener('submit',async e=>{e.preventDefault();const c=CUR;if(!c)return;const res=(cf.querySelector('input[name=res]:checked')||{}).value;
  if(!res){alert(TT('กรุณาเลือกผลการโทร','Please choose the call result'));return}
  let st=res==='ok'?cf.st.value:res,cb=null;const at=(+c.attempts||0)+(res==='noans'?1:0);if(res==='noans'&&at>=3)st='bad';
- if(st==='cb'){cb=d2i(cf.cb.value.trim());if(!cb){alert(TT('กรุณากรอกวันที่โทรกลับ (dd/mm/yyyy)','Please enter the call-back date (dd/mm/yyyy)'));cf.cb.focus();return}}
+ if(st==='cb'){cb=d2i(cf.cb.value.trim());if(!cb){alert(TT('กรุณากรอกวันที่โทรกลับ (dd/mm/yyyy)','Please enter the call-back date (dd/mm/yyyy)'));cf.cb.focus();return}if(!cf.cbt.value){alert(TT('กรุณากรอกเวลาโทรกลับ','Please enter the call-back time'));cf.cbt.focus();return}}
  const now=new Date().toISOString(),note=cf.note.value.trim(),tp=(cf.querySelector('input[name=tp]:checked')||{}).value||'';
  if(res==='ok'&&['int','cb'].includes(st)&&!tp){alert(TT('กรุณาเลือกโอกาสปิดการขาย','Please choose Hot / Warm / Cold'));return}
  const call=isCaller(),patch=call?{status:st,attempts:at,last_call_at:now,last_call_by:me(),callback_date:cb,note:note||null,calling_by:null,calling_at:null}:{status:st,callback_date:cb,note:note||null,calling_by:null,calling_at:null};
  if(boss()&&cf.as.value!==(c.assignee||''))patch.assignee=cf.as.value||null;
- if(tp&&tp!==(c.data||{}).temp)patch.data={...(c.data||{}),temp:tp};
+ {const dd={...(c.data||{})};let ch=false;if(tp&&tp!==dd.temp){dd.temp=tp;ch=true}
+  if(st==='cb'){const r=cf.cbn.checked?+(cf.dataset.cbr||0):-1;if(dd.cbt!==cf.cbt.value||dd.cbr!==r){dd.cbt=cf.cbt.value;dd.cbr=r;delete dd.cbs;ch=true}if(cf.cbn.checked&&window.Notification&&Notification.permission==='default')try{Notification.requestPermission()}catch(x){}}
+  else if(dd.cbt!=null||dd.cbr!=null){delete dd.cbt;delete dd.cbr;delete dd.cbs;ch=true}
+  if(ch)patch.data=dd}
  const{error}=await sb.from('so_calls').update(patch).eq('id',c.id);if(error)return alert(TT('บันทึกไม่สำเร็จ','Failed to save'));Object.assign(c,patch);
  if(call)try{await sb.from('so_call_logs').insert({call_id:c.id,actor:me(),result:res,status:st,note:note||null})}catch(x){}
  if(st==='int'&&cf.tg.checked&&!SO.deals.some(z=>(z.company||'').trim().toLowerCase()===String(c.company||'').trim().toLowerCase())){
   const row={team:TM,company:c.company,stage:'lead',sales:c.assignee||me()};if(SO.hasData)row.data={ct:c.contact||'',ph:c.phone||'',note,src:'call',temp:tp,ch:'Call out',call_id:c.id,online:isOn(c)?1:0};
   const r=await sb.from('so_deals').insert(row).select().single();if(!r.error&&r.data){SO.deals.unshift(r.data);await soLog(`เพิ่ม Clientจากการโทร: ${c.company}`)}}
- CUR=null;cd.close();soRender()});
+ CUR=null;cd.close();soRender();if(window.cbRefresh)window.cbRefresh()});
 /* auto hand-off: Online leads not interested for 30 days, with a phone */
 async function syncOnline(){const cut=new Date(Date.now()-30*864e5).toISOString().slice(0,10),L=new Map();
  for(const k of['status','fu_status']){let d=await pg2(()=>sb.from('leads').select(cols()+',customer_id').in('team',['A','B']).eq(k,ST_N));if(!d.length)d=await pg2(()=>sb.from('leads').select(cols()).in('team',['A','B']).eq(k,ST_N));d.forEach(x=>L.set(x.id,{...norm(x),customer_id:x.customer_id}))}
@@ -6855,6 +6868,81 @@ document.addEventListener('input',e=>{if(e.target&&e.target.id==='mklk_q'){MK.lk
 document.addEventListener('click',e=>{const o=e.target.closest&&e.target.closest('[data-lko]');if(o){e.preventDefault();e.stopPropagation();MK.lk.o=o.dataset.lko;MK.lk.p=1;document.querySelectorAll('[data-lko]').forEach(x=>x.classList.toggle('on',x===o));const b=$('mklk_b');if(b)b.innerHTML=mkLinkBody();return}
  const a=e.target.closest&&e.target.closest('[data-lkp]');if(a){e.preventDefault();e.stopPropagation();if(a.disabled)return;MK.lk.p=+a.dataset.lkp;const b=$('mklk_b');if(b)b.innerHTML=mkLinkBody();return}
  if(e.target.closest&&e.target.closest('.mklk-a'))e.stopPropagation()},true);
+</script>
+
+<style>
+.hid-off,#vF>.hid-off,#vF>#kyb.hid-off,#vF>#fst.hid-off{display:none!important}.cbi .btn,.cbt .btn{width:auto!important;flex:none!important}
+#fOff .fo-kp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}@media(max-width:900px){#fOff .fo-kp{grid-template-columns:repeat(2,1fr)}}
+#fOff .fo-k{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;border-left:5px solid var(--c)}#fOff .fo-k b{display:block;font-size:26px;color:var(--c);line-height:1.2}#fOff .fo-k span{font-size:13px;color:var(--mu)}
+#fOff .fo-g2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}@media(max-width:1000px){#fOff .fo-g2{grid-template-columns:1fr}}
+#fOff .pn{padding:16px 18px}#fOff .pn h3{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:8px}#fOff .pn h3:before{content:"";width:8px;height:8px;border-radius:3px;background:var(--ac,#f08a24)}
+.cbi{display:flex;gap:12px;align-items:center;border:1px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:8px;background:var(--card)}.cbi .t{width:66px;flex:none;text-align:center;border-radius:10px;padding:6px 0;background:rgba(0,150,214,.1);color:#0b6fb0;line-height:1.15}.cbi .t b{display:block;font-size:17px}.cbi .t span{font-size:11px}
+.cbi.late{border-color:#f5c2c0;background:rgba(224,49,49,.05)}.cbi.late .t{background:rgba(224,49,49,.12);color:#c92a2a}.cbi.nw{border-color:#0096d6;box-shadow:0 0 0 3px rgba(0,150,214,.12)}.cbi.dn{opacity:.6}.cbi.dn .t{background:var(--bg);color:var(--mu)}
+.cbi h4{margin:0 0 2px;font-size:14.5px}.cbi .s{font-size:12.5px;color:var(--mu)}.cbi .q{font-size:12.5px;background:var(--bg);border-radius:8px;padding:3px 8px;margin-top:4px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cbi .ac{margin-left:auto;display:flex;gap:6px;flex:none}
+.cbi .btn.cbg,.cbt .btn.cbg{background:#e6f4ea;color:#137333;border-color:#b7dcc4}
+.fo-sec{font-size:12.5px;color:var(--mu);font-weight:600;margin:12px 0 8px;display:flex;align-items:center;gap:8px}.fo-sec:after{content:"";flex:1;border-top:1px solid var(--bd)}
+.fuo{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--bd);cursor:pointer}.fuo:last-child{border:0}.fuo .d{font-size:12.5px;color:var(--mu);width:74px;flex:none}.fuo .d.late{color:var(--er);font-weight:600}.fuo h4{margin:0;font-size:14px}.fuo .s{font-size:12.5px;color:var(--mu)}
+#cbtw{position:fixed;right:8px;bottom:8px;z-index:9000;display:flex;flex-direction:column-reverse;gap:12px;max-height:calc(100vh - 16px);overflow:auto;padding:16px}.cbt{width:min(400px,calc(100vw - 32px));background:var(--card);border-radius:18px;box-shadow:0 16px 48px rgba(10,30,60,.28);padding:16px 18px;border-top:5px solid #0096d6;display:flex;flex-direction:column;gap:6px}.cbt .h{font-size:12.5px;color:#0b6fb0;font-weight:700}.cbt h4{margin:0;font-size:16px}.cbt .s{font-size:13px;color:var(--mu)}.cbt .q{font-size:12.5px;background:var(--bg);border-radius:8px;padding:6px 10px;margin:4px 0}.cbt .r{display:flex;gap:8px;margin-top:4px}.cbt .r .btn:last-child{margin-left:auto}
+
+</style>
+<script>
+(function(){
+const isOff=()=>!!profile&&profile.role==='sales'&&profile.team==='C';
+const me=()=>(profile&&profile.name)||'';
+let CB=[],FV='d',TK=null;
+const p2=v=>String(v).padStart(2,'0'),hm=d=>p2(d.getHours())+':'+p2(d.getMinutes());
+const dueAt=c=>new Date(c.callback_date+'T'+(((c.data||{}).cbt)||'09:00')+':00');
+const mine=c=>(c.assignee||c.last_call_by)===me();
+async function cbLoad(){if(!profile)return;const r=await sb.from('so_calls').select('id,company,contact,phone,callback_date,status,data,assignee,last_call_by,last_call_at,note').eq('team','C').eq('status','cb');if(!r.error)CB=(r.data||[]).filter(c=>c.callback_date&&mine(c));offBadge();if(isOff()&&!$('vF').classList.contains('hid'))offRender();cbTick()}
+window.cbRefresh=()=>cbLoad();
+function offBadge(){const b=$('fdot');if(!b)return;const t=today(),n=CB.filter(c=>c.callback_date<=t).length;b.textContent=n;b.classList.toggle('hid',!n)}
+function ensure(){let b=$('fOff');if(!b){b=document.createElement('div');b.id='fOff';b.className='hid';$('vF').append(b);
+ b.addEventListener('click',e=>{const v=e.target.closest('[data-fv]');if(v){FV=v.dataset.fv;return offRender()}const o=e.target.closest('[data-cbo]');if(o){window.soCallOpen&&window.soCallOpen(o.dataset.cbo);return}
+  const z=e.target.closest('[data-cbz]');if(z)return snoozeTo(z.dataset.cbz);const d=e.target.closest('[data-dl]');if(d&&window.soInfo)window.soInfo(+d.dataset.dl)})}return b}
+async function snoozeTo(id){const c=CB.find(x=>String(x.id)===String(id));if(!c)return;const d=new Date(Math.max(Date.now(),dueAt(c).getTime())+60*60e3),dd={...(c.data||{}),cbt:hm(d)};delete dd.cbs;
+ const nd=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());const r=await sb.from('so_calls').update({callback_date:nd,data:dd}).eq('id',c.id);if(r.error)return alert(TT('บันทึกไม่สำเร็จ','Failed to save'));
+ c.callback_date=nd;c.data=dd;const s=SO.calls&&SO.calls.find(x=>x.id===c.id);if(s){s.callback_date=nd;s.data=dd}offRender();offBadge()}
+async function offRender(){const b=ensure();const t=today(),now=Date.now();
+ if(!SO.loaded&&typeof soLoad==='function'){b.innerHTML='<div class="sub" style="padding:20px">…</div>';try{await soLoad()}catch(e){}}
+ const lim=FV==='d'?t:FV==='w'?(()=>{const d=new Date();d.setDate(d.getDate()+6);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())})():'9999';
+ const L=CB.filter(c=>c.callback_date<=lim).sort((a,b)=>dueAt(a)-dueAt(b));
+ const od=CB.filter(c=>dueAt(c).getTime()<now).length,dToday=CB.filter(c=>c.callback_date<=t).length;
+ const done=(SO.calls||[]).filter(c=>c.last_call_by===me()&&(c.last_call_at||'').slice(0,10)===t&&c.status!=='cb').sort((a,b)=>(b.last_call_at||'').localeCompare(a.last_call_at||''));
+ const doneN=done.length;
+ const DD=d=>d&&d.data&&typeof d.data==='object'?d.data:{};
+ const fus=(SO.deals||[]).filter(d=>d.sales===me()&&!['closed','lost'].includes(d.stage)&&DD(d).next&&DD(d).next.d&&!DD(d).next.done&&DD(d).next.d<=lim).sort((a,b)=>DD(a).next.d.localeCompare(DD(b).next.d));
+ const ST2=window.SO_ST2||{},stOf=d=>{const k=window.soStat?window.soStat(d):'';return ST2[k]||['','#888']};
+ const row=c=>{const due=dueAt(c),dd=c.data||{},o=due.getTime()<now,soon=!o&&due.getTime()-now<=30*60e3,dl=c.callback_date===t?'':fmtD(c.callback_date).slice(0,5);
+  const lab=o?TT('เลย ','Late ')+ago(now-due.getTime()):soon?TT('อีก ','In ')+Math.max(1,Math.round((due.getTime()-now)/60e3))+TT(' นาที',' min'):(dl||TT('วันนี้','Today'));
+  return `<div class="cbi${o?' late':soon?' nw':''}"><div class="t"><b>${esc(dd.cbt||'—')}</b><span>${esc(lab)}</span></div><div style="min-width:0;flex:1"><h4>${esc(c.company||'')}</h4><div class="s">${esc([c.contact,c.phone].filter(Boolean).join(' · '))}</div>${c.note?`<span class="q">“${esc(c.note)}”</span>`:''}</div><div class="ac"><button type="button" class="btn sm cbg" data-cbo="${c.id}">${TT('บันทึกผล','Log result')}</button><button type="button" class="btn sm" data-cbz="${c.id}">${TT('เลื่อน 1 ชม.','Snooze 1 h')}</button></div></div>`};
+ const drow=c=>`<div class="cbi dn"><div class="t"><b>${esc(soHM2(c.last_call_at))}</b><span>${TT('โทรแล้ว','Called')}</span></div><div style="min-width:0;flex:1"><h4>${esc(c.company||'')}</h4><div class="s">${esc([c.contact,c.phone].filter(Boolean).join(' · '))}</div></div><div class="ac"><button type="button" class="btn sm" data-cbo="${c.id}">${TT('เปิด','Open')}</button></div></div>`;
+ b.innerHTML=`<div class="nh"><h3 style="margin:0">${TT('งานของฉัน','My work')}</h3><div class="mktabs">${[['d','วันนี้','Today'],['w','สัปดาห์นี้','This week'],['a','ทั้งหมด','All']].map(([k,th,en])=>`<button type="button" data-fv="${k}" class="${FV===k?'on':''}">${TT(th,en)}</button>`).join('')}</div></div>
+ <div class="fo-kp">${[[dToday,TT('นัดโทรกลับวันนี้','Call-backs today'),'#0096d6'],[od,TT('เลยเวลานัด','Overdue'),'#e03131'],[fus.length,TT('งานติดตามลูกค้า','Client follow-ups'),'#f08a24'],[doneN,TT('โทรแล้ววันนี้','Called today'),'#2f9e44']].map(([v,l,c])=>`<div class="fo-k" style="--c:${c}"><b>${NFm(v)}</b><span>${l}</span></div>`).join('')}</div>
+ <div class="fo-g2"><div class="pn"><h3>${TT('นัดโทรกลับ','Call-backs')}</h3>${L.length?L.map(row).join(''):`<div class="sub" style="padding:14px 0;text-align:center">${TT('ไม่มีนัดโทรกลับ','No call-backs')}</div>`}${FV==='d'&&done.length?`<div class="fo-sec">${TT('โทรแล้ววันนี้','Called today')}</div>`+done.slice(0,8).map(drow).join(''):''}</div>
+ <div class="pn"><h3>${TT('งานติดตามลูกค้า','Client follow-ups')}</h3>${fus.length?fus.map(d=>{const n=DD(d).next,s=stOf(d);return `<div class="fuo" data-dl="${d.id}"><div class="d${n.d<t?' late':''}">${n.d===t?TT('วันนี้','Today'):fmtD(n.d)}</div><div style="flex:1;min-width:0"><h4>${esc(d.company||'')}</h4><div class="s">${esc(n.t||'')}</div></div>${s[0]?`<span class="so2-chip" style="--c:${s[1]}">${esc(TT(s[0],s[0]))}</span>`:''}</div>`}).join(''):`<div class="sub" style="padding:14px 0;text-align:center">${TT('ไม่มีงานติดตาม','No follow-ups')}</div>`}</div></div>`}
+const NFm=v=>Math.round(+v||0).toLocaleString('en-US');
+const soHM2=x=>{if(!x)return'';const d=new Date(x);return hm(d)};
+const ago=ms=>{const m=Math.round(ms/60e3);return m<60?m+TT(' นาที',' min'):m<1440?Math.floor(m/60)+TT(' ชม.',' h'):Math.floor(m/1440)+TT(' วัน',' d')};
+const _rf=renderFu;renderFu=function(){const off=isOff(),b=ensure();[...$('vF').children].forEach(ch=>{if(ch!==b)ch.classList.toggle('hid-off',off)});b.classList.toggle('hid',!off);if(!off)return _rf();$('fnb').classList.add('hid');offRender();if(!SO.calls||!SO.calls.length)window.soCallsLoad&&window.soCallsLoad().then(()=>{if(!$('vF').classList.contains('hid'))offRender()}).catch(()=>{})};
+const _fb=fuBadge;fuBadge=function(){if(isOff())return offBadge();return _fb()};
+/* reminders */
+const SHOWN=new Set();
+const nKey=c=>'cbn_'+c.id+'_'+c.callback_date+'_'+((c.data||{}).cbt||'');
+const lsG=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+function cbTick(){if(!CB.length)return;const now=Date.now();
+ CB.forEach(c=>{const dd=c.data||{};if(dd.cbr==null||dd.cbr===-1||!dd.cbt)return;const k=nKey(c),st=lsG(k);if(st==='x')return;const at=st&&+st?+st:dueAt(c).getTime()-(+dd.cbr||0)*60e3;
+  if(now>=at&&now-dueAt(c).getTime()<12*3600e3&&!SHOWN.has(k))cbShow(c,k)})}
+function cbShow(c,k){SHOWN.add(k);const dd=c.data||{},due=dueAt(c),mins=Math.round((due.getTime()-Date.now())/60e3);
+ const h=mins>0?TT('นัดโทรกลับ · อีก '+mins+' นาที','Call-back · in '+mins+' min'):TT('ถึงเวลาโทรกลับ','Time to call back');
+ const el=document.createElement('div');el.className='cbt';el.innerHTML=`<div class="h">🔔 ${esc(h)}</div><h4>${esc(c.company||'')}</h4><div class="s">${esc([c.contact,c.phone,dd.cbt].filter(Boolean).join(' · '))}</div>${c.note?`<div class="q">“${esc(c.note)}”</div>`:''}<div class="r"><button type="button" class="btn cbg" data-a="o">${TT('บันทึกผลการโทร','Log call result')}</button><button type="button" class="btn" data-a="z">${TT('เลื่อน 15 นาที','Snooze 15 min')}</button><button type="button" class="btn" data-a="x">${TT('ปิด','Close')}</button></div>`;
+ let w=$('cbtw');if(!w){w=document.createElement('div');w.id='cbtw';document.body.append(w)}w.append(el);
+ el.onclick=e=>{const a=(e.target.closest('[data-a]')||{}).dataset;if(!a||!a.a)return;if(a.a==='z'){lsS(k,String(Date.now()+15*60e3));SHOWN.delete(k)}else lsS(k,'x');el.remove();if(a.a==='o'&&window.soCallOpen)window.soCallOpen(c.id)};
+ try{if(window.Notification&&Notification.permission==='granted'){const n=new Notification(h+(dd.cbt?' '+dd.cbt:''),{body:[c.company,c.contact,c.phone].filter(Boolean).join(' · '),tag:k,requireInteraction:true});n.onclick=()=>{window.focus();n.close()}}}catch(e){}}
+function start(){if(TK)return;TK=1;cbLoad();setInterval(cbTick,30e3);setInterval(cbLoad,5*60e3);
+ try{sb.channel('cb-rt').on('postgres_changes',{event:'UPDATE',schema:'public',table:'so_calls'},pl=>{const n=pl.new||{};const i=CB.findIndex(x=>x.id===n.id);if(n.status==='cb'&&n.callback_date&&mine(n)){if(i>=0)CB[i]={...CB[i],...n};else CB.push(n)}else if(i>=0)CB.splice(i,1);offBadge();cbTick();if(isOff()&&!$('vF').classList.contains('hid'))offRender()}).subscribe()}catch(e){}}
+const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);if(p&&p.role==='sales'&&p.team==='C'){$('tF').classList.remove('hid');start()}};
+if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove('hid');start()}
+})();
 </script>
 </body>
 </html>
