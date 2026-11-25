@@ -6940,8 +6940,9 @@ function cbShow(c,k){SHOWN.add(k);const dd=c.data||{},due=dueAt(c),mins=Math.rou
  try{if(window.Notification&&Notification.permission==='granted'){const n=new Notification(h+(dd.cbt?' '+dd.cbt:''),{body:[c.company,c.contact,c.phone].filter(Boolean).join(' · '),tag:k,requireInteraction:true});n.onclick=()=>{window.focus();n.close()}}}catch(e){}}
 function start(){if(TK)return;TK=1;cbLoad();setInterval(cbTick,30e3);setInterval(cbLoad,5*60e3);
  try{sb.channel('cb-rt').on('postgres_changes',{event:'UPDATE',schema:'public',table:'so_calls'},pl=>{const n=pl.new||{};const i=CB.findIndex(x=>x.id===n.id);if(n.status==='cb'&&n.callback_date&&mine(n)){if(i>=0)CB[i]={...CB[i],...n};else CB.push(n)}else if(i>=0)CB.splice(i,1);offBadge();cbTick();if(isOff()&&!$('vF').classList.contains('hid'))offRender()}).subscribe()}catch(e){}}
-const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);if(p&&p.role==='sales'&&p.team==='C'){$('tF').classList.remove('hid');start()}};
-if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove('hid');start()}
+const place=()=>{const f=$('tF'),so=$('tSO');if(f&&so)so.before(f);['nsep1','nsep2'].forEach(id=>{const e=$(id);if(!e)return;let n=e.nextElementSibling,v=false;while(n&&!/^nsep/.test(n.id||'')){if(n.tagName==='BUTTON'&&!n.classList.contains('hid')&&getComputedStyle(n).display!=='none')v=true;n=n.nextElementSibling}e.style.display=v?'':'none'})};
+const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);if(p&&p.role==='sales'&&p.team==='C'){$('tF').classList.remove('hid');place();start()}else['nsep1','nsep2'].forEach(id=>{const e=$(id);if(e)e.style.display=''})};
+if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove('hid');place();start()}
 })();
 </script>
 </body>
