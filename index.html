@@ -624,6 +624,7 @@ html.scl #fxbg,html.scl #fxban:after{animation-play-state:paused!important}
  <div id="n_prev" class="hid" style="margin:10px 0"><img id="n_pimg" alt="" style="max-width:100%;max-height:240px;border-radius:10px;border:1px solid var(--bd)"><div><button type="button" class="btn sm" id="n_rm" style="margin-top:6px">ลบรูป</button></div></div>
  <label style="display:flex;gap:6px;align-items:center;margin:12px 0;cursor:pointer"><input type="checkbox" name="pin"> ปักหมุดไว้บนสุด</label>
  <div class="acts"><button type="button" class="btn" id="n_cx">ยกเลิก</button><button class="btn p" id="n_sv">บันทึก</button></div></form></dialog>
+<dialog id="naD" style="width:min(820px,94vw)"><form method="dialog" onsubmit="return false" style="padding:18px 20px;display:block"><h3 style="margin:0 0 12px" id="naT"></h3><div style="max-height:70vh;overflow:auto"><table class="natb"><thead><tr><th>วันที่</th><th>ลูกค้า</th><th>Ads</th><th>เซลล์</th><th>วันที่ปิด</th></tr></thead><tbody id="naB"></tbody></table></div></form></dialog>
 <dialog id="ncd" style="width:min(600px,94vw)"><form method="dialog" onsubmit="return false" style="padding:18px 20px;display:block"><div id="ncdc"></div></form></dialog>
 <dialog id="cfd" style="width:min(420px,94vw)"><form method="dialog" style="padding:20px 22px" onsubmit="return false"><h3 id="cft" style="margin:0 0 8px"></h3><div id="cfm" style="white-space:pre-line;font-size:14px;line-height:1.5;margin-bottom:18px"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" id="cfn">ยกเลิก</button><button type="button" class="btn p" id="cfy">ตกลง</button></div></form></dialog>
 <dialog id="mkd" style="width:min(520px,94vw)"><form id="mkf" method="dialog" style="padding:18px 20px"><h3 id="mkt" style="margin:0 0 12px"></h3><div id="mkfl" class="g1"></div><div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px"><button type="button" class="btn" id="mkdel">ลบ</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="mkcx">ยกเลิก</button><button class="btn p" id="mksv">บันทึก</button></span></div></form></dialog>
@@ -1226,7 +1227,7 @@ const dkey=k=>{k=String(k||'');const c=svcCat(k).toLowerCase();if(/^air/.test(c)
 const dIc=(k,z)=>{if(typeof CHI!=='undefined'&&CHI[k])return `<span class="dicw">${chIcon(k,z||18)}</span>`;const t=dkey(k);return t?`<span class="dicw">${dsv(t,z)}</span>`:''};
 const lb=k=>dIc(k)+esc(k);
 let ADSP=[];
-async function loadSpend(){if(!profile||!['admin','marketing'].includes(profile.role))return;const r=await sb.from('mk_items').select('id,data').eq('kind','adspend');if(r.error)return;ADSP=(r.data||[]).map(x=>({id:x.id,m:(x.data||{}).m,t:(x.data||{}).t,a:+(x.data||{}).a||0})).filter(x=>x.m&&x.t);if(!$('vD').classList.contains('hid'))renderDash()}
+async function loadSpend(){if(!profile||!['admin','marketing','zimp'].includes(profile.role))return;const r=await sb.from('mk_items').select('id,data').eq('kind','adspend');if(r.error)return;ADSP=(r.data||[]).map(x=>({id:x.id,m:(x.data||{}).m,t:(x.data||{}).t,a:+(x.data||{}).a||0})).filter(x=>x.m&&x.t);if(!$('vD').classList.contains('hid'))renderDash()}
 function renderDash(){
  const offV=$('dtm').value==='C'||(!!profile&&profile.role==='sales'&&profile.team==='C');if(offV&&dashMode==='A')dashMode='M';
  const DM=[['A','Ads',''],['M','Marketing','Marketing'],['K','Sales','Sales'],['E','CEO','CEO']].filter(x=>(window.DRok||'AMKE').includes(x[0])&&!(offV&&x[0]==='A'));$('dmodes').innerHTML=DM.map(([k,l,e])=>`<button data-m="${k}" class="${dashMode===k?'on':''}">${e?TT(l,e):l}</button>`).join('');$('dmodes').classList.toggle('hid',DM.length<2);
@@ -1321,11 +1322,12 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  const spLo=(a||(ds[0]||'')).slice(0,7),spHi=(b||(ds[ds.length-1]||'')).slice(0,7),spR=ADSP.filter(x=>x.m>=spLo&&x.m<=spHi&&(!tm||x.t===tm)),SP=spR.reduce((t,x)=>t+x.a,0),REV=amtP(adsLw);
  const roiV=SP?Math.round((REV-SP)/SP*1000)/10:null,fm=v=>v==null?'-':N(Math.round(v));
  const stM={
-  A:[['Lead จาก Ads',adsL.length],['ปิดการขายจาก Ads',adsW.length],['% ปิดการขาย|ปิดการขาย ÷ Lead ที่มาจาก Ads',pc(adsW.length,adsL.length)],['ยอดปิดจาก Ads (บาท)',amtP(adsLw)],['Ads อันดับ 1',top1(grp(r=>r.ads,''),adsX)],['Lead Organic|ลูกค้าเก่า + Spam',l.filter(r=>ORG.includes(r.ads)).length],['% ระบุ Ads|Lead ที่กรอกช่อง Ads แล้ว ÷ Lead ทั้งหมด',pc(l.filter(r=>r.ads).length,T)]],
+  A:[['Lead จาก Ads',adsL.length],['ปิดการขายจาก Ads',adsW.length],['% ปิดการขาย|ปิดการขาย ÷ Lead ที่มาจาก Ads',pc(adsW.length,adsL.length)],['ยอดปิดจาก Ads (บาท)',amtP(adsLw)],['ปิดแล้วยังไม่ใส่ยอด|ปิดการขายจาก Ads ที่ยังไม่ได้กรอกยอดขาย',(window.NAL=adsLw.filter(r=>!dlsP(r).some(x=>x.a>0))).length],['Ads อันดับ 1',top1(grp(r=>r.ads,''),adsX)],['Lead Organic|ลูกค้าเก่า + Spam',l.filter(r=>ORG.includes(r.ads)).length],['% ระบุ Ads|Lead ที่กรอกช่อง Ads แล้ว ÷ Lead ทั้งหมด',pc(l.filter(r=>r.ads).length,T)]],
   M:[['Lead ทั้งหมด',T],['Lead เฉลี่ยต่อวัน',Math.round(T/dayN*10)/10],['ประเทศยอดนิยม',top1(cty,[U])],['บริการยอดนิยม',top1(grp(r=>r.svc,''))],['ช่องทางหลัก',top1(ch,[U])],['ไม่สนใจ',cn(ST_N)],['% ปิดการขาย|ปิดการขาย ÷ Lead',pc(l.filter(closedR).length,T)]],
   K:[['เลยกำหนดติดตาม',fuOd],['ต้องติดตามวันนี้',fuTd],['รอการตัดสินใจ',cn(ST_S)],['ออกใบเสนอราคา',l.filter(isQ).length],['ปิดการขาย',W],['% ปิดการขาย|ปิดการขาย ÷ Lead',pc(l.filter(closedR).length,T)],['ยอดที่ปิดได้ (บาท)',AMT]],
   E:[['ยอดที่ปิดได้ (บาท)',AMT],['ดีลที่ปิด',DN],['มูลค่าเฉลี่ยต่อดีล (บาท)',DN?Math.round(AMT/DN):0],['% ปิดการขาย|ปิดการขาย ÷ Lead',pc(l.filter(closedR).length,T)],['Lead ทั้งหมด',T],['รอการตัดสินใจ',cn(ST_S)]]};
- $('dk').innerHTML=(stM[dashMode]||stM.K).map(([x,y])=>{const q=x.split('|');const tx=typeof y==='string'&&y.length>5;return `<div class="st${tx?' stx':''}"><b${tx?` title="${esc(y)}"`:''}>${N(y)}</b><span>${q[0]}${q[1]?`<i class="ri" tabindex="0" data-tip="${q[1]}" aria-label="${q[1]}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.500"/><path d="M12 11v6M12 7.500v.5"/></svg></i>`:''}</span></div>`}).join('');
+ {const L=(stM[dashMode]||stM.K);$('dk').style.setProperty('--dkn',Math.max(7,L.length))}
+ $('dk').innerHTML=(stM[dashMode]||stM.K).map(([x,y])=>{const q=x.split('|');const tx=typeof y==='string'&&y.length>5,na=q[0]==='ปิดแล้วยังไม่ใส่ยอด';return `<div class="st${tx?' stx':''}${na?' stna'+(y?' on':''):''}"${na&&y?' data-na="1" role="button" tabindex="0"':''}><b${tx?` title="${esc(y)}"`:''}>${N(y)}</b><span>${q[0]}${q[1]?`<i class="ri" tabindex="0" data-tip="${q[1]}" aria-label="${q[1]}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.500"/><path d="M12 11v6M12 7.500v.5"/></svg></i>`:''}</span></div>`}).join('');
  const spMon=[...new Set(spR.map(x=>x.m))].sort(),spCan=!!profile&&['admin','marketing'].includes(profile.role);
  const roiC=v=>v==null?'':v<0?' style="color:var(--dgr)"':' style="color:var(--suc)"';
  const roiP=dashMode!=='M'?'':`<div class="pn w12"><div class="spH"><h3>${TT('ผลตอบแทนโฆษณา (ROI)','Ad return (ROI)')}</h3>${spCan?`<button type="button" class="btn" id="spb">${TT('บันทึกค่าโฆษณา','Ad spend')}</button>`:''}</div><div class="stats">${[[TT('ค่าโฆษณา (บาท)','Ad spend (THB)'),fm(SP||null),''],[TT('รายได้จาก Ads (บาท)','Revenue from Ads (THB)'),N(REV),''],['ROI',roiV==null?'-':roiV+'%',roiC(roiV)],['ROAS',SP?(Math.round(REV/SP*100)/100)+'x':'-',''],[TT('ต้นทุนต่อ Lead (บาท)','Cost per Lead (THB)'),SP&&adsL.length?fm(SP/adsL.length):'-',''],[TT('ต้นทุนต่อดีลที่ปิด (บาท)','Cost per deal (THB)'),SP&&adsW.length?fm(SP/adsW.length):'-','']].map(([x,y,c])=>`<div class="st"><b${c}>${y}</b><span>${x}</span></div>`).join('')}</div>${spMon.length?`<table class="stt"><thead><tr><th style="position:static">${TT('เดือน','Month')}</th><th class="num" style="position:static">${TT('ค่าโฆษณา','Ad spend')}</th><th class="num" style="position:static">${TT('รายได้จาก Ads','Ads revenue')}</th><th class="num" style="position:static">ROI</th></tr></thead><tbody>${spMon.map(m=>{const sp=spR.filter(x=>x.m===m).reduce((t,x)=>t+x.a,0),rv=amt(adsLw.filter(r=>cdt(r).slice(0,7)===m)),ro=sp?Math.round((rv-sp)/sp*1000)/10:null;return `<tr><td>${m.slice(5)}/${m.slice(0,4)}</td><td class="num">${N(sp)}</td><td class="num">${N(rv)}</td><td class="num"${roiC(ro)}>${ro==null?'-':ro+'%'}</td></tr>`}).join('')}</tbody></table>`:''}</div>`;
@@ -2545,7 +2547,9 @@ $('rs_pub').onclick=async()=>{if(!DR||!DR.data||!Object.keys(DR.data).length){$(
 .cub-r{background:#fde8e8;border-color:#f3b8b8;color:#9b1c1c}#cu_ll table{width:100%;min-width:0}
 
 /* dashboard density */
-#vD .stats#dk{grid-template-columns:repeat(7,minmax(0,1fr))}
+#vD .stats#dk{grid-template-columns:repeat(var(--dkn,7),minmax(0,1fr))}
+#dk .stna.on{cursor:pointer}#dk .stna.on b{color:var(--er,#e03131)}#dk .stna.on:hover{border-color:var(--er,#e03131)}
+#naD table{width:100%!important;min-width:0!important;table-layout:auto!important;border-collapse:collapse;font-size:14px}#naD th{text-align:left;color:var(--mu);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--bd)}#naD td{padding:9px 10px;border-bottom:1px solid var(--bd)}#naD tbody tr:nth-child(even){background:var(--zb,rgba(0,0,0,.025))}#naD tr[data-nid]:hover{background:rgba(0,150,214,.07)}#naD td,#naD th{white-space:nowrap}#naD td.nm{white-space:normal}#naD tr[data-nid]{cursor:pointer}
 @media(max-width:1250px){#vD .stats#dk{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:760px){#vD .stats#dk{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #vD .stats#dk .st span{white-space:normal}
@@ -2916,7 +2920,7 @@ table tbody tr:nth-child(even){background:rgba(120,140,170,.11)}table tbody tr:h
 #vCU .pn{overflow-x:auto}#vCU table{width:100%}#vCU td:first-child,#vCU td:nth-child(4){white-space:normal;min-width:120px;max-width:240px;overflow-wrap:anywhere}#vCU .cub{white-space:normal;text-align:left;line-height:1.35;border-radius:12px}#vCU td:last-child{min-width:150px;max-width:220px}
 #vW .nh #mkgear{height:48px;width:48px;padding:3px;box-sizing:border-box;align-items:stretch;justify-content:center}#vW #mkgear button{padding:0!important;width:100%;display:flex;align-items:center;justify-content:center}#hdt{top:12px;height:48px}
 #mkfl.mk2{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}#mkfl.mk2 .mkw{grid-column:1/-1}#mkfl.mk2 .f{margin:0}@media(max-width:560px){#mkfl.mk2{grid-template-columns:1fr}}
-#spd,#nd,#ncd,#mkd,#aed,#aud,#cud,#xd,#cfd,#sod,#sodd,#fod,#foa{overflow:visible}
+#spd,#nd,#ncd,#naD,#mkd,#aed,#aud,#cud,#xd,#cfd,#sod,#sodd,#fod,#foa{overflow:visible}
 #ncd>form{max-height:88vh;overflow:auto;border-radius:inherit}#spd>form,#nd>form,#mkd>form,#aed>form,#aud>form,#cud>form,#xd>form,#cfd>form,#sod>form,#sodd>form,#fod>form,#foa>.fo-ad{max-height:92vh;overflow:auto;overscroll-behavior:contain;border-radius:inherit}
 #mkfl textarea{width:100%;min-height:76px;resize:vertical;font:inherit;line-height:1.5;box-sizing:border-box}.cpgr .cpd{white-space:pre-line}
 #vL .wrap{overflow-x:auto}#vL table{min-width:940px}#vL th{overflow-wrap:normal;word-break:keep-all}
@@ -3761,7 +3765,7 @@ document.body.appendChild(pp);document.body.appendChild(b);set(cur);
 })();
 </script>
 <script>
-(function(){const X='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';['spd','nd','ncd','mkd','aed','aud','cud','xd','cfd','sod','sodd','fod','foa','cdd','soci'].forEach(id=>{const d=document.getElementById(id);if(!d||d.querySelector(':scope>.dlgx'))return;const b=document.createElement('button');b.type='button';b.className='dlgx';b.title=b.ariaLabel=TT('ปิด','Close');b.innerHTML=X;b.onclick=()=>d.close();d.append(b)})})();
+(function(){const X='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';['spd','nd','ncd','naD','mkd','aed','aud','cud','xd','cfd','sod','sodd','fod','foa','cdd','soci'].forEach(id=>{const d=document.getElementById(id);if(!d||d.querySelector(':scope>.dlgx'))return;const b=document.createElement('button');b.type='button';b.className='dlgx';b.title=b.ariaLabel=TT('ปิด','Close');b.innerHTML=X;b.onclick=()=>d.close();d.append(b)})})();
 
 (function(){const b=document.getElementById('sbt');if(!b)return;const set=c=>{document.body.classList.toggle('sbc',c);const t=c?TT('ขยายแถบด้านข้าง','Expand sidebar'):TT('ย่อแถบด้านข้าง','Collapse sidebar');b.title=t;b.setAttribute('aria-label',t);try{localStorage.setItem('sbc',c?'1':'')}catch(e){}};let c=false;try{c=localStorage.getItem('sbc')==='1'}catch(e){}set(c);b.onclick=()=>set(!document.body.classList.contains('sbc'))})();
 </script>
@@ -6943,6 +6947,14 @@ function start(){if(TK)return;TK=1;cbLoad();setInterval(cbTick,30e3);setInterval
 const place=()=>{const f=$('tF'),so=$('tSO');if(f&&so)so.before(f);['nsep1','nsep2'].forEach(id=>{const e=$(id);if(!e)return;let n=e.nextElementSibling,v=false;while(n&&!/^nsep/.test(n.id||'')){if(n.tagName==='BUTTON'&&!n.classList.contains('hid')&&getComputedStyle(n).display!=='none')v=true;n=n.nextElementSibling}e.style.display=v?'':'none'})};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);if(p&&p.role==='sales'&&p.team==='C'){$('tF').classList.remove('hid');place();start()}else['nsep1','nsep2'].forEach(id=>{const e=$(id);if(e)e.style.display=''})};
 if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove('hid');place();start()}
+})();
+</script>
+<script>
+(function(){const op=()=>{const L=(window.NAL||[]).slice().sort((a,b)=>String(b.deal_date||b.date||'').localeCompare(String(a.deal_date||a.date||'')));
+ $('naT').textContent=TT('ปิดแล้วยังไม่ใส่ยอด','Closed without amount')+' · '+L.length;
+ $('naB').innerHTML=L.map(r=>`<tr${can(r)?` data-nid="${r.id}"`:''}><td>${esc(fmtD(r.date))}</td><td class="nm"><b>${esc(r.name||'')}</b></td><td>${esc(r.ads||'')}</td><td>${esc(r.sales||'')}</td><td>${esc(fmtD(r.deal_date||''))}</td></tr>`).join('');$('naD').showModal()};
+ $('dk').addEventListener('click',e=>{if(e.target.closest('[data-na]'))op()});$('dk').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-na]'))op()});
+ $('naB').addEventListener('click',e=>{const t=e.target.closest('[data-nid]');if(!t)return;const id=isNaN(+t.dataset.nid)?t.dataset.nid:+t.dataset.nid;$('naD').close();try{if(!rows.some(y=>y.id===id)){const x=(window.NAL||[]).find(y=>y.id===id);if(x)rows.push(x)}}catch(_){}if(typeof openForm==='function')openForm(id)});
 })();
 </script>
 </body>
