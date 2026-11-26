@@ -36,6 +36,7 @@ create table if not exists public.sales_jobs (
   svc text not null, country text, income numeric default 0, net numeric default 0, new_old text,
   channel text, branch text, status text default 'OPEN', pay text default 'p', src text,
   so text, awb text, product text, remark text, created_by uuid default auth.uid(), created_at timestamptz default now());
+alter table public.sales_jobs enable row level security;
 
 -- 3) กิจกรรมของ Lead (สิทธิ์ตาม leads)
 do $$
