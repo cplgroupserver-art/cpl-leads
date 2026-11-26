@@ -17,8 +17,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 var(--font);ove
 button,input,select,textarea{font:inherit;color:inherit}
 .sb,.mnav{display:none!important}
 .app{display:block}.mn{display:block}
-.tb{position:absolute;top:43px;right:72px;display:flex;align-items:center;gap:8px;z-index:2}
-.tabs2{margin-right:280px}.dtop{font-size:13px;color:var(--mu);margin:0 0 8px 2px;min-height:20px;line-height:20px}
+.tb{position:absolute;top:18px;right:28px;display:flex;align-items:center;gap:8px;z-index:2}
+.topr{display:flex;align-items:center;gap:16px;margin:0 256px 16px 0;min-height:46px}.topr .tabs2{margin:0!important;flex:none}.dtop{font-size:13px;color:var(--mu);white-space:nowrap}.topr .btn{margin-left:auto}
 .role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}
 .role select{min-height:var(--h-md);border-radius:var(--r-md);border:1px solid transparent;background:var(--fld);padding:0 12px;font-weight:500;color:var(--tx)}
 .ct{padding:12px 28px 40px}
@@ -32,6 +32,20 @@ h1{font-size:18px;font-weight:700;margin:0;line-height:1.3}
 .btn.sm{min-height:var(--h-sm);font-size:13px;padding:0 12px}
 .btn.ok{background:var(--okb);color:var(--ok);border-color:transparent}
 .btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lt);outline-offset:1px}
+.dd{position:fixed;z-index:9999;background:var(--card);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.14),0 2px 6px rgba(15,23,42,.06);padding:6px;min-width:160px;max-height:320px;display:flex;flex-direction:column;animation:ddIn .12s ease-out}
+@keyframes ddIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.dd-q{margin:0 0 6px;height:34px;border-radius:8px;border:1px solid transparent;background:var(--fld);padding:0 10px;font-size:13px;flex:none}
+.dd-q:focus{outline:2px solid var(--lt);outline-offset:0}
+.dd-l{overflow-y:auto;position:relative;overscroll-behavior:contain}
+.dd-o{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border-radius:8px;font-size:14px;color:var(--tx);cursor:pointer;white-space:nowrap;line-height:1.3}
+.dd-o.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.dd-o.hi{background:var(--fld)}
+.dd-o.on{color:var(--pr);font-weight:600;background:var(--infb)}
+.dd-o.on.hi{background:var(--infb)}
+.dd-o svg{flex:none;opacity:0}.dd-o.on svg{opacity:1}
+.dd-o.e{color:var(--mu)}
+.dd-n{padding:10px;font-size:13px;color:var(--mu);text-align:center}
+select.ddopen{outline:2px solid var(--lt);outline-offset:1px}
 /* Tabs (sub pages) */
 .seg{display:inline-flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);box-shadow:var(--sh-1);max-width:100%;overflow-x:auto}
 .seg button{min-height:var(--h-tab);padding:0 18px;border:0;background:none;border-radius:var(--r-sm);color:var(--mu);font:500 14px/1.2 var(--font);cursor:pointer;white-space:nowrap}
@@ -146,7 +160,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .sum{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--bd);padding-top:14px;margin-top:6px}
 details summary{cursor:pointer;font-weight:600;color:var(--pr);margin:2px 0 12px;font-size:13px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--nv);color:#fff;padding:10px 16px;border-radius:var(--r-md);font-size:13px;box-shadow:var(--sh-pop);z-index:99;opacity:0;transition:opacity .15s;pointer-events:none}.toast.on{opacity:1}
-@media(max-width:600px){.row{flex-wrap:wrap}.row .a{width:100%;justify-content:flex-end}.ct{padding:12px 14px 40px}.tb{position:static;padding:12px 14px 0;justify-content:flex-end}.tabs2{margin-right:0}}
+@media(max-width:600px){.row{flex-wrap:wrap}.row .a{width:100%;justify-content:flex-end}.ct{padding:12px 14px 40px}.tb{position:static;padding:12px 14px 0;justify-content:flex-end}.topr{margin-right:0;flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -281,7 +295,7 @@ function checklist(br){const L=CKD[br==='CPLExJJ'?'BR':'HO'];return `<div class=
 /* ---------- homes ---------- */
 function homeSales(){
  const s=me(),M=J.filter(j=>j.s===s.id&&inM(j,CUR)),A=mine(s.id),pd=A.filter(j=>j.pay==='p'),nl=M.filter(j=>!j.lead);
- const head=`<div class="hrow"><div class="act"><button class="btn p" data-nj>+ ลงงานปิดการขาย</button></div></div>`;
+ const head=``;
  const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(j=>j.no==='ใหม่').length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
  const shown=new Set(dueList(A).slice(0,5).map(j=>j.id)),OP=dueList(A).filter(j=>!shown.has(j.id)).concat(A.filter(j=>!j.inc&&isDone(j))).slice(0,5);
  const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
@@ -294,14 +308,14 @@ function homeHead(){
  const tot=SALES.reduce((a,s)=>a+netOf(s.id),0),tg=SALES.reduce((a,s)=>a+s.t2,0)||1,pd=pend(J);
  const alerts=[...dueList(J).filter(j=>j.close&&dleft(j)<=1).map(j=>[`${j.s} · ${j.job} · ${j.cus}`,`Close Date ${fd(j.close)} (${dueTxt(dleft(j))}) · ${j.st}`,'var(--ac)']),...pd.filter(j=>j.inc).map(j=>[`${j.s} · ${j.cus}`,`ค้างชำระ ${B(j.inc)}`,'var(--dgr)'])].slice(0,6);
  const groups=['CPL-Inter','CPLEx','Offline Team'].map(t=>[t,SALES.filter(s=>s.team===t)]);
- return `<div class="hrow"><div><h1>ภาพรวมทีมขาย · ${MLBL}</h1></div><div class="act"></div></div>`+
+ return ``+
  kpi([[B(tot),'ยอดสุทธิทั้งทีม','var(--ok)'],[Math.round(tot/tg*100)+'%','ของเป้ารวม','var(--br)'],[pd.length+' งาน','ค้างชำระ','var(--dgr)'],[J.filter(j=>!j.inc).length+' งาน','ยังไม่ใส่ยอด','var(--wn)']])+
  `<div class="grid" style="margin-top:14px"><div class="pn"><h3>เป้ารายคน · ขั้นคอมคำนวณจากเงินเดือน (20 เท่า = 1%, 30 เท่า = 2%)</h3><div class="scroll"><table><thead><tr><th>เซลล์</th><th class="n">ยอดสุทธิ</th><th class="n">เป้า 2% (30 เท่า)</th><th>ความคืบหน้า</th><th class="n">ขั้นคอม</th><th class="n">งาน</th><th class="n">ค้างชำระ</th><th class="n">รอใส่ยอด</th><th class="n">เทียบ ต.ค.</th></tr></thead><tbody>${groups.map(([g,L])=>`<tr><td colspan="9" style="background:var(--infb);font-weight:600;color:var(--inf)">${g}</td></tr>`+teamRows(L)).join('')}</tbody></table></div></div>
  <div class="pn"><h3>ต้องตามต่อ</h3>${alerts.map(([a,b,c])=>`<div class="row"><span class="chip" style="--c:${c}">!</span><div><h4>${esc(a)}</h4><div class="s">${esc(b)}</div></div></div>`).join('')||'<div class="empty">ไม่มี</div>'}</div></div>`;
 }
 function homeMkt(){
  const ads=[['Ads: Inbox',21],['Ads: Promotion PLXM3M',13],['Ads: EX/IM Singapore',7],['ลูกค้าเก่า',5],['Ads: Import from China',4]],mx=21;
- return `<div class="hrow"><div><h1>Marketing · วันนี้</h1><div class="sub">Lead เข้า, ช่องทาง และยอดที่ปิดจาก Ads</div></div></div>`+
+ return ``+
  kpi([[38,'Lead เข้าวันนี้','var(--br)'],['14 นาที','เวลาตอบเฉลี่ย','var(--inf)'],[B(642400),'ยอดปิดจาก Ads เดือนนี้','var(--ok)'],[3,'Pending (ปิดแล้วไม่ใส่ยอด)','var(--wn)']])+
  `<div class="grid g2" style="margin-top:14px"><div class="pn"><h3>Lead เดือนนี้ แยกตาม Ads</h3>${ads.map(([a,v])=>`<div class="row"><div style="width:190px;flex:none">${esc(a)}</div><div class="bar" style="flex:1"><b style="width:${v/mx*100}%;--c:var(--br)"></b></div><b style="width:30px;text-align:right">${v}</b></div>`).join('')}</div>
  <div class="pn"><h3>งาน Marketing วันนี้</h3>${[['ส่งงาน ZIMP · Content 23–27 พ.ย.','กำหนดส่งวันนี้'],['ยิงแอด Black Friday','เริ่ม 24–30 พ.ย.'],['สรุปผล Q4','ประชุม 02/12']].map(([a,b])=>`<div class="row"><div><h4>${a}</h4><div class="s">${b}</div></div></div>`).join('')}</div></div>`;
@@ -309,7 +323,7 @@ function homeMkt(){
 function homeCeo(){
  const br=[['CPL-Inter',SALES.filter(s=>s.team==='CPL-Inter'),'var(--br)'],['CPLEx',SALES.filter(s=>s.team==='CPLEx'),'var(--ac)'],['Offline Team',SALES.filter(s=>s.team==='Offline Team'),'var(--ok)']].map(([a,L,c])=>[a,L.reduce((x,s)=>x+netOf(s.id),0),c]);
  const tot=br.reduce((a,b)=>a+b[1],0)||1,months=MK.map(k=>J.filter(j=>inM(j,k)).reduce((a,j)=>a+j.net,0)),mx=Math.max(1,...months),pv=months[7];
- return `<div class="hrow"><div><h1>ภาพรวมบริษัท</h1><div class="sub">${MLBL}</div></div></div>`+
+ return ``+
  kpi([[B(months[8]),'ยอดขายเดือนนี้','var(--ok)'],[pv?((months[8]-pv)/pv*100).toFixed(1)+'%':'—','เทียบเดือนก่อน','var(--br)'],[B(months.reduce((a,b)=>a+b,0)),'ยอด 9 เดือน','var(--pr)'],[pend(J).length+' งาน','ค้างชำระ','var(--dgr)']])+
  `<div class="grid g2" style="margin-top:14px"><div class="pn"><h3>ยอดขายรายเดือน</h3><div class="trend" style="height:200px">${months.map((v,i)=>`<div title="${B(v)}"><i style="height:${Math.max(2,v/mx*100)}%;--c:${i===8?'var(--ok)':'var(--lt)'}"></i><span>${MON[i]}</span></div>`).join('')}</div></div>
  <div class="pn"><h3>ยอดสุทธิแยกทีม</h3>${br.map(([a,v,c])=>`<div class="row"><div style="width:110px;flex:none;font-weight:600">${a}</div><div class="bar" style="flex:1;--c:${c}"><b style="width:${v/tot*100}%"></b></div><b style="white-space:nowrap">${B(v)}</b></div>`).join('')}</div></div>`;
@@ -324,7 +338,7 @@ const grp=(L,f)=>{const m={};L.forEach(j=>{const k=f(j);m[k]=m[k]||[0,0];m[k][0]
 function pageDb(){
  const L=(isSales()?mine(ROLE):J).filter(j=>inM(j,CUR)),W=L.filter(j=>j.net),tot=W.reduce((a,j)=>a+(!isSales()||j.s===ROLE?j.net:0),0);
  const fromLead=W.filter(j=>j.lead),nw=W.filter(j=>j.no==='ใหม่');
- return `<div class="hrow"><div><h1>แดชบอร์ดปิดการขาย</h1><div class="sub">${MLBL} · ${isSales()?esc(ROLE):'ทั้งบริษัท'}</div></div></div>`+
+ return ``+
  kpi([[B(tot),'ยอดสุทธิ','var(--ok)'],[W.length+' งาน','งานที่ใส่ยอดแล้ว','var(--br)'],[nw.length+' ราย','ลูกค้าใหม่','var(--inf)'],[fromLead.length+' งาน','ปิดจาก Lead','var(--wn)']])+
  `<div class="grid g2" style="margin-top:14px">
  <div class="pn"><h3>แยกตามบริการ</h3>${bars(grp(W,j=>MG(j.sv)).map(([k,[v,n]])=>[k,v,MGC[k],n]))}</div>
@@ -336,7 +350,7 @@ let LFIL='all';
 function pageLead(){
  const base=isSales()?LD.filter(l=>l.s===ROLE):LD,L=base.filter(l=>LFIL==='all'||l.st===LFIL);
  const jl=l=>J.filter(j=>String(j.lead)===String(l.id));
- return `<div class="hrow"><div><h1>Lead</h1><div class="sub">14 เดือนล่าสุด</div></div></div>`+
+ return ``+
  kpi([[base.length,'Lead ทั้งหมด','var(--br)'],...Object.keys(LST).map(k=>[base.filter(l=>l.st===k).length,k,LST[k]])])+
  `<div style="margin:14px 0" class="chips">${['all',...Object.keys(LST)].map(k=>`<button class="${LFIL===k?'on':''}" data-lfil="${k}">${k==='all'?'ทั้งหมด':k}</button>`).join('')}</div>
  <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่รับ</th><th>ชื่อ</th><th>Ads / ช่องทาง</th><th>สนใจ</th>${isSales()?'':'<th>เซลล์</th>'}<th>สถานะ</th><th>งานปิดการขาย</th><th></th></tr></thead><tbody>${L.map(l=>{const js=jl(l);return `<tr><td>${fd(l.in)}</td><td class="nm"><b>${esc(l.n)}</b></td><td>${esc(l.ads)}</td><td><span class="code" style="--c:${SCOL(l.sv)}">${l.sv}</span> ${l.cty}</td>${isSales()?'':`<td>${l.s}</td>`}<td><span class="chip" style="--c:${LST[l.st]||'var(--gy)'}">${l.st}</span></td><td>${js.map(j=>`<button class="jlk" data-ej="${j.id}">${jnoB(j)} ${j.net?B(j.net):'ยังไม่ใส่ยอด'}</button>`).join('')||'—'}</td><td>${l.st==='ไม่สนใจ'?'':`<button class="btn sm${js.length?'':' p'}" data-lj="${l.id}">${js.length?'+ งานใหม่':'ปิดการขาย'}</button>`}</td></tr>`}).join('')||'<tr><td colspan="8" class="empty">ไม่มี Lead</td></tr>'}</tbody></table></div></div>`;
@@ -345,7 +359,7 @@ let COPEN='';
 function pageCus(){
  const L=(isSales()?CUS.filter(c=>c.s===ROLE||J.some(j=>j.cus===c.n&&(j.s===ROLE||j.as===ROLE))):CUS.filter(c=>c.last)).slice(0,400);
  const jc=c=>J.filter(j=>j.cid===c.id||j.cus===c.n);
- return `<div class="hrow"><div><h1>ลูกค้า</h1><div class="sub">${N(L.length)} ราย</div></div></div>
+ return `
  <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>รหัส</th><th>ลูกค้า</th><th>ช่องทาง</th><th>สาขา</th>${isSales()?'':'<th>เซลล์</th>'}<th class="n">งาน</th><th class="n">ยอดสุทธิรวม</th><th class="n">ค้างชำระ</th><th>งานล่าสุด</th><th></th></tr></thead><tbody>${L.map(c=>{const js=jc(c).sort((a,b)=>b.open.localeCompare(a.open)),lj=js[0],pd=js.filter(j=>j.pay==='p'&&j.inc).reduce((a,j)=>a+j.inc,0),op=COPEN===c.code;
   return `<tr><td>${c.code}</td><td class="nm"><b>${esc(c.n)}</b></td><td>${esc(c.ch)}</td><td>${c.br}</td>${isSales()?'':`<td>${c.s}</td>`}<td class="n">${js.length}</td><td class="n">${N(js.reduce((a,j)=>a+(+j.net||0),0),2)}</td><td class="n" style="${pd?'color:var(--dgr);font-weight:700':''}">${pd?N(pd,2):'—'}</td><td>${lj?`<span class="jno">${lj.job}</span> <span class="code" style="--c:${SCOL(lj.sv)}">${lj.sv}</span> ${lj.cty}`:'—'}</td><td><button class="btn sm" data-cx="${c.code}">${op?'ซ่อน':'ดูงาน'}</button></td></tr>`+
   (op?`<tr><td colspan="10" style="background:var(--card);white-space:normal">${js.map(jobRow).join('')||'<div class="empty">ยังไม่มีงาน</div>'}<div style="margin-top:8px"><button class="btn sm p" data-cj="${c.code}">+ ลงงานปิดการขายให้ลูกค้านี้</button></div></td></tr>`:'')}).join('')}</tbody></table></div></div>`;
@@ -369,21 +383,21 @@ function pageJob(){
  const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?j.no==='ใหม่':JF.x==='old'?j.no==='เก่า':JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
  const sc=!isSales();
  const sum=base.reduce((a,j)=>a+(sc?(+j.inc||+j.net||0):share$(j)),0);
- return `<div class="hrow"><div><h1>งานปิดการขาย</h1></div><div class="act"><button class="btn p" data-nj>+ ลงงาน</button></div></div>`+
+ return ``+
  kpi([[N(base.length),'งาน','','job|all'],[B(sum),'รายได้สุทธิ','','job|all'],[N(pend(base).length),'ค้างชำระ',pend(base).length?'var(--dgr)':'','job|p'],[N(base.filter(j=>!j.lead).length),'ยังไม่ผูก Lead','','job|nl']])+
  `<div style="margin-top:14px">${perBar()}</div>
- <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n">รายได้</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n">${j.inc?N(j.inc,2):'—'}${j.as&&j.inc?`<div class="split">หารครึ่ง · ${N(share$(j),2)}</div>`:''}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
+ <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n">รายได้</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n">${j.inc?N(j.inc,2):'—'}${j.as&&j.inc?`<div class="split">Net · ${N(share$(j),2)}</div>`:''}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
 }
 function pageRep(){
  const rows=SALES.map(s=>`<tr><td class="nm"><b>${s.id}</b><div class="sub">${s.team}</div></td>${s.trend.map((v,i)=>`<td class="n" style="${v===Math.max(...s.trend)&&v?'background:var(--okb);color:var(--ok);font-weight:600':''}">${v?N(i===8?netOf(s.id):v*1000):'—'}</td>`).join('')}<td class="n"><b>${N(s.trend.slice(0,8).reduce((a,b)=>a+b*1000,0)+netOf(s.id))}</b></td></tr>`).join('');
- return `<div class="hrow"><div><h1>รายงานยอดขายรายคน รายเดือน</h1></div></div><div class="pn" style="padding:8px 10px"><div class="scroll"><table><thead><tr><th>เซลล์</th>${MON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">รวม</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+ return `<div class="pn" style="padding:8px 10px"><div class="scroll"><table><thead><tr><th>เซลล์</th>${MON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">รวม</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
 const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[]:[['rep','รายงานรายเดือน']])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
 function render(){
  renderNav();
  const c=$('ct');
- c.innerHTML=`<div class="dtop">${DLBL}</div>`+subTabs()+(PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
+ c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}</div>`+(PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
 }
 
 /* ---------- job entry ---------- */
@@ -417,7 +431,7 @@ function drawJob(){
   ${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
   ${fld('Open Date',dIn('jopen',F.open))}
   ${fld('Closed Date',dIn('jclose',F.close),{rq:1})}
-  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`หารครึ่ง · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`)}
+  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`)}
   ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
   ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList(),F.ch),F.ch,'—')}</select>`)}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`)}
@@ -447,7 +461,7 @@ async function cusSearch(q){const id=++_sq,sb=HB.sb(),like='%'+q.replace(/[%_,()
 const pickSug=i=>{const o=SUG[+i];if(!o)return;$('jsug').hidden=true;if(o.k==='l')pickLead(o.x);else pickCus(o.x)};
 fj.addEventListener('input',e=>{const t=e.target;
  if(t.id==='jcus'){F.cus=t.value;F.cid=null;clearTimeout(_st);const q=t.value.trim();if(q.length<2){$('jsug').hidden=true;return}_st=setTimeout(()=>cusSearch(q),220);return}
- if(t.id==='jinc'){F.inc=pnum(t.value);const sp=$('jsplit');if(sp)sp.textContent=F.as&&F.inc?`หารครึ่ง · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:'';return}
+ if(t.id==='jinc'){F.inc=pnum(t.value);const sp=$('jsplit');if(sp)sp.textContent=F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:'';return}
  if(t.id==='jnet'){F.net=pnum(t.value);return}
  if(t.id==='jclose'||t.id==='jopen'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F[t.id==='jclose'?'close':'open']=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  const m={jno:'job',jawb:'awb',jrem:'remark'};if(m[t.id])F[m[t.id]]=t.value});
@@ -515,6 +529,37 @@ async function reload(){await loadAll();render()}
  render();if(DBERR)toast('โหลดข้อมูลงานไม่สำเร็จ: '+DBERR);
 })();
 }
+
+/* custom dropdown for every <select> */
+(()=>{const esc=v=>String(v??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');let M=null,S=null,items=[],hi=-1;const CK='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+ const close=()=>{if(M){M.remove();M=null}if(S){S.classList.remove('ddopen');S=null}};
+ const pick=i=>{const o=items[i];if(!o||!S)return;const sel=S;if(sel.value!==o.v){sel.value=o.v;sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))}close();sel.focus()};
+ const mark=i=>{hi=i;M.querySelectorAll('.dd-o').forEach(e=>e.classList.toggle('hi',+e.dataset.i===i));const e=M.querySelector(`.dd-o[data-i="${i}"]`);if(e){const L=e.parentNode;if(e.offsetTop<L.scrollTop)L.scrollTop=e.offsetTop;else if(e.offsetTop+e.offsetHeight>L.scrollTop+L.clientHeight)L.scrollTop=e.offsetTop+e.offsetHeight-L.clientHeight}};
+ const paint=q=>{const L=M.querySelector('.dd-l'),k=(q||'').trim().toLowerCase(),mono=S.classList.contains('mono');
+  const vis=items.map((o,i)=>[o,i]).filter(([o])=>!k||o.t.toLowerCase().includes(k)||o.v.toLowerCase().includes(k));
+  L.innerHTML=vis.length?vis.map(([o,i])=>`<div class="dd-o${mono?' mono':''}${o.v===S.value?' on':''}${o.v===''?' e':''}" data-i="${i}"><span>${esc(o.t)}</span>${CK}</div>`).join(''):'<div class="dd-n">ไม่พบ</div>';
+  mark(vis.length?(vis.find(([o])=>o.v===S.value)||vis[0])[1]:-1)};
+ const place=()=>{if(!M||!S)return;const r=S.getBoundingClientRect(),h=M.offsetHeight,vh=innerHeight,vw=innerWidth;
+  M.style.minWidth=r.width+'px';const w=M.offsetWidth;let left=Math.min(r.left,vw-w-8),top=r.bottom+6;if(top+h>vh-8&&r.top-h-6>8)top=r.top-h-6;
+  const pr=M.offsetParent&&M.offsetParent!==document.body?M.offsetParent.getBoundingClientRect():{left:0,top:0};M.style.left=(Math.max(8,left)-pr.left)+'px';M.style.top=(top-pr.top)+'px'};
+ const open=sel=>{close();if(sel.disabled)return;S=sel;S.classList.add('ddopen');items=[...sel.options].map(o=>({v:o.value,t:o.textContent}));
+  M=document.createElement('div');M.className='dd';M.setAttribute('role','listbox');const srch=items.length>10;
+  M.innerHTML=(srch?'<input class="dd-q" placeholder="ค้นหา">':'')+'<div class="dd-l"></div>';(sel.closest('dialog')||document.body).appendChild(M);paint('');place();
+  if(srch){const q=M.querySelector('.dd-q');q.addEventListener('input',()=>{paint(q.value);place()});setTimeout(()=>q.focus(),0)}
+  M.addEventListener('mousedown',e=>{if(!e.target.closest('.dd-q'))e.preventDefault()});
+  M.addEventListener('mousemove',e=>{const o=e.target.closest('.dd-o');if(o&&+o.dataset.i!==hi)mark(+o.dataset.i)});
+  M.addEventListener('click',e=>{const o=e.target.closest('.dd-o');if(o)pick(+o.dataset.i)})};
+ document.addEventListener('mousedown',e=>{const sel=e.target.closest('select');if(sel&&!sel.multiple){e.preventDefault();if(S===sel){close();return}sel.focus();open(sel);return}if(M&&!M.contains(e.target))close()},true);
+ document.addEventListener('keydown',e=>{
+  if(M){const vis=[...M.querySelectorAll('.dd-o')].map(x=>+x.dataset.i),p=vis.indexOf(hi);
+   if(e.key==='Escape'){e.preventDefault();const s=S;close();s&&s.focus()}
+   else if(e.key==='ArrowDown'){e.preventDefault();if(vis.length)mark(vis[Math.min(vis.length-1,p+1)])}
+   else if(e.key==='ArrowUp'){e.preventDefault();if(vis.length)mark(vis[Math.max(0,p-1)])}
+   else if(e.key==='Enter'){e.preventDefault();pick(hi)}
+   else if(e.key==='Tab')close();return}
+  const sel=e.target;if(sel&&sel.tagName==='SELECT'&&!sel.multiple&&(e.key==='Enter'||e.key===' '||e.key==='ArrowDown'||e.key==='ArrowUp')&&!e.altKey){e.preventDefault();open(sel)}},true);
+ addEventListener('resize',close);document.addEventListener('scroll',e=>{if(M&&!M.contains(e.target))close()},true);
+})();
 </script>
 </body>
 </html>
