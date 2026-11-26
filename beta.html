@@ -46,7 +46,11 @@ h1{font-size:18px;font-weight:700;margin:0;line-height:1.3}
 .chips button:hover{color:var(--tx)}.chips button.on{background:var(--card);color:var(--pr);font-weight:600;box-shadow:var(--sh-raise)}
 .chips select.in{min-height:var(--h-filter)!important;height:var(--h-filter);background:var(--card);font-size:13px}
 /* Layout */
-.grid{display:grid;gap:14px}.g2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+.grid{display:grid;gap:14px}.g2e{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}@media(max-width:1000px){.g2e{grid-template-columns:1fr}}
+.pn.col{display:flex;flex-direction:column}.pn.col .trend{flex:1;min-height:150px;height:auto}.stack{display:flex;flex-direction:column;gap:14px}.stack>.pn:last-child{flex:1}
+.lgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}.lgrid .row:nth-last-child(2):nth-child(odd){border-bottom:0}@media(max-width:1000px){.lgrid{grid-template-columns:1fr}}
+button.st{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:.15s}button.st:hover{border-color:var(--pr)}button.st:hover span{color:var(--pr)}
+.stats+.grid{margin-top:14px}.info+.stats{margin-top:0}.g2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
 @media(max-width:1100px){.g2{grid-template-columns:1fr}}
 /* Panel */
 .pn{background:var(--card);border:1px solid var(--bd);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-1)}
@@ -64,15 +68,16 @@ h1{font-size:18px;font-weight:700;margin:0;line-height:1.3}
 .tgt .v{font-size:28px;font-weight:700;line-height:1.15;color:var(--tx);white-space:nowrap}
 .meter{grid-column:1/-1;position:relative;height:10px;border-radius:var(--r-pill);background:var(--fld);margin:12px 0 14px}
 .meter i{position:absolute;inset:0 auto 0 0;border-radius:var(--r-pill);background:linear-gradient(90deg,var(--lt),var(--br))}
-.meter u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mu);opacity:.6}
+.meter u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mu);opacity:.7;text-decoration:none}.meter u em{position:absolute;top:16px;left:0;transform:translateX(-50%);font-style:normal;font-size:11px;color:var(--mu);white-space:nowrap}
+.tgt+.trend{margin-top:auto}.meter{margin-bottom:26px!important}
 .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}
 .tiers div{border-radius:var(--r-md);background:var(--fld);padding:8px 12px;font-size:12px;border:1px solid transparent}
 .tiers b{display:block;font-size:14px;font-weight:600;white-space:nowrap}.tiers span{color:var(--mu)}
 .tiers .on{background:var(--okb);border-color:var(--ok)}.tiers .on b,.tiers .on span{color:var(--ok)}
-.trend{display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:8px}
+.trend{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:8px;margin-top:14px}
 .trend div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
 .trend i{width:100%;max-width:30px;border-radius:6px 6px 0 0;background:var(--c,var(--lt))}
-.trend span{font-size:11px;color:var(--mu)}
+.trend span{font-size:11px;color:var(--mu)}.trend em{font-style:normal;font-size:10px;color:var(--mu);white-space:nowrap;min-height:14px}
 /* Rows / lists */
 .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.row:last-child{border:0}
 .row .t{width:52px;flex:none;font-weight:600;font-size:13px;color:var(--inf)}.row .t.l{color:var(--dgr)}
@@ -94,6 +99,7 @@ button.jst,button.pay{cursor:pointer}
 .lk{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}.lk:hover{color:var(--pr)}
 .jlk{border:0;background:none;padding:2px 0;cursor:pointer;font-size:13px;color:var(--tx);display:block;text-align:left}
 /* Info line */
+.perbar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}.perbar label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mu)}.perbar .in{width:150px}.perbar select.in{width:160px}
 .info{display:flex;gap:6px 10px;align-items:center;flex-wrap:wrap;border-radius:var(--r-md);background:var(--infb);color:var(--tx);padding:10px 14px;margin-bottom:14px;font-size:13px}
 .info>b{color:var(--inf);display:inline-flex;align-items:center;gap:6px;font-weight:600}.info>i{color:var(--mu);font-style:normal}
 .info svg{width:16px;height:16px}
@@ -237,31 +243,32 @@ const navClick=e=>{const b=e.target.closest('[data-p]');if(!b)return;const p=b.d
 $('role').onchange=e=>{ROLE=e.target.value;PAGE='home';try{localStorage.setItem('hb-role',ROLE)}catch(er){}render()};
 
 /* ---------- pieces ---------- */
-const kpi=(L)=>`<div class="stats">${L.map(([v,l,c])=>`<div class="st"><b${c==='var(--dgr)'?' style="color:var(--dgr)"':''}>${v}</b><span>${l}</span></div>`).join('')}</div>`;
+const kpi=(L)=>`<div class="stats">${L.map(([v,l,c,a])=>`<${a?`button type="button" data-kp="${a}"`:'div'} class="st${a?' clk':''}"><b${c==='var(--dgr)'?' style="color:var(--dgr)"':''}>${v}</b><span>${l}</span></${a?'button':'div'}>`).join('')}</div>`;
 function target(s){
- const v=netOf(s.id),mx=Math.max(s.t2*1.15,v*1.05),p=x=>Math.min(100,x/mx*100),[r,c]=comm(v,s,commBase(s.id));
- const left=v>=s.t2?'ได้ขั้นสูงสุดแล้ว · คอม 2%':v>=s.t1?`อีก ${B(s.t2-v)} ได้คอม 2%`:`อีก ${B(s.t1-v)} ได้คอม 1%`;
- if(!s.sal)return `<div class="pn"><h3>ยอดขายสุทธิเดือนนี้ · ${MLBL}<button class="r" data-sal="${esc(s.id)}">ตั้งเงินเดือน</button></h3><div class="tgt"><div><div class="v">${B(v)}</div></div></div><div class="trend">${s.trend.map((x,i)=>`<div><i style="height:${Math.max(3,x/Math.max(.001,...s.trend)*100)}%;--c:${i===8?'var(--ok)':'var(--lt)'}"></i><span>${MON[i]}</span></div>`).join('')}</div></div>`;
- return `<div class="pn"><h3>ยอดขายสุทธิเดือนนี้ · ${MLBL}<button class="r" data-sal="${esc(s.id)}">เงินเดือน ${N(s.sal)}</button></h3><div class="tgt"><div><div class="v">${B(v)}</div><div class="sub">${left}</div>${(n=>n?`<div class="sub" style="margin-top:2px">มีงานร่วมกับเซลล์อื่น ${n} งาน · ค่าคอมหารครึ่ง</div>`:'')(mine(s.id).filter(j=>j.as).length)}</div><div style="text-align:right"><b style="font-size:20px;color:${r?'var(--ok)':'var(--mu)'}">${r?B(c):'—'}</b><div class="sub">ค่าคอมโดยประมาณ${r?' ('+r+'%)':''}</div></div>
- <div class="meter" role="img" aria-label="ความคืบหน้าเป้า"><i style="width:${p(v)}%"></i><u style="left:${p(s.t1)}%"></u><u style="left:${p(s.t2)}%"></u></div></div>
- <div class="tiers"><div class="${r===0?'on':''}"><b>ต่ำกว่า ${N(s.t1)}</b><span>ยังไม่ได้คอม</span></div><div class="${r===1?'on':''}"><b>${N(s.t1)}+</b><span>20 เท่าของเงินเดือน · 1%</span></div><div class="${r===2?'on':''}"><b>${N(s.t2)}+</b><span>30 เท่าของเงินเดือน · 2%</span></div></div>
- <div class="trend" aria-label="ยอด 9 เดือน">${s.trend.map((x,i)=>`<div><i style="height:${Math.max(3,x/Math.max(.001,...s.trend)*100)}%;--c:${i===8?'var(--ok)':'var(--lt)'}"></i><span>${MON[i]}</span></div>`).join('')}</div></div>`}
-const isDone=j=>j.st==='RELEASED'&&j.pay==='d';
+ const v=netOf(s.id),[r,c]=comm(v,s,commBase(s.id)),mx=Math.max(1,...s.trend),sh=mine(s.id).filter(j=>j.as&&inM(j,CUR)).length;
+ const bars=`<div class="trend" aria-label="ยอด 9 เดือน">${s.trend.map((x,i)=>`<div title="${MON[i]} · ${B(x*1000)}"><em>${x>=1?N(x)+'K':''}</em><i style="height:${Math.max(2,x/mx*100)}%;--c:${i===8?'var(--br)':'var(--lt)'};opacity:${i===8?1:.55}"></i><span>${MON[i]}</span></div>`).join('')}</div>`;
+ let top;
+ if(s.sal){const m=Math.max(s.t2*1.1,v*1.02),p=x=>Math.min(100,x/m*100),nx=v>=s.t2?'ได้ขั้นสูงสุดแล้ว':v>=s.t1?`อีก ${B(s.t2-v)} ถึงขั้น 2%`:`อีก ${B(s.t1-v)} ถึงขั้น 1%`;
+  top=`<div class="tgt"><div><div class="v">${B(v)}</div><div class="sub">${nx}${sh?` · งานร่วม ${sh} งาน`:''}</div></div><div style="text-align:right"><div class="v" style="font-size:20px;color:${r?'var(--ok)':'var(--mu)'}">${B(r?c:0)}</div><div class="sub">ค่าคอม${r?' '+r+'%':''}</div></div>
+  <div class="meter"><i style="width:${p(v)}%"></i><u style="left:${p(s.t1)}%"><em>${N(s.t1/1000)}K · 1%</em></u><u style="left:${p(s.t2)}%"><em>${N(s.t2/1000)}K · 2%</em></u></div></div>`}
+ else top=`<div class="tgt"><div><div class="v">${B(v)}</div><div class="sub">${sh?`งานร่วม ${sh} งาน`:'&nbsp;'}</div></div></div>`;
+ return `<div class="pn col"><h3>ยอดขายสุทธิ · ${MLBL}<button class="r" data-sal="${esc(s.id)}">${s.sal?'เงินเดือน '+N(s.sal):'ตั้งเงินเดือน'}</button></h3>${top}${bars}</div>`}
+const isDone=j=>['BOOKED','RELEASED','CANCELED'].includes(j.st);
 const dleft=j=>j.close?Math.round((Date.parse(j.close)-Date.parse(TODAY))/864e5):null;
 const dueTxt=d=>d==null?'ยังไม่กำหนด':d<0?`เลย ${-d} วัน`:d===0?'วันนี้':d===1?'พรุ่งนี้':`อีก ${d} วัน`;
 const dueCol=d=>d==null?'var(--mu)':d<0?'var(--dgr)':d<=1?'var(--wn)':'var(--inf)';const dueCls=d=>d==null?'':d<0?'er':d<=1?'wn':'inf';
 const shTag=j=>{if(!j.as)return '';const o=`${j.s} Owner`,a=`${j.as} Assistant`,t=ROLE===j.as?o:ROLE===j.s?a:`${o} · ${a}`;return `<span class="shr">${t} · 50%</span>`};
 const dueList=L=>L.filter(j=>!isDone(j)).sort((a,b)=>(a.close||'9999').localeCompare(b.close||'9999'));
 function lastClose(L){const C=dueList(L).slice(0,5);
- return `<div class="pn"><h3>Close Date ใกล้ถึง<button class="r" data-go="job">ดูทั้งหมด</button></h3>${C.map(j=>{const d=dleft(j);return `<div class="row"><div class="due ${dueCls(d)}"><b>${j.close?fd(j.close).slice(0,5):'—'}</b><span>${dueTxt(d)}</span></div><div style="flex:1"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${jnoB(j)}<span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><span class="s">${j.cty}</span>${shTag(j)}</div><h4>${esc(j.cus)}</h4></div><div style="text-align:right"><span class="jst ${STC[j.st]}">${j.st}</span><div><span class="pay ${j.pay}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</span></div></div><div class="a"><button class="btn sm" data-ej="${j.id}">เปิด</button></div></div>`}).join('')||'<div class="empty">ไม่มีเคสที่ต้องดู</div>'}</div>`}
-function dueAlert(L){const D=dueList(L).filter(j=>j.close&&dleft(j)>=0&&dleft(j)<=1);if(!D.length)return '';
- return `<div class="info"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Close Date</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${dueTxt(dleft(j))}</span>`).join('<i>·</i>')}</div>`}
-function payCard(L){const pd=L.filter(j=>j.pay==='p'&&j.inc),dn=L.filter(j=>j.pay==='d'&&j.inc),sp=pd.reduce((a,j)=>a+j.inc,0),sd=dn.reduce((a,j)=>a+j.inc,0),tt=sp+sd||1;
+ return `<div class="pn col"><h3>Close Date ใกล้ถึง<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${C.map(j=>{const d=dleft(j);return `<div class="row"><div class="due ${dueCls(d)}"><b>${j.close?fd(j.close).slice(0,5):'—'}</b><span>${dueTxt(d)}</span></div><div style="flex:1"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${jnoB(j)}<span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><span class="s">${j.cty}</span>${shTag(j)}</div><h4>${esc(j.cus)}</h4></div><div style="text-align:right"><span class="jst ${STC[j.st]}">${j.st}</span><div><span class="pay ${j.pay}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</span></div></div><div class="a"><button class="btn sm" data-ej="${j.id}">เปิด</button></div></div>`}).join('')||'<div class="empty">ไม่มีเคสที่ต้องดู</div>'}</div>`}
+function dueAlert(L){const A=dueList(L).filter(j=>j.close&&dleft(j)>=0&&dleft(j)<=1);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
+ return `<div class="info"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Close Date</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${dueTxt(dleft(j))}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|due" style="margin-left:auto;color:var(--pr);font-weight:600">+${more} งาน</button>`:''}</div>`}
+function payCard(L,cap){cap=cap||5;const pd=L.filter(j=>j.pay==='p'&&j.inc),dn=L.filter(j=>j.pay==='d'&&j.inc),sp=pd.reduce((a,j)=>a+j.inc,0),sd=dn.reduce((a,j)=>a+j.inc,0),tt=sp+sd||1;
  const age=j=>j.close?Math.round((Date.parse(TODAY)-Date.parse(j.close))/864e5):null;
  return `<div class="pn"><h3>สถานะการชำระเงินของลูกค้า<button class="r" data-go="job">ดูทั้งหมด</button></h3>
  <div class="paysum"><div><b style="color:var(--ok)">${B(sd)}</b><span>ชำระแล้ว · ${dn.length} งาน</span></div><div><b style="color:var(--dgr)">${B(sp)}</b><span>ค้างชำระ · ${pd.length} งาน</span></div></div>
  <div class="pbar"><b style="width:${sd/tt*100}%"></b><i style="width:${sp/tt*100}%"></i></div>
- ${pd.sort((a,b)=>(a.close||'9').localeCompare(b.close||'9')).slice(0,5).map(j=>{const a=age(j);return `<div class="row"><div style="flex:1"><h4>${esc(j.cus)}</h4><div class="s">${jnoB(j)} · Close Date ${j.close?fd(j.close):'—'}${a!=null&&a>0?` · <b style="color:${a>14?'var(--dgr)':'var(--mu)'}">ค้าง ${a} วัน</b>`:''}</div></div><b style="white-space:nowrap">${B(j.inc)}</b><div class="a"><button class="btn sm ok" data-pay="${j.id}">รับชำระแล้ว</button></div></div>`}).join('')||'<div class="empty">ไม่มียอดค้างชำระ</div>'}</div>`}
+ ${pd.sort((a,b)=>(a.close||'9').localeCompare(b.close||'9')).slice(0,cap).map(j=>{const a=age(j);return `<div class="row"><div style="flex:1"><h4>${esc(j.cus)}</h4><div class="s">${jnoB(j)} · Close Date ${j.close?fd(j.close):'—'}${a!=null&&a>0?` · <b style="color:${a>14?'var(--dgr)':'var(--mu)'}">ค้าง ${a} วัน</b>`:''}</div></div><b style="white-space:nowrap">${B(j.inc)}</b><div class="a"><button class="btn sm ok" data-pay="${j.id}">รับชำระแล้ว</button></div></div>`}).join('')||'<div class="empty">ไม่มียอดค้างชำระ</div>'}</div>`}
 const jnoB=j=>j.ro?`<span class="ro">Lead</span>`:`<span class="jno">${j.job}</span>`;
 const cusB=j=>j.cid?`<button class="lk" data-cu2="${j.cid}">${esc(j.cus)}</button>`:esc(j.cus);
 const jobRow=j=>`<div class="row"><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><div style="flex:1"><div style="display:flex;gap:6px;align-items:center">${jnoB(j)}<h4>${cusB(j)}</h4></div><div class="s">${j.as?shTag(j)+' ':''}${j.cty} · ${j.inc?B(j.inc):'ยังไม่ใส่ยอด'} · Close Date ${j.close?fd(j.close)+` <b style="color:${dueCol(dleft(j))}">(${dueTxt(dleft(j))})</b>`:'—'}</div></div><div class="a"><button class="jst ${STC[j.st]}" data-adv="${j.id}" title="กดเพื่อเลื่อนสถานะ">${j.st}</button><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></div></div>`;
@@ -269,15 +276,14 @@ function checklist(br){const L=CKD[br==='CPLExJJ'?'BR':'HO'];return `<div class=
 
 /* ---------- homes ---------- */
 function homeSales(){
- const s=me(),L=monthJ(s.id).concat(mine(s.id).filter(j=>!inM(j,CUR)&&!isDone(j))),pd=pend(L),op=L.filter(j=>!j.inc||j.st==='OPEN'),nw=L.filter(j=>j.no==='ใหม่').length;
- const off=false;
+ const s=me(),M=J.filter(j=>j.s===s.id&&inM(j,CUR)),A=mine(s.id),pd=A.filter(j=>j.pay==='p'),nl=M.filter(j=>!j.lead);
  const head=`<div class="hrow"><div><h1>สวัสดี ${esc(s.id)}</h1><div class="sub">${DLBL} · ${esc(s.team)}</div></div><div class="act"><button class="btn p" data-nj>+ ลงงานปิดการขาย</button></div></div>`;
- const k=kpi(off?[[ (CB[s.id]||[]).filter(x=>!x[4]).length,'นัดโทรกลับวันนี้','var(--br)'],[1,'เลยเวลานัด','var(--dgr)'],[L.length,'งานเดือนนี้','var(--inf)'],[pd.length,'ค้างชำระ','var(--wn)']]:[[L.length,'งานเดือนนี้','var(--br)'],[op.length,'รอใส่ยอด / เปิดงานอยู่','var(--wn)'],[pd.length+' · '+B(pd.reduce((a,j)=>a+j.inc,0)),'ค้างชำระ','var(--dgr)'],[nw,'ลูกค้าใหม่เดือนนี้','var(--inf)']]);
- const jobs=`<div class="pn"><h3>งานที่ต้องจัดการต่อ<button class="r" data-go="job">ดูทั้งหมด</button></h3>${[...op,...pd.filter(j=>!op.includes(j))].slice(0,6).map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
- const cb=off?`<div class="pn"><h3>นัดโทรกลับวันนี้</h3>${CB[s.id].map(([t,n,p,q,late],i)=>`<div class="row"><div class="t${late?' l':''}">${t}</div><div style="flex:1"><h4>${esc(n)}</h4><div class="s">${esc(p)} · “${esc(q)}”</div></div><div class="a"><button class="btn sm ok" data-cbd="${i}">บันทึกผล</button></div></div>`).join('')}</div>`:'';
- const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>j.lead===l.id)).slice(0,6);
- const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm p" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div>`:'';
- return head+dueAlert(L)+`<div class="grid g2" style="margin-bottom:14px">${target(s)}${lastClose(L)}</div>`+k+`<div class="grid g2" style="margin-top:14px"><div style="display:flex;flex-direction:column;gap:14px">${off?cb:''}${jobs}${ld}</div><div style="display:flex;flex-direction:column;gap:14px">${payCard(L)}</div></div>`;
+ const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(j=>j.no==='ใหม่').length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
+ const shown=new Set(dueList(A).slice(0,5).map(j=>j.id)),OP=dueList(A).filter(j=>!shown.has(j.id)).concat(A.filter(j=>!j.inc&&isDone(j))).slice(0,5);
+ const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
+ const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>String(j.lead)===String(l.id))).slice(0,6);
+ const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3><div>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1;min-width:0"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div></div>`:'';
+ return head+dueAlert(A)+k+`<div class="grid g2e">${target(s)}${lastClose(A)}</div><div class="grid g2e"><div class="stack">${jobs}${ld}</div>${payCard(A,Math.max(3,OP.length+(ld?3:0)))}</div>`;
 }
 function teamRows(list){return list.map(s=>{const v=netOf(s.id),L=mine(s.id),p=s.t2?v/s.t2*100:0;return `<tr><td class="nm"><b>${esc(s.id)}</b><div class="sub">${esc(s.team)}</div></td><td class="n">${N(v)}</td><td class="n">${s.sal?N(s.t2):'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1;--c:${p>=100?'var(--ok)':p>=s.t1/s.t2*100?'var(--br)':'var(--wn)'}"><b style="width:${Math.min(100,p)}%"></b></div><b style="width:42px;text-align:right">${Math.round(p)}%</b></div></td><td class="n">${(([r,c])=>r?`<b style="color:var(--ok)">${r}% · ${N(c)}</b>`:'—')(comm(v,s,commBase(s.id)))}</td><td class="n">${L.length}</td><td class="n">${pend(L).length}</td><td class="n">${L.filter(j=>!j.inc).length}</td><td class="n">${s.trend[8]>=s.trend[7]?'▲':'▼'} ${s.trend[7]?Math.abs(Math.round((s.trend[8]-s.trend[7])/s.trend[7]*100)):0}%</td></tr>`}).join('')}
 function homeHead(){
@@ -342,14 +348,22 @@ function pageCus(){
 }
 
 /* ---------- jobs page ---------- */
+let JP={p:'m',f:'',t:''};
+const iso=v=>{const m=String(v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?m[3]+'-'+m[2]+'-'+m[1]:''};
+const mEnd=k=>{const[y,m]=k.split('-').map(Number);return k+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0')};
+function jpRange(){const t=TODAY,ym=t.slice(0,7),add=(k,n)=>{const[y,m]=k.split('-').map(Number),d=new Date(y,m-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+ if(JP.p==='m')return[ym+'-01',mEnd(ym)];if(JP.p==='pm'){const k=add(ym,-1);return[k+'-01',mEnd(k)]}if(JP.p==='3')return[add(ym,-2)+'-01',mEnd(ym)];if(JP.p==='y')return[t.slice(0,4)+'-01-01',t.slice(0,4)+'-12-31'];if(JP.p==='c')return[JP.f,JP.t];return['','']}
+const jd=j=>j.rm?((j.close||'').slice(0,7)===j.rm?j.close:j.rm+'-15'):(j.close||j.open||'');
+const inJP=j=>{const[a,b]=jpRange(),d=jd(j);return(!a||d>=a)&&(!b||d<=b)};
+const perBar=()=>{const[a,b]=jpRange();return `<div class="perbar"><label>ช่วงเวลา<select class="in" id="jp_p">${[['m','เดือนนี้'],['pm','เดือนที่แล้ว'],['3','3 เดือนล่าสุด'],['y','ปีนี้'],['all','ทั้งหมด'],['c','กำหนดเอง']].map(([k,t])=>`<option value="${k}"${JP.p===k?' selected':''}>${t}</option>`).join('')}</select></label><label>ตั้งแต่<input class="in" id="jp_f" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(a)}"></label><label>ถึง<input class="in" id="jp_t" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(b)}"></label></div>`};
 function pageJob(){
- const base=(isSales()&&JV==='mine'?mine(ROLE):J).filter(j=>inM(j,CUR)||!isDone(j));
- const L=base.filter(j=>FIL==='all'||(FIL==='nl'?!j.lead:FIL==='p'?j.pay==='p':FIL==='o'?!j.inc:j.st===FIL)).sort((a,b)=>b.open.localeCompare(a.open));
+ const base=(isSales()&&JV==='mine'?mine(ROLE):J).filter(inJP);
+ const L=base.filter(j=>FIL==='all'||(FIL==='open'?!isDone(j):FIL==='new'?j.no==='ใหม่':FIL==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:FIL==='nl'?!j.lead:FIL==='p'?j.pay==='p':FIL==='o'?!j.inc:j.st===FIL)).sort((a,b)=>b.open.localeCompare(a.open));
  const sc=!(isSales()&&JV==='mine');
  const sum=base.reduce((a,j)=>a+(sc||j.s===ROLE?(+j.net||0):0),0);
- return `<div class="hrow"><div><h1>งานปิดการขาย</h1><div class="sub">${MLBL}</div></div><div class="act">${isSales()?`<div class="seg flt"><button class="${JV==='mine'?'on':''}" data-jv="mine">ของฉัน</button><button class="${JV==='all'?'on':''}" data-jv="all">ทั้งทีม</button></div>`:''}<button class="btn p" data-nj>+ ลงงาน</button></div></div>`+
- kpi([[base.length,'งาน','var(--br)'],[B(sum),'รายได้สุทธิ (ที่ลงในระบบ)','var(--ok)'],[pend(base).length,'ค้างชำระ','var(--dgr)'],[base.filter(j=>!j.inc).length,'ยังไม่ใส่ยอด','var(--wn)']])+
- `<div style="margin:14px 0" class="chips">${[['all','ทั้งหมด'],['o','ยังไม่ใส่ยอด'],['p','ค้างชำระ'],['nl','ยังไม่ผูก Lead'],['OPEN','OPEN'],['BOOKED','BOOKED'],['RELEASED','RELEASED']].map(([k,t])=>`<button class="${FIL===k?'on':''}" data-fil="${k}">${t}</button>`).join('')}</div>
+ return `<div class="hrow"><div><h1>งานปิดการขาย</h1></div><div class="act">${isSales()?`<div class="seg flt"><button class="${JV==='mine'?'on':''}" data-jv="mine">ของฉัน</button><button class="${JV==='all'?'on':''}" data-jv="all">ทั้งทีม</button></div>`:''}<button class="btn p" data-nj>+ ลงงาน</button></div></div>`+
+ perBar()+kpi([[N(base.length),'งาน','','job|all'],[B(sum),'รายได้สุทธิ','','job|all'],[N(pend(base).length),'ค้างชำระ',pend(base).length?'var(--dgr)':'','job|p'],[N(base.filter(j=>!j.lead).length),'ยังไม่ผูก Lead','','job|nl']])+
+ `<div style="margin:14px 0" class="chips">${[['all','ทั้งหมด'],['open','ยังไม่ปิด'],['o','ยังไม่ใส่ยอด'],['p','ค้างชำระ'],['nl','ยังไม่ผูก Lead'],['new','ลูกค้าใหม่'],['OPEN','OPEN'],['BOOKED','BOOKED'],['RELEASED','RELEASED']].map(([k,t])=>`<button class="${FIL===k?'on':''}" data-fil="${k}">${t}</button>`).join('')}</div>
  <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n">รายได้</th><th class="n">สุทธิ</th><th>ใหม่/เก่า</th><th>สาขา</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n">${j.inc?N(j.inc,2):'—'}</td><td class="n">${j.net?N(j.net,2):'—'}</td><td>${j.no}</td><td>${j.br}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
 }
 function pageRep(){
@@ -461,9 +475,11 @@ $('fc').addEventListener('submit',async e=>{e.preventDefault();const v=pnum($('c
 document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
 
 /* ---------- page actions ---------- */
-$('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2]');if(!b)return;const d=b.dataset;
+$('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
+$('ct').addEventListener('input',e=>{const t=e.target;if(t.id==='jp_f'||t.id==='jp_t'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v}});
+$('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2],[data-kp]');if(!b)return;const d=b.dataset;
  if(d.nj!=null)return openJob();if(d.lj)return openJob(null,LD.find(x=>String(x.id)===d.lj));if(d.sal)return openSal(d.sal);if(d.lfil){LFIL=d.lfil;return render()}if(d.cx){COPEN=COPEN===d.cx?'':d.cx;return render()}if(d.cj)return openJob(null,null,CUS.find(c=>c.code===d.cj));
- if(d.go==='lead'){try{HB.go('L')}catch(e){}return}if(d.go){PAGE=d.go;return render()}if(d.ld2){try{HB.lead(+d.ld2||d.ld2)}catch(e){}return}if(d.cu2){try{HB.cus(d.cu2)}catch(e){}return}if(d.jv){JV=d.jv;return render()}if(d.fil){FIL=d.fil;return render()}
+ if(d.kp){const[p,f]=d.kp.split('|');if(PAGE!=='job')JP={p:'m',f:'',t:''};PAGE=p;FIL=f||'all';return render()}if(d.go==='lead'){try{HB.go('L')}catch(e){}return}if(d.go){PAGE=d.go;return render()}if(d.ld2){try{HB.lead(+d.ld2||d.ld2)}catch(e){}return}if(d.cu2){try{HB.cus(d.cu2)}catch(e){}return}if(d.jv){JV=d.jv;return render()}if(d.fil){FIL=d.fil;return render()}
  const j=J.find(x=>String(x.id)===(d.adv||d.pay||d.ej));
  if(j&&j.ro&&(d.adv||d.pay))return toast('รายการนี้มาจาก Lead');if(j&&j.ro&&d.ej)return openJob({...j,id:null,job:'',ro:0,_conv:1});
  if(d.adv&&j){const i=STS.indexOf(j.st),st=STS[Math.min(STS.length-1,i+1)];return upd(j,{status:st},()=>{j.st=st;toast(j.job+' → '+st)})}
