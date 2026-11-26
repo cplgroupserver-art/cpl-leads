@@ -82,9 +82,10 @@ button.st{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:.
 /* Target */
 .tgt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 18px;align-items:end}
 .tgt .v{font-size:28px;font-weight:700;line-height:1.15;color:var(--tx);white-space:nowrap}
+.goal{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:5px 12px;border-radius:var(--r-pill);background:#fff3c4;border:1px solid #f5d565;color:#8a5a00;font-size:13px;font-weight:600}.goal b{font-size:15px;font-weight:800;color:#7a4a00}.goal svg{flex:none;color:#e0a100}.goal.done{background:var(--okb);border-color:transparent;color:var(--ok)}.goal.done svg{color:var(--ok)}
 .meter{grid-column:1/-1;position:relative;height:10px;border-radius:var(--r-pill);background:var(--fld);margin:12px 0 14px}
 .meter i{position:absolute;inset:0 auto 0 0;border-radius:var(--r-pill);background:linear-gradient(90deg,var(--lt),var(--br))}
-.meter u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mu);opacity:.7;text-decoration:none}.meter u em{position:absolute;top:16px;left:0;transform:translateX(-50%);font-style:normal;font-size:11px;color:var(--mu);white-space:nowrap}
+.meter u{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--card);border:3px solid #f2b705;box-shadow:0 1px 3px rgba(15,23,42,.18);text-decoration:none}.meter u.on{background:var(--br);border-color:var(--card)}.meter u em{position:absolute;top:20px;left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;color:var(--mu);white-space:nowrap}
 .tgt+.trend{margin-top:auto}.meter{margin-bottom:26px!important}
 .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}
 .tiers div{border-radius:var(--r-md);background:var(--fld);padding:8px 12px;font-size:12px;border:1px solid transparent}
@@ -287,9 +288,9 @@ function target(s){
  const v=netOf(s.id),[r,c]=comm(v,s,commBase(s.id)),mx=Math.max(1,...s.trend),sh=mine(s.id).filter(j=>j.as&&inM(j,CUR)).length;
  const bars=`<div class="trend" aria-label="ยอด 9 เดือน">${s.trend.map((x,i)=>`<div title="${MON[i]} · ${B(x*1000)}"><em>${x>=1?N(x)+'K':''}</em><i style="height:${Math.max(2,x/mx*100)}%;--c:${i===8?'var(--br)':'var(--lt)'};opacity:${i===8?1:.55}"></i><span>${MON[i]}</span></div>`).join('')}</div>`;
  let top;
- if(s.sal){const m=Math.max(s.t2*1.1,v*1.02),p=x=>Math.min(100,x/m*100),nx=v>=s.t2?'ได้ขั้นสูงสุดแล้ว':v>=s.t1?`อีก ${B(s.t2-v)} ถึงขั้น 2%`:`อีก ${B(s.t1-v)} ถึงขั้น 1%`;
-  top=`<div class="tgt"><div><div class="v">${B(v)}</div><div class="sub">${nx}${sh?` · งานร่วม ${sh} งาน`:''}</div></div><div style="text-align:right"><div class="v" style="font-size:20px;color:${r?'var(--ok)':'var(--mu)'}">${B(r?c:0)}</div><div class="sub">ค่าคอม${r?' '+r+'%':''}</div></div>
-  <div class="meter"><i style="width:${p(v)}%"></i><u style="left:${p(s.t1)}%"><em>${N(s.t1/1000)}K · 1%</em></u><u style="left:${p(s.t2)}%"><em>${N(s.t2/1000)}K · 2%</em></u></div></div>`}
+ if(s.sal){const m=Math.max(s.t2*1.1,v*1.02),p=x=>Math.min(100,x/m*100),nx=v>=s.t2?'ได้ขั้นสูงสุดแล้ว':v>=s.t1?`อีก <b>${B(s.t2-v)}</b> ถึงขั้น 2%`:`อีก <b>${B(s.t1-v)}</b> ถึงขั้น 1%`;
+  top=`<div class="tgt"><div><div class="v">${B(v)}</div><div class="goal${v>=s.t2?' done':''}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>${nx}</span></div>${sh?`<div class="sub">งานร่วม ${sh} งาน</div>`:''}</div><div style="text-align:right"><div class="v" style="font-size:20px;color:${r?'var(--ok)':'var(--mu)'}">${B(r?c:0)}</div><div class="sub">ค่าคอม${r?' '+r+'%':''}</div></div>
+  <div class="meter"><i style="width:${p(v)}%"></i><u class="${v>=s.t1?'on':''}" style="left:${p(s.t1)}%"><em>${N(s.t1/1000)}K · 1%</em></u><u class="${v>=s.t2?'on':''}" style="left:${p(s.t2)}%"><em>${N(s.t2/1000)}K · 2%</em></u></div></div>`}
  else top=`<div class="tgt"><div><div class="v">${B(v)}</div><div class="sub">${sh?`งานร่วม ${sh} งาน`:'&nbsp;'}</div></div></div>`;
  return `<div class="pn col"><h3>ยอดขายสุทธิ · ${MLBL}<button class="r" data-sal="${esc(s.id)}">${s.sal?'เงินเดือน '+N(s.sal):'ตั้งเงินเดือน'}</button></h3>${top}${bars}</div>`}
 const isDone=j=>['BOOKED','RELEASED','CANCELED'].includes(j.st);
