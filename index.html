@@ -855,7 +855,7 @@ function fLabels(){const d=new Date(),y=d.getFullYear(),M=LANG==='en'?MTE:MTH,mo
  const D={y:TT('ปีนี้','This year')+' ('+y+')',all:TT('ทั้งหมด','All'),'7':TT('7 วันล่าสุด','Last 7 days')+' ('+dm(ago(6))+'–'+dm(d)+')','30':TT('30 วันล่าสุด','Last 30 days')+' ('+dm(ago(29))+'–'+dm(d)+')',m:TT('เดือนนี้','This month')+' ('+mo(0)+')',pm:TT('เดือนที่แล้ว','Last month')+' ('+mo(1)+')',c:TT('กำหนดเอง','Custom')};
  ['dp','lp','kp','fop','pp','cu_p'].forEach(id=>{const e=$(id);if(e)[...e.options].forEach(o=>{if(D[o.value])o.textContent=D[o.value]})})}
 function rangeFrom(){const v=$('rg').value;if(v==='all')return'';if(v==='d30'){const x=new Date(Date.now()-29*864e5);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}const d=new Date(),y=d.getFullYear();if(v==='y')return y+'-01-01';const dt=new Date(y,d.getMonth()-(v==='m'?0:v==='pm'?1:v==='2'?1:2),1);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-01'}
-async function reload(){if(!window.__LDONE&&typeof window.skelRows==='function'&&$('tb')&&!$('tb').rows.length){$('tb').innerHTML=window.skelRows(8,10);$('em').classList.add('hid')}try{const f=rangeFrom(),vm=$('vm').value,lf=$('lf').value,lt=$('lt').value;let d=await fetchRows(f);await fetchClosed();await Promise.all([cfgLoad(),actLoad(f)]);if(f){const ex=[];if(vm&&vm+'-01'<f){const[y,mo]=vm.split('-').map(Number);ex.push([vm+'-01',vm+'-'+String(new Date(y,mo,0).getDate()).padStart(2,'0')])}if(lf&&lf<f)ex.push([lf,lt&&lt<f?lt:'']);const da=$('d1').value,db=$('d2').value;if(da&&da<f)ex.push([da,db&&db<f?db:'']);const ka=$('k1').value,kb=$('k2').value;if(ka&&ka<f)ex.push([ka,kb&&kb<f?kb:'']);const ids=new Set(d.map(x=>x.id));for(const[a,b]of ex){(await fetchRows(a,b||undefined)).forEach(x=>{if(!ids.has(x.id)){ids.add(x.id);d.push(x)}})}}rows=d.map(norm)}catch(e){alert('โหลดข้อมูลไม่สำเร็จ: '+e.message);return}const v=$('fa').value;setSales();$('fa').value=v;render()}
+async function reload(){if(!window.__LDONE&&typeof window.skelRows==='function'&&$('tb')&&!$('tb').rows.length){$('tb').innerHTML=window.skelRows(8,10);$('em').classList.add('hid')}try{const f=rangeFrom(),vm=$('vm').value,lf=$('lf').value,lt=$('lt').value;let d=await fetchRows(f);await fetchClosed();await Promise.all([cfgLoad(),actLoad(f)]);if(f){const ex=[];if(vm&&vm+'-01'<f){const[y,mo]=vm.split('-').map(Number);ex.push([vm+'-01',vm+'-'+String(new Date(y,mo,0).getDate()).padStart(2,'0')])}if(lf&&lf<f)ex.push([lf,lt&&lt<f?lt:'']);const da=$('d1').value,db=$('d2').value;if(da&&da<f)ex.push([da,db&&db<f?db:'']);const ka=$('k1').value,kb=$('k2').value;if(ka&&ka<f)ex.push([ka,kb&&kb<f?kb:'']);const ids=new Set(d.map(x=>x.id));for(const[a,b]of ex){(await fetchRows(a,b||undefined)).forEach(x=>{if(!ids.has(x.id)){ids.add(x.id);d.push(x)}})}}rows=d.map(norm).filter(ownL)}catch(e){alert('โหลดข้อมูลไม่สำเร็จ: '+e.message);return}const v=$('fa').value;setSales();$('fa').value=v;render()}
 function refresh(){rows.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.id>a.id?1:-1));const v=$('fa').value;setSales();$('fa').value=v;render()}
 let CLZ=new Map();
 const LTN={new:['New','New'],repeat_inquiry:['ทักซ้ำ','Repeat'],active:['Active','Active'],winback:['Win-back','Win-back']},LTC={new:'#0096d6',repeat_inquiry:'#8e5bd6',active:'#2fb170',winback:'#f08a24'};
@@ -1159,7 +1159,7 @@ function buildSeg(){if(team==='C'&&!(profile&&profile.role==='sales'&&profile.te
 function setTeam(k){team=k;setSales();$('fa').value='';render()}
 let SALL=[];
 async function loadSalesAll(){try{let o=[],i=0;for(;;){const{data,error}=await sb.from('leads').select('sales,team').range(i,i+999);if(error||!data)return;o=o.concat(data);if(data.length<1000)break;i+=1000}SALL=[...new Set(o.filter(x=>x.sales).map(x=>x.team+'\u0001'+x.sales))].map(x=>x.split('\u0001'));const v=$('fa').value;setSales();$('fa').value=v}catch(e){}}
-function setSales(){fill($('fa'),[...new Set([...rows.filter(r=>r.team===team).map(r=>r.sales),...SALL.filter(x=>x[0]===team).map(x=>x[1])].filter(Boolean))],'ทุก Sales')}
+function setSales(){fill($('fa'),[...new Set([...rows.filter(r=>r.team===team).map(r=>r.sales),...SALL.filter(x=>x[0]===team).map(x=>x[1])].filter(Boolean))],'ทุก Sales');$('fa').classList.toggle('hid',!!(profile&&profile.role==='sales'))}
 function tab(k){if('AMKE'.includes(k))dashMode=k;const v='AMKE'.includes(k)?'D':k;['L','D','S','C','N','F','W'].forEach(x=>$('v'+x).classList.toggle('hid',x!==v));['L','A','M','K','E','C','S','N','F','W'].forEach(x=>$('t'+x).classList.toggle('on',x===k));$('tDB').classList.toggle('on','AMKE'.includes(k));$('fnb').classList.toggle('hid',v!=='F');if(v==='D')renderDash();if(v==='L')fitWrap();if(v==='C')calcLeads();if(v==='N'){loadNews();newsSeen()}if(v==='S')loadUsers();if(v==='F')renderFu();if(v==='W')loadMk()}
 let OPTS={ads:[],brand:[],promo:[],sales:[]};
 const KINDS=[['brand','แบรนด์'],['promo','โปรโมชัน']];
@@ -1378,6 +1378,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
 function formEff(f){f=f||$('fm_');const s=stv(f.status.value);return closedR({status:s,fu_status:f.fu_status.value})?ST_Y:(okS(f.fu_status.value)||s)}
 function toggleReason(){$('rsn').classList.toggle('hid',formEff()!==ST_N)}
 function openForm(id){
+ if(id&&!rows.some(y=>y.id===id)){const x=(typeof SRX!=='undefined'&&SRX.find(y=>y.id===id))||(typeof CLZ!=='undefined'&&CLZ.get&&CLZ.get(id));if(x)rows.push(x)}
  {const x=id&&rows.find(y=>y.id===id);if(x&&x.team&&x.team!==team){team=x.team;buildSeg();setSales()}}
  const f=$('fm_');editId=id||null;f.reset();applyOpts();
  const r=id?rows.find(x=>x.id===id):{date:today(),status:ST_S,svc:[]};
@@ -1456,11 +1457,12 @@ async function qFetch(){const t=$('q').value.trim().replace(/[,()*%]/g,' ').trim
 let LFU=false;
 const QF={name:r=>[r.name],ads:r=>[r.ads],country:r=>[r.country],note:r=>[r.note],ct:r=>{const d=r.detail||{};return[JSON.stringify(d)]}};
 function qHit(r,q){const f=($('qf')||{}).value||'';const v=QF[f]?QF[f](r):[r.name,r.ads,r.country,r.note,r.quo];return v.filter(x=>x!=null).join(' ').toLowerCase().includes(q)}
+function ownL(r){return !(profile&&profile.role==='sales')||(r.sales||'')===(profile.name||'')}
 function filtered(){
  const q=$('q').value.toLowerCase(),s=$('fs').value,c=$('fc').value,a=$('fa').value,m=$('fm').value,o=($('fo')||{}).value||'',y=($('fty')||{}).value||'',okT=r=>(!o||((r.detail||{}).temp||'')===o)&&(!y||ltOf(r)===y);
- const ok=r=>okT(r)&&(!s||effS(r)===s)&&(!c||r.channel===c||((r.detail&&r.detail.ch2)||[]).includes(c))&&(!a||r.sales===a)&&(!m||r.svc.some(x=>svcCat(x)===m))&&(!LFU||(r.fu&&r.fu<=today()&&![ST_Y,ST_N].includes(effS(r))));
+ const ok=r=>ownL(r)&&okT(r)&&(!s||effS(r)===s)&&(!c||r.channel===c||((r.detail&&r.detail.ch2)||[]).includes(c))&&(!a||r.sales===a)&&(!m||r.svc.some(x=>svcCat(x)===m))&&(!LFU||(r.fu&&r.fu<=today()&&![ST_Y,ST_N].includes(effS(r))));
  if(q){const pool=new Map();SRX.concat(rows).forEach(r=>{if(r.team===team)pool.set(r.id,r)});return[...pool.values()].filter(r=>ok(r)&&qHit(r,q)).sort((a,b)=>b.date.localeCompare(a.date))}
- return rows.filter(r=>r.team===team&&inVm(r)&&inLr(r)&&okT(r)&&(!s||effS(r)===s)&&(!c||r.channel===c||((r.detail&&r.detail.ch2)||[]).includes(c))&&(!a||r.sales===a)&&(!m||r.svc.some(x=>svcCat(x)===m))&&(!LFU||(r.fu&&r.fu<=today()&&![ST_Y,ST_N].includes(effS(r))))&&
+ return rows.filter(r=>ownL(r)&&r.team===team&&inVm(r)&&inLr(r)&&okT(r)&&(!s||effS(r)===s)&&(!c||r.channel===c||((r.detail&&r.detail.ch2)||[]).includes(c))&&(!a||r.sales===a)&&(!m||r.svc.some(x=>svcCat(x)===m))&&(!LFU||(r.fu&&r.fu<=today()&&![ST_Y,ST_N].includes(effS(r))))&&
   (!q||qHit(r,q))).sort((a,b)=>b.date.localeCompare(a.date));
 }
 

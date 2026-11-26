@@ -132,7 +132,7 @@ button.jst,button.pay{cursor:pointer}
 .perbar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}.perbar label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mu)}.perbar .in{width:150px}.perbar select.in{width:160px}
 .info{display:flex;gap:6px 10px;align-items:center;flex-wrap:wrap;border-radius:var(--r-md);background:var(--infb);color:var(--tx);padding:10px 14px;margin-bottom:14px;font-size:13px}
 .info>b{color:var(--inf);display:inline-flex;align-items:center;gap:6px;font-weight:600}.info>i{color:var(--mu);font-style:normal}
-.info svg{width:16px;height:16px}
+.info svg{width:16px;height:16px}.info.wn{background:var(--wnb)}.info.wn>b{color:var(--wn);display:inline-flex;align-items:center;gap:6px}.info .lk{font-weight:600}
 /* Payment */
 .paysum{display:grid;grid-template-columns:1fr 1fr;gap:10px}.paysum b{display:block;font-size:22px;font-weight:700;white-space:nowrap}.paysum span{font-size:12px;color:var(--mu)}
 .pbar{display:flex;height:8px;border-radius:var(--r-pill);overflow:hidden;background:var(--fld);margin:10px 0 6px}.pbar b{background:var(--suc)}.pbar i{background:var(--dgr)}
@@ -232,7 +232,7 @@ async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
  const all=async q=>{const f=await q(true).range(0,999);if(f.error)return{data:[],error:f.error};const n=f.count||0,P=[];for(let i=1000;i<n;i+=1000)P.push(q().range(i,i+999));const R=await Promise.all(P);return{data:(f.data||[]).concat(...R.map(x=>x.data||[])),error:null}};
  const m0=MK[0],d0=m0+'-01',l0=(d=>(d.setDate(d.getDate()-90),d.toISOString().slice(0,10)))(new Date());
- const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id';
+ const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu';
  const [tg,jr,lr]=await Promise.all([sb.from('sales_targets').select('*'),
   all(c=>sb.from('sales_jobs').select('*',c?{count:'exact'}:undefined).or(`rep_month.gte.${m0},close_date.gte.${d0},open_date.gte.${d0}`).order('id',{ascending:true})),
   sb.from('leads').select(lc).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400)]);
@@ -313,6 +313,9 @@ const shTag=j=>{if(!j.as)return '';const o=`${j.s} Owner`,a=`${j.as} Assistant`,
 const dueList=L=>L.filter(j=>!isDone(j)).sort((a,b)=>(a.close||'9999').localeCompare(b.close||'9999'));
 function lastClose(L){const C=dueList(L).slice(0,5);
  return `<div class="pn col"><h3>Close Date ใกล้ถึง<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${C.map(j=>{const d=dleft(j);return `<div class="row"><div class="due ${dueCls(d)}"><b>${j.close?fd(j.close).slice(0,5):'—'}</b><span>${dueTxt(d)}</span></div><div style="flex:1"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${jnoB(j)}<span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><span class="s">${j.cty}</span>${shTag(j)}</div><h4>${esc(j.cus)}</h4></div><div style="text-align:right"><span class="jst ${STC[j.st]}">${j.st}</span><div><span class="pay ${j.pay}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</span></div></div><div class="a"><button class="btn sm" data-ej="${j.id}">เปิด</button></div></div>`}).join('')||'<div class="empty">ไม่มีเคสที่ต้องดู</div>'}</div>`}
+const LMISS=r=>{const m=[];if(!r)return m;if(!String(r.ads||'').trim())m.push('Ads');if(!String(r.channel||'').trim())m.push('ช่องทาง');if(!String(r.country||'').trim())m.push('ประเทศ');if(!(Array.isArray(r.svc)?r.svc.length:String(r.svc||'').trim()))m.push('บริการ');if(!String(r.brand||'').trim())m.push('แบรนด์');if(!r.fu&&r.status!==ST.Y)m.push('วันติดตาม');return m};
+function leadAlert(sid){const A=LD.filter(l=>l.s===sid).map(l=>[l,LMISS(l.raw)]).filter(x=>x[1].length);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
+ return `<div class="info wn"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Lead ข้อมูลไม่ครบ ${N(A.length)}</b>${D.map(([l,m])=>`<span><button class="lk" data-ld2="${l.id}">${esc(l.n||'—')}</button> · ขาด ${m.join(', ')}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-go="lead" style="margin-left:auto;color:var(--wn);font-weight:600">+${more} Lead</button>`:''}</div>`}
 function dueAlert(L){const A=dueList(L).filter(j=>j.close&&dleft(j)>=0&&dleft(j)<=1);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
  return `<div class="info"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Close Date</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${dueTxt(dleft(j))}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|due" style="margin-left:auto;color:var(--pr);font-weight:600">+${more} งาน</button>`:''}</div>`}
 function payCard(L,cap){cap=cap||5;const pd=L.filter(j=>j.pay==='p'&&j.inc),dn=L.filter(j=>j.pay==='d'&&j.inc),sp=pd.reduce((a,j)=>a+j.inc,0),sd=dn.reduce((a,j)=>a+j.inc,0),tt=sp+sd||1;
@@ -335,7 +338,7 @@ function homeSales(){
  const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
  const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>String(j.lead)===String(l.id))).slice(0,6);
  const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3><div>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1;min-width:0"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div></div>`:'';
- return head+dueAlert(A)+k+`<div class="grid g2e">${target(s)}${lastClose(A)}</div><div class="grid g2e"><div class="stack">${jobs}${ld}</div>${payCard(A,Math.max(3,OP.length+(ld?3:0)))}</div>`;
+ return head+dueAlert(A)+leadAlert(s.id)+k+`<div class="grid g2e">${target(s)}${lastClose(A)}</div><div class="grid g2e"><div class="stack">${jobs}${ld}</div>${payCard(A,Math.max(3,OP.length+(ld?3:0)))}</div>`;
 }
 function teamRows(list){return list.map(s=>{const v=netOf(s.id),L=mine(s.id),p=s.t2?v/s.t2*100:0;return `<tr><td class="nm"><b>${esc(s.id)}</b><div class="sub">${esc(s.team)}</div></td><td class="n">${N(v)}</td><td class="n">${s.sal?N(s.t2):'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1;--c:${p>=100?'var(--ok)':p>=s.t1/s.t2*100?'var(--br)':'var(--wn)'}"><b style="width:${Math.min(100,p)}%"></b></div><b style="width:42px;text-align:right">${Math.round(p)}%</b></div></td><td class="n">${(([r,c])=>r?`<b style="color:var(--ok)">${r}% · ${N(c)}</b>`:'—')(comm(v,s,commBase(s.id)))}</td><td class="n">${L.length}</td><td class="n">${pend(L).length}</td><td class="n">${L.filter(j=>!j.inc).length}</td><td class="n">${s.trend[8]>=s.trend[7]?'▲':'▼'} ${s.trend[7]?Math.abs(Math.round((s.trend[8]-s.trend[7])/s.trend[7]*100)):0}%</td></tr>`}).join('')}
 function homeHead(){
@@ -486,7 +489,7 @@ function pickCus(c){F.cus=c.name;F.cid=c.id;F.no='เก่า';drawJob()}
 const fj=$('fj');
 let _sq=0,_st=null;
 async function cusSearch(q){const id=++_sq,sb=HB.sb(),like='%'+q.replace(/[%_,()]/g,' ').trim()+'%';
- const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id';
+ const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu';
  let lr=await sb.from('leads').select(lc+',lead_type').ilike('name',like).order('date',{ascending:false}).limit(6);if(lr.error)lr=await sb.from('leads').select(lc).ilike('name',like).order('date',{ascending:false}).limit(6);
  const cr=await sb.from('customers').select('id,name,owner').ilike('name',like).limit(4);
  if(id!==_sq)return;const ul=$('jsug');if(!ul)return;
