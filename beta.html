@@ -17,8 +17,8 @@ body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 var(--font);ove
 button,input,select,textarea{font:inherit;color:inherit}
 .sb,.mnav{display:none!important}
 .app{display:block}.mn{display:block}
-.tb{position:absolute;top:15px;right:72px;display:flex;align-items:center;gap:8px;z-index:2}
-.tabs2{margin-right:280px}
+.tb{position:absolute;top:43px;right:72px;display:flex;align-items:center;gap:8px;z-index:2}
+.tabs2{margin-right:280px}.dtop{font-size:13px;color:var(--mu);margin:0 0 8px 2px;min-height:20px;line-height:20px}
 .role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}
 .role select{min-height:var(--h-md);border-radius:var(--r-md);border:1px solid transparent;background:var(--fld);padding:0 12px;font-weight:500;color:var(--tx)}
 .ct{padding:12px 28px 40px}
@@ -134,7 +134,8 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .svg button b{display:block;font-size:14px;font-weight:600}.svg button span{font-size:12px;color:var(--mu)}
 .svg button.on{background:var(--infb);border-color:var(--br)}.svg button.on b{color:var(--pr)}
 .four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 12px}.four .c2{grid-column:span 2}.four .c3{grid-column:span 3}
-.in.em{background:var(--erb)}.lchip{display:inline-flex;align-items:center;gap:6px;margin-top:6px;align-self:flex-start;font-size:12px;color:var(--tx);background:var(--okb);border-radius:var(--r-pill);padding:2px 4px 2px 10px}.lchip b{color:var(--ok);font-weight:600}.lchip button{border:0;background:none;cursor:pointer;color:var(--mu);font-size:12px;width:20px;height:20px;border-radius:50%}.lchip button:hover{background:rgba(0,0,0,.06)}.ctag{color:var(--inf)!important;background:var(--infb)!important}.mono{font-family:ui-monospace,Menlo,monospace;font-weight:600}
+.in.em{background:var(--erb)}.split{display:block;font-size:12px;color:var(--inf);margin-top:2px}.f .split:empty{display:none}
+.lchip{display:inline-flex;align-items:center;gap:6px;margin-top:6px;align-self:flex-start;font-size:12px;color:var(--tx);background:var(--okb);border-radius:var(--r-pill);padding:2px 4px 2px 10px}.lchip b{color:var(--ok);font-weight:600}.lchip button{border:0;background:none;cursor:pointer;color:var(--mu);font-size:12px;width:20px;height:20px;border-radius:50%}.lchip button:hover{background:rgba(0,0,0,.06)}.ctag{color:var(--inf)!important;background:var(--infb)!important}.mono{font-family:ui-monospace,Menlo,monospace;font-weight:600}
 @media(max-width:700px){.four{grid-template-columns:1fr 1fr}}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:600px){.two,.three{grid-template-columns:1fr}}
 .sug{position:relative}.sug ul{position:absolute;left:0;right:0;top:100%;margin:4px 0 0;padding:6px;list-style:none;background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);box-shadow:var(--sh-pop);z-index:3;max-height:240px;overflow:auto}
@@ -211,7 +212,7 @@ async function loadAll(){
  SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL',sal:sal[o.value]||0}));
  SALES.forEach(s=>{s.t1=s.sal*20;s.t2=s.sal*30});
  J=(jr.data||[]).map(fromRow);
- SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>j.s===s.id&&inM(j,k)).reduce((a,j)=>a+j.net,0)/1000));
+ SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>(j.s===s.id||j.as===s.id)&&inM(j,k)).reduce((a,j)=>a+share$(j),0)/1000));
  LD=(lr.data||[]).filter(r=>r.status!==ST.N).map(r=>({raw:r,id:r.id,in:r.date,t:'',n:r.name||'',ph:'',ads:r.ads||r.channel||'',ch:r.channel||'',s:r.sales||'',sv:leadSv(r),cty:ctyCode(r.country),st:r.status||ST.S,cid:r.customer_id}));
  const pre=TODAY.slice(2,4)+TODAY.slice(5,7)+'-';seq=1+Math.max(0,...J.filter(j=>j.job.startsWith(pre)).map(j=>+j.job.slice(5)||0));
  ROLES=[...SALES.map(s=>[s.id,`${s.id} · ${s.team}`]),['HEAD','หัวหน้าเซลล์ (ทุกคน)'],['CEO','ผู้บริหาร']];
@@ -225,8 +226,9 @@ const isSales=()=>!!me();
 const mine=id=>J.filter(j=>j.s===id||j.as===id);
 const share=j=>j.as?.5:1;
 const monthJ=id=>mine(id).filter(j=>inM(j,CUR));
-const netOf=id=>J.filter(j=>j.s===id&&inM(j,CUR)).reduce((a,j)=>a+(+j.net||0),0);
-const commBase=id=>monthJ(id).reduce((a,j)=>a+(+j.net||0)*(j.as?.5:1)*(j.s===id||j.as===id?1:0),0);
+const share$=j=>j.as?(+j.inc?(+j.inc)/2:(+j.net||0)):(+j.net||+j.inc||0);
+const netOf=id=>J.filter(j=>(j.s===id||j.as===id)&&inM(j,CUR)).reduce((a,j)=>a+share$(j),0);
+const commBase=id=>netOf(id);
 const pend=l=>l.filter(j=>j.pay==='p');
 const openJ=l=>l.filter(j=>j.st!=='RELEASED'&&j.st!=='BOOKED');
 
@@ -279,7 +281,7 @@ function checklist(br){const L=CKD[br==='CPLExJJ'?'BR':'HO'];return `<div class=
 /* ---------- homes ---------- */
 function homeSales(){
  const s=me(),M=J.filter(j=>j.s===s.id&&inM(j,CUR)),A=mine(s.id),pd=A.filter(j=>j.pay==='p'),nl=M.filter(j=>!j.lead);
- const head=`<div class="hrow"><div><h1>สวัสดี ${esc(s.id)}</h1><div class="sub">${DLBL} · ${esc(s.team)}</div></div><div class="act"><button class="btn p" data-nj>+ ลงงานปิดการขาย</button></div></div>`;
+ const head=`<div class="hrow"><div class="act"><button class="btn p" data-nj>+ ลงงานปิดการขาย</button></div></div>`;
  const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(j=>j.no==='ใหม่').length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
  const shown=new Set(dueList(A).slice(0,5).map(j=>j.id)),OP=dueList(A).filter(j=>!shown.has(j.id)).concat(A.filter(j=>!j.inc&&isDone(j))).slice(0,5);
  const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
@@ -366,11 +368,11 @@ function pageJob(){
  if(FIL!=='keep'){JF={st:'',pay:'',x:''};if(FIL==='p')JF.pay='p';else if(['open','new','nl','o','due'].includes(FIL))JF.x=FIL;else if(STA.includes(FIL))JF.st=FIL;FIL='keep'}
  const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?j.no==='ใหม่':JF.x==='old'?j.no==='เก่า':JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
  const sc=!isSales();
- const sum=base.reduce((a,j)=>a+(sc||j.s===ROLE?(+j.net||0):0),0);
+ const sum=base.reduce((a,j)=>a+(sc?(+j.inc||+j.net||0):share$(j)),0);
  return `<div class="hrow"><div><h1>งานปิดการขาย</h1></div><div class="act"><button class="btn p" data-nj>+ ลงงาน</button></div></div>`+
  kpi([[N(base.length),'งาน','','job|all'],[B(sum),'รายได้สุทธิ','','job|all'],[N(pend(base).length),'ค้างชำระ',pend(base).length?'var(--dgr)':'','job|p'],[N(base.filter(j=>!j.lead).length),'ยังไม่ผูก Lead','','job|nl']])+
  `<div style="margin-top:14px">${perBar()}</div>
- <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n">รายได้</th><th class="n">สุทธิ</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n">${j.inc?N(j.inc,2):'—'}</td><td class="n">${j.net?N(j.net,2):'—'}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
+ <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n">รายได้</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n">${j.inc?N(j.inc,2):'—'}${j.as&&j.inc?`<div class="split">หารครึ่ง · ${N(share$(j),2)}</div>`:''}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
 }
 function pageRep(){
  const rows=SALES.map(s=>`<tr><td class="nm"><b>${s.id}</b><div class="sub">${s.team}</div></td>${s.trend.map((v,i)=>`<td class="n" style="${v===Math.max(...s.trend)&&v?'background:var(--okb);color:var(--ok);font-weight:600':''}">${v?N(i===8?netOf(s.id):v*1000):'—'}</td>`).join('')}<td class="n"><b>${N(s.trend.slice(0,8).reduce((a,b)=>a+b*1000,0)+netOf(s.id))}</b></td></tr>`).join('');
@@ -381,7 +383,7 @@ const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tabli
 function render(){
  renderNav();
  const c=$('ct');
- c.innerHTML=subTabs()+(PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
+ c.innerHTML=`<div class="dtop">${DLBL}</div>`+subTabs()+(PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
 }
 
 /* ---------- job entry ---------- */
@@ -415,8 +417,8 @@ function drawJob(){
   ${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
   ${fld('Open Date',dIn('jopen',F.open))}
   ${fld('Closed Date',dIn('jclose',F.close),{rq:1})}
-  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span>`)}
-  ${fld('Income Net',`<span class="nf" data-u="บาท"><input class="in" id="jnet" inputmode="decimal" value="${F.net?N(F.net,2):''}"></span>`)}
+  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`หารครึ่ง · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`)}
+  ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
   ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList(),F.ch),F.ch,'—')}</select>`)}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`)}
   ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
@@ -445,11 +447,12 @@ async function cusSearch(q){const id=++_sq,sb=HB.sb(),like='%'+q.replace(/[%_,()
 const pickSug=i=>{const o=SUG[+i];if(!o)return;$('jsug').hidden=true;if(o.k==='l')pickLead(o.x);else pickCus(o.x)};
 fj.addEventListener('input',e=>{const t=e.target;
  if(t.id==='jcus'){F.cus=t.value;F.cid=null;clearTimeout(_st);const q=t.value.trim();if(q.length<2){$('jsug').hidden=true;return}_st=setTimeout(()=>cusSearch(q),220);return}
- if(t.id==='jinc'){F.inc=pnum(t.value);F.net=vatNet(F.inc,F.br);$('jnet').value=F.inc?N(F.net,2):'';return}
+ if(t.id==='jinc'){F.inc=pnum(t.value);const sp=$('jsplit');if(sp)sp.textContent=F.as&&F.inc?`หารครึ่ง · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:'';return}
  if(t.id==='jnet'){F.net=pnum(t.value);return}
  if(t.id==='jclose'||t.id==='jopen'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F[t.id==='jclose'?'close':'open']=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  const m={jno:'job',jawb:'awb',jrem:'remark'};if(m[t.id])F[m[t.id]]=t.value});
-fj.addEventListener('change',e=>{const t=e.target,m={jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(m[t.id]){F[m[t.id]]=t.value;if(t.id==='jst')drawJob();if(t.id==='jsl'){const s=SALES.find(x=>x.id===t.value);if(s)F.br=s.br}}});
+fj.addEventListener('change',e=>{const t=e.target,m={jas:'as',jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(m[t.id]){F[m[t.id]]=t.value;if(t.id==='jst'||t.id==='jas'||t.id==='jsl'){if(t.id==='jsl'&&F.as===F.s)F.as='';drawJob()}if(t.id==='jsl'){const s=SALES.find(x=>x.id===t.value);if(s)F.br=s.br}}});
+fj.addEventListener('focusout',e=>{if(e.target.id==='jcus')setTimeout(()=>{if(document.activeElement!==$('jcus')){const u=$('jsug');if(u)u.hidden=true;_sq++}},200)});
 fj.addEventListener('keydown',e=>{if(e.target.id==='jcus'&&e.key==='Enter'){e.preventDefault();const li=$('jsug').querySelector('li.on');if(li&&!$('jsug').hidden)pickSug(li.dataset.sg)}});
 fj.addEventListener('click',e=>{const b=e.target.closest('button,li');if(!b)return;const d=b.dataset;
  if(d.sg!=null)return pickSug(d.sg);if(d.unl!=null){F.lead='';F._ln='';drawJob()}});
@@ -458,7 +461,7 @@ fj.addEventListener('submit',async e=>{e.preventDefault();
  fj.querySelectorAll('.in.em').forEach(x=>x.classList.remove('em'));need.forEach(([id])=>$(id)&&$(id).classList.add('em'));
  if(need.length){$(need[0][0]).focus();toast('กรอกช่องที่มี * ให้ครบ');return}
  const no=(F.job||nextNo()).trim();
- const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:+F.net||0,no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark};
+ const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark};
  const btn=fj.querySelector('[type=submit]');btn.disabled=true;const sb=HB.sb();
  try{
   if(!F._edit&&!o.cid){const{data:ex}=await sb.from('customers').select('id').ilike('name',o.cus).limit(1);if(ex&&ex[0])o.cid=ex[0].id;else{const{data:c}=await sb.from('customers').insert({name:o.cus,owner:o.s||null}).select('id').single();if(c)o.cid=c.id}}
@@ -471,7 +474,7 @@ fj.addEventListener('submit',async e=>{e.preventDefault();
   if(!F._edit&&o.lead){try{const{data:l}=await sb.from('leads').select('status,deal_amt,detail,customer_id').eq('id',o.lead).single();if(l){const dt={...(l.detail||{})},g=MG(o.sv),sv=g==='Sea'?'Sea':g==='Truck'?'Truck':'Air',dir=o.sv[0]==='I'?'นำเข้า':'ส่งออก',up={status:ST.Y};
    if(!+l.deal_amt&&!(dt.deals||[]).length){up.deal_amt=o.net||o.inc||0;up.deal_date=o.close;dt.cl={dir,svc:sv,cty:cname(o.cty)}}else dt.deals=[...(dt.deals||[]),{d:o.close,a:o.net||o.inc||0,dr:dir,s:sv,c:cname(o.cty)}];
    up.detail=dt;if(!l.customer_id&&o.cid)up.customer_id=o.cid;await sb.from('leads').update(up).eq('id',o.lead)}}catch(e){}}
-  SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>j.s===s.id&&inM(j,k)).reduce((a,j)=>a+j.net,0)/1000));
+  SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>(j.s===s.id||j.as===s.id)&&inM(j,k)).reduce((a,j)=>a+share$(j),0)/1000));
   toast(F._edit?'บันทึกแล้ว':'ลงงาน '+no+' แล้ว');$('dj').close();render();
  }finally{btn.disabled=false}
 });
