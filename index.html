@@ -3241,7 +3241,7 @@ function cuRender(){
  const ps=[];for(let k=1;k<=np;k++)if(k===1||k===np||Math.abs(k-CU.pg)<=1)ps.push(k);else if(ps[ps.length-1]!=='…')ps.push('…');
  $('cu_pg').innerHTML=L.length?`<span class="sub">${TT('แสดง','Showing')} ${N((CU.pg-1)*PS+1)}–${N(Math.min(CU.pg*PS,L.length))} ${TT('จาก','of')} ${N(L.length)}</span>${np>1?`<span class="cu-pgb">${pb('‹',CU.pg-1,0,CU.pg===1)}${ps.map(k=>k==='…'?'<span class="sub">…</span>':pb(k,k,k===CU.pg)).join('')}${pb('›',CU.pg+1,0,CU.pg===np)}</span>`:''}`:''}
 
-function cuDupGroups(){const mine=profile&&profile.role==='sales'?profile.name:'',L=CU.list.filter(c=>!mine||c.owner===mine),par={},f=x=>par[x]===x?x:(par[x]=f(par[x])),u=(a,b)=>{par[f(a)]=f(b)},by={};L.forEach(c=>par[c.id]=c.id);
+function cuDupGroups(){const mine=profile&&profile.role==='sales'?profile.name:'',L=CU.list.filter(c=>(!mine||c.owner===mine)&&(!CU.tm||cuTeams(c).has(CU.tm))),par={},f=x=>par[x]===x?x:(par[x]=f(par[x])),u=(a,b)=>{par[f(a)]=f(b)},by={};L.forEach(c=>par[c.id]=c.id);
  L.forEach(c=>{const ks=[];const k=keyOf(c.name);if(k)ks.push('n:'+k);(CU.cts[c.id]||[]).forEach(x=>{const p=dupPh(x.phone);if(p)ks.push('p:'+p)});ks.forEach(k=>{if(by[k])u(by[k],c.id);else by[k]=c.id})});
  const g={};L.forEach(c=>(g[f(c.id)]=g[f(c.id)]||[]).push(c));return Object.values(g).filter(a=>a.length>1).map(a=>a.sort((x,y)=>(stats(y.id).n-stats(x.id).n)||String(x.created_at||'').localeCompare(String(y.created_at||''))))}
 function cuXls(){if(typeof XLSX==='undefined')return alert(TT('ส่งออกไม่สำเร็จ','Export failed'));const L=CU.L||[],brd=CU.tm==='B'?'B':'A',ptOk=typeof PT!=='undefined'&&PT.ok;
