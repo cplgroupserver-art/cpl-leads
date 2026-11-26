@@ -7086,15 +7086,13 @@ const _ar=applyRoleUI;applyRoleUI=function(){const r=_ar.apply(this,arguments);t
 try{place()}catch(e){}
 })();
 
-/* ===== column colour groups (numeric columns) ===== */
+/* ===== column banding (numeric columns) ===== */
 (function(){if(window.__CG)return;window.__CG=1;
-const R=[['pct',/%/],['bad',/ค้าง|เลยกำหนด|ไม่สนใจ|overdue|unpaid|not interested/i],['won',/ปิดได้|ปิดการขาย|ปิดดีล|ยอด|รายได้|บาท|revenue|net\b|closed|won|thb|ค่าคอม/i],['wait',/รอ|pending|ติดตาม|วันนี้|today|follow/i],['new',/ใหม่|\bnew\b/i],['rep',/ทักซ้ำ|repeat/i],['act',/active/i],['win',/win-?back/i],['old',/เก่า|returning/i]];
-const st=document.createElement('style');st.textContent=[['new','0,150,214'],['rep','142,91,214'],['act','47,177,112'],['win','240,138,36'],['won','47,177,112'],['bad','224,69,47'],['wait','224,160,32'],['pct','90,107,133'],['old','120,110,100'],['num','0,110,160']].map(([k,c])=>`th.cg-${k}{color:rgb(${c})!important;background-image:linear-gradient(rgba(${c},.16),rgba(${c},.16))!important}td.cg-${k}{background-image:linear-gradient(rgba(${c},.10),rgba(${c},.10))!important}`).join('');document.head.appendChild(st);
-const cls=t=>{t=(t||'').trim();if(!t)return '';for(const[k,re]of R)if(re.test(t))return k;return ''};
-function run(tb){if(!tb.tHead)return;const hr=tb.tHead.rows[tb.tHead.rows.length-1];if(!hr)return;const sig=[...hr.cells].map(c=>c.textContent).join('|');const map=[];let ci=0,any=0;
- [...hr.cells].forEach(c=>{const num=c.classList.contains('num')||c.classList.contains('n');const k=num?(cls(c.textContent)||'num'):'';[...c.classList].filter(x=>x.startsWith('cg-')).forEach(x=>c.classList.remove(x));if(k){c.classList.add('cg-'+k);any=1}for(let s=0;s<(c.colSpan||1);s++)map[ci++]=k});
- if(!any&&!tb.dataset.cg)return;tb.dataset.cg=sig;
- [...tb.tBodies].forEach(b=>[...b.rows].forEach(r=>{let i=0;[...r.cells].forEach(c=>{const k=map[i];[...c.classList].filter(x=>x.startsWith('cg-')).forEach(x=>c.classList.remove(x));if(k&&r.cells.length>1)c.classList.add('cg-'+k);i+=c.colSpan||1})}))}
+const st=document.createElement('style');st.textContent='th.cgb,td.cgb{box-shadow:inset 0 0 0 9999px rgba(0,150,214,.06)!important}html[data-theme=dark] th.cgb,html[data-theme=dark] td.cgb{box-shadow:inset 0 0 0 9999px rgba(120,180,255,.07)!important}';document.head.appendChild(st);
+function run(tb){if(!tb.tHead)return;const hr=tb.tHead.rows[tb.tHead.rows.length-1];if(!hr)return;const map=[];let ci=0,n=0;
+ [...hr.cells].forEach(c=>{const num=c.classList.contains('num')||c.classList.contains('n');const on=num&&(n++%2===0);c.classList.toggle('cgb',on);for(let s=0;s<(c.colSpan||1);s++)map[ci++]=on});
+ if(!n)return;
+ [...tb.tBodies].forEach(b=>[...b.rows].forEach(r=>{let i=0;[...r.cells].forEach(c=>{c.classList.toggle('cgb',!!map[i]&&r.cells.length>1);i+=c.colSpan||1})}))}
 let q=0;const sch=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;document.querySelectorAll('table').forEach(t=>{if(!t.closest('#vL'))run(t)})})};
 new MutationObserver(sch).observe(document.body,{childList:true,subtree:true});sch()})();
 
