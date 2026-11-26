@@ -7040,10 +7040,10 @@ if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove
 (function(){const fit=()=>{document.querySelectorAll('#dk .st b, #vD .stats .st b').forEach(b=>{b.style.removeProperty('font-size');if(!b.closest('.st'))return;let f=parseFloat(getComputedStyle(b).fontSize),n=0;while(b.scrollWidth>b.clientWidth+1&&f>15&&n<20){f-=1;b.style.setProperty('font-size',f+'px','important');n++}if(b.scrollWidth>b.clientWidth+1){b.title=b.textContent.trim();[...b.childNodes].forEach(x=>{if(x.nodeType===3&&x.textContent.trim()){const sp=document.createElement('span');sp.className='stxt';sp.textContent=x.textContent;x.replaceWith(sp)}})}})};
  let t=0;const q=()=>{cancelAnimationFrame(t);t=requestAnimationFrame(fit)};const d=document.getElementById('vD');if(d)new MutationObserver(q).observe(d,{childList:true,subtree:true});addEventListener('resize',q)})();
 
-/* ===== หน้าหลัก Beta (Jonus only) ===== */
+/* ===== หน้าหลัก Beta (admin + sales) ===== */
 (function(){
 window.HB={go:k=>tab(k),lead:id=>{tab('L');if(rows.some(x=>x.id==id)&&typeof openDetail==='function')openDetail(rows.find(x=>x.id==id).id)},cus:id=>{if(window.cuGo)window.cuGo(isNaN(+id)?id:+id);else tab('CU')},sb:()=>sb,profile:()=>profile,sales:()=>(OPTS.sales||[]).map(o=>({value:o.value,team:o.team})),brands:()=>[...new Set((OPTS.brand||[]).map(o=>o.value).filter(Boolean))],channels:()=>(typeof OPT!=='undefined'&&OPT.channel)||[],ST:{Y:ST_Y,N:ST_N,S:ST_S,H:ST_H}};
-const ok=()=>!!(profile&&/jonus/i.test(profile.name||'')&&(typeof PVR==='undefined'||!PVR||profile===PVR));
+const ok=()=>!!(profile&&['admin','sales'].includes(profile.role));
 const gate=()=>{$('tHB').classList.toggle('hid',!ok());if(!ok()&&!$('vHB').classList.contains('hid'))tab('L')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
 const fit=()=>{const n=document.querySelector('nav.tabs');if(!n)return;const b=n.getBoundingClientRect();document.documentElement.style.setProperty('--hbl',Math.round(b.right)+'px');document.documentElement.style.setProperty('--hbt',Math.round(b.bottom)+'px')};addEventListener('resize',fit);try{new ResizeObserver(fit).observe(document.querySelector('nav.tabs'))}catch(e){}

@@ -19,7 +19,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .sb,.mnav{display:none!important}
 .app{display:block}.mn{display:block}
 .tb{position:absolute;top:18px;right:28px;display:flex;align-items:center;gap:8px;z-index:2}
-.topr{display:flex;align-items:center;gap:16px;margin:0 256px 16px 0;min-height:46px}.topr .tabs2{margin:0!important;flex:none}.dtop{font-size:13px;color:var(--mu);white-space:nowrap}.topr .btn{margin-left:auto}
+.topr{display:flex;align-items:center;gap:16px;margin:0 256px 16px 0;min-height:46px}.notb .tb{display:none}.notb .topr{margin-right:0}.topr .tabs2{margin:0!important;flex:none}.dtop{font-size:13px;color:var(--mu);white-space:nowrap}.topr .btn{margin-left:auto}
 .role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}
 .role select{min-height:var(--h-md);border-radius:var(--r-md);border:1px solid transparent;background:var(--fld);padding:0 12px;font-weight:500;color:var(--tx)}
 .ct{padding:12px 28px 40px}
@@ -575,6 +575,7 @@ async function reload(){await loadAll();render()}
  await loadAll();
  let r0='';try{r0=localStorage.getItem('hb-role')||''}catch(e){}
  ROLE=ROLES.some(x=>x[0]===r0)?r0:'HEAD';
+ {const p=HB.profile()||{};if(p.role!=='admin'){const nm=p.name||'';if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
  $('role').innerHTML=ROLES.map(([k,t])=>`<option value="${esc(k)}">${esc(t)}</option>`).join('');$('role').value=ROLE;
  render();if(DBERR)toast('โหลดข้อมูลงานไม่สำเร็จ: '+DBERR);
 })();
