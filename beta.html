@@ -126,6 +126,8 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .svg button{border:1px solid transparent;border-radius:var(--r-md);background:var(--fld);padding:8px 12px;text-align:left;cursor:pointer;min-height:52px;color:var(--tx);transition:.15s}
 .svg button b{display:block;font-size:14px;font-weight:600}.svg button span{font-size:12px;color:var(--mu)}
 .svg button.on{background:var(--infb);border-color:var(--br)}.svg button.on b{color:var(--pr)}
+.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.four .c2{grid-column:span 2}.mono{font-family:ui-monospace,Menlo,monospace;font-weight:600}
+@media(max-width:700px){.four{grid-template-columns:1fr 1fr}}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:600px){.two,.three{grid-template-columns:1fr}}
 .sug{position:relative}.sug ul{position:absolute;left:0;right:0;top:100%;margin:4px 0 0;padding:6px;list-style:none;background:var(--card);border:1px solid var(--bd);border-radius:var(--r-md);box-shadow:var(--sh-pop);z-index:3;max-height:240px;overflow:auto}
 .sug li{padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;font-weight:500;color:var(--tx)}.sug li:hover,.sug li.on{background:var(--infb)}.sug li span{display:block;font-size:12px;color:var(--mu);font-weight:400}
@@ -367,32 +369,45 @@ let F={};
 const vatNet=(inc,br)=>br&&br.startsWith('CPLEx')?Math.round(inc/1.07*100)/100:inc;
 function openJob(j,lead,cus){
  const s=me()||SALES[0];
- F=j?{...j,io:j.sv[0],mode:j.sv==='DOM'?'DOM':j.sv.slice(1)}:{s:s.id,cus:'',io:'E',mode:'AX',cty:'',inc:'',net:'',no:'',ch:'',br:s.br,st:'OPEN',pay:'p',open:TODAY,close:'',pt:'',awb:'',so:'',remark:'',as:'',lead:'',src:''};
+ F=j?{...j,sv:j.sv,io:j.sv[0],mode:j.sv==='DOM'?'DOM':j.sv.slice(1)}:{s:s.id,cus:'',sv:'',io:'E',mode:'AX',cty:'',inc:'',net:'',no:'',ch:'',br:s.br,st:'OPEN',pay:'p',open:TODAY,close:'',pt:'',awb:'',so:'',remark:'',as:'',lead:'',src:''};
  F._edit=!!j&&!j._conv;if(lead)pickLead(lead,true);if(cus)pickCus(cus,true);drawJob();$('dj').showModal();if(!j)setTimeout(()=>$('jcus').focus(),50);
 }
-const svCode=()=>F.mode==='DOM'?'DOM':F.io+F.mode;
+const svCode=()=>F.sv||(F.mode==='DOM'?'DOM':F.io+F.mode);
+const SVC=['EAX','EAE','EAD','EAG','ETL','ETF','ESL','ESF','IAX','IAE','IAD','IAG','ITL','ITF','ISL','ISF','DOM','WH'];
+const CC=['DEU','USA','JPN','SGP','MYS','THA','GBR','AUS','CHN','HKG','CHE','TWN','PHL','NZL','ITA','KOR','CAN','VNM','ESP','NLD','IDN','FRA','SWE','IND','ARE','DNK','BEL','NOR','MAC','KWT','PRT','IRL','LAO','KHM','MMR','AUT','FIN','ISR','TUR','GRC','ZAF','SAU','QAT','BRA','MEX','POL','CZE','LKA','BGD','NPL','BRN','SVK','CHL','KAZ'];
+const STA=['OPEN','DROP OFF','PICKUP','REGISTER','PACKING','PACKED','PAYMENT','BOOKING','BOOKED','RELEASED','CANCELED'];
+const opt=(L,v,e)=>(e!=null?`<option value="">${e}</option>`:'')+L.map(x=>{const[k,t]=Array.isArray(x)?x:[x,x];return `<option value="${esc(k)}"${String(v)===String(k)?' selected':''}>${esc(t)}</option>`}).join('');
 function drawJob(){
- const top=CTY.slice(0,8);
- $('fj').innerHTML=`<h2 id="djt">${F._edit?'แก้ไขงาน '+F.job:'ลงงานปิดการขาย'}</h2>${F._edit?`<div class="sub" style="margin:-8px 0 14px">${esc(F.cus)}</div>`:''}
- <div class="f sug"><span>ลูกค้า <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul></div>
- ${F.lead?'':`<div class="f sug"><span>Lead</span><input class="in" id="jld" autocomplete="off" value=""><ul id="jldsug" hidden></ul></div>`}
- ${F.lead?(l=>!l?'':`<div class="lnk"><b>Lead</b>${esc(l.n)} · ${esc(l.ads)} · ${fd(l.in)}<button type="button" class="btn sm" data-unl>ยกเลิกการเชื่อม</button></div>`)(LD.find(x=>String(x.id)===String(F.lead))):''}${F._hint?`<div class="hint">ลูกค้าเก่า · ${esc(F._hint)}<button type="button" class="btn sm" data-rep>ใช้ข้อมูลงานล่าสุด</button></div>`:''}
- <div class="f"><span>บริการ <b class="rq">*</b></span><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><div class="seg"><button type="button" class="${F.io==='E'&&F.mode!=='DOM'?'on':''}" data-io="E">ส่งออก</button><button type="button" class="${F.io==='I'&&F.mode!=='DOM'?'on':''}" data-io="I">นำเข้า</button><button type="button" class="${F.mode==='DOM'?'on':''}" data-io="D">ในประเทศ</button></div></div>
- ${F.mode==='DOM'?'':`<div class="svg">${MODES.map(([k,t,d])=>`<button type="button" class="${F.mode===k?'on':''}" data-md="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div>`}</div>
- <div class="f"><span>ประเทศ <b class="rq">*</b></span><div class="chips">${top.map(([k,t])=>`<button type="button" class="${F.cty===k?'on':''}" data-cty="${k}">${t}</button>`).join('')}<select class="in" id="jcty" style="width:auto;height:36px;border-radius:99px;font-size:14px"><option value="">ประเทศอื่น…</option>${CTY.slice(8).map(([k,t])=>`<option value="${k}"${F.cty===k?' selected':''}>${t} · ${k}</option>`).join('')}</select></div></div>
- <div class="three"><div class="f"><span>Job No. <b class="rq">*</b></span><input class="in" id="jno" value="${esc(F.job||nextNo())}" style="font-family:ui-monospace,Menlo,monospace;font-weight:700"></div><div class="f"><span>วันที่เปิดงาน</span><input class="in" id="jopen" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(F.open)}"></div><div class="f"><span>Close Date <b class="rq">*</b></span><input class="in" id="jclose" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(F.close)}"></div></div>
- <div class="two"><div class="f"><span>Owner <b class="rq">*</b></span><select class="in" id="jsl">${SALES.map(x=>`<option value="${x.id}"${F.s===x.id?' selected':''}>${esc(x.name)}</option>`).join('')}</select></div><div class="f"><span>Assistant</span><select class="in" id="jas"><option value="">ไม่มี</option>${SALES.filter(x=>x.id!==F.s).map(x=>`<option value="${x.id}"${F.as===x.id?' selected':''}>${esc(x.name)}</option>`).join('')}</select></div></div>
- <div class="two"><div class="f"><span>รายได้ (บาท)</span><span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span></div><div class="f"><span>รายได้สุทธิ</span><span class="nf" data-u="บาท"><input class="in" id="jnet" inputmode="decimal" value="${F.net?N(F.net,2):''}"></span></div></div>
- <div class="two"><div class="f"><span>สถานะงาน</span><div class="chips">${STS.map(x=>`<button type="button" class="${F.st===x?'on':''}" data-st="${x}">${x}</button>`).join('')}</div></div><div class="f"><span>การชำระเงิน</span><div class="chips"><button type="button" class="${F.pay==='d'?'on':''}" data-py="d">ชำระแล้ว</button><button type="button" class="${F.pay==='p'?'on':''}" data-py="p">ค้างชำระ</button></div></div></div>
+ const sv=svCode(),cc=CC.includes(F.cty)||!F.cty?CC:[F.cty,...CC];
+ $('fj').innerHTML=`<h2 id="djt">${F._edit?'แก้ไขงาน '+esc(F.job):'ลงงานปิดการขาย'}</h2>
+ <div class="four"><div class="f sug c2"><span>CUSTOMER NAME <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul></div>
+ ${F.lead?(l=>`<div class="f c2"><span>LEAD</span><div class="lnk" style="margin:0;min-height:var(--h-md)"><b>Lead</b>${l?esc(l.n)+' · '+fd(l.in):'#'+esc(F.lead)}<button type="button" class="btn sm" data-unl>ยกเลิก</button></div></div>`)(LD.find(x=>String(x.id)===String(F.lead))):`<div class="f sug c2"><span>LEAD</span><input class="in" id="jld" autocomplete="off"><ul id="jldsug" hidden></ul></div>`}</div>
+ ${F._hint?`<div class="hint">${esc(F._hint)}<button type="button" class="btn sm" data-rep>ใช้ข้อมูลงานล่าสุด</button></div>`:''}
+ <div class="four"><div class="f"><span>JOB NO. <b class="rq">*</b></span><input class="in mono" id="jno" value="${esc(F.job||nextNo())}"></div>
+ <div class="f"><span>SERVICE <b class="rq">*</b></span><select class="in mono" id="jsv">${opt(SVC,sv)}</select></div>
+ <div class="f"><span>COUNTRY <b class="rq">*</b></span><select class="in mono" id="jcty">${opt(cc,F.cty,'—')}</select></div>
+ <div class="f"><span>CLOSED DATE <b class="rq">*</b></span><input class="in" id="jclose" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(F.close)}"></div></div>
+ <div class="four"><div class="f"><span>INCOME</span><span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span></div>
+ <div class="f"><span>INCOME NET</span><span class="nf" data-u="บาท"><input class="in" id="jnet" inputmode="decimal" value="${F.net?N(F.net,2):''}"></span></div>
+ <div class="f"><span>STATUS</span><select class="in" id="jst">${opt(STA,F.st)}</select></div>
+ <div class="f"><span>PAYMENT</span><select class="in" id="jpay">${opt([['d','DONE'],['p','PENDING']],F.pay)}</select></div></div>
+ <div class="four"><div class="f"><span>SALES <b class="rq">*</b></span><select class="in" id="jsl">${opt(SALES.map(x=>x.id),F.s)}</select></div>
+ <div class="f"><span>ASSIST</span><select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select></div>
+ <div class="f"><span>OPEN DATE</span><input class="in" id="jopen" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(F.open)}"></div>
+ <div class="f"><span>NEW/OLD</span><select class="in" id="jnew">${opt([['ใหม่','NEW'],['เก่า','OLD']],F.no||'ใหม่')}</select></div></div>
  <details${F._edit?' open':''}><summary>รายละเอียดเพิ่มเติม</summary>
- <div class="three"><div class="f"><span>SO / SJ</span><input class="in" id="jso" value="${esc(F.so)}"></div>
- <div class="f"><span>ช่องทาง</span><select class="in" id="jch"><option value="">—</option>${CH.map(x=>`<option${F.ch===x?' selected':''}>${x}</option>`).join('')}</select></div><div class="f"><span>สาขา</span><select class="in" id="jbr">${BR.map(x=>`<option${F.br===x?' selected':''}>${x}</option>`).join('')}</select></div><div class="f"><span>ประเภทสินค้า</span><select class="in" id="jpt"><option value="">—</option>${PT.map(x=>`<option${F.pt===x?' selected':''}>${x}</option>`).join('')}</select></div>
- <div class="f"><span>ที่มา</span><select class="in" id="jsrc">${['',...new Set(['ลูกค้าเก่า',...LD.map(l=>l.ads),'Ads: Inbox','CALL-IN','WALK-IN (PLAZA)',F.src].filter(Boolean))].map(x=>`<option${F.src===x?' selected':''}>${esc(x)}</option>`).join('')}</select></div><div class="f"><span>AWB / BL No.</span><input class="in" id="jawb" value="${esc(F.awb)}"></div><div class="f" style="grid-column:span 2"><span>หมายเหตุ</span><input class="in" id="jrem" value="${esc(F.remark)}"></div></div></details>
- <div class="sum"><span class="code" style="--c:${SCOL(svCode())}">${svCode()}</span><span>${F.cty||'—'}</span><span class="sub">${F.no?('ลูกค้า'+F.no):''}</span><span style="margin-left:auto;display:flex;gap:8px"><button type="button" class="btn" data-close>ยกเลิก</button><button class="btn p" type="submit">บันทึก</button></span></div>`;
+ <div class="four"><div class="f"><span>SO/SJ</span><input class="in" id="jso" value="${esc(F.so)}"></div>
+ <div class="f"><span>CHANNEL</span><select class="in" id="jch">${opt(CH.includes(F.ch)||!F.ch?CH:[F.ch,...CH],F.ch,'—')}</select></div>
+ <div class="f"><span>BRANCH</span><select class="in" id="jbr">${opt(BR.includes(F.br)||!F.br?BR:[F.br,...BR],F.br)}</select></div>
+ <div class="f"><span>PRODUCT TYPE</span><select class="in" id="jpt">${opt(PT.includes(F.pt)||!F.pt?PT:[F.pt,...PT],F.pt,'—')}</select></div>
+ <div class="f"><span>SOURCE</span><select class="in" id="jsrc">${opt(['',...new Set(['ลูกค้าเก่า',...LD.map(l=>l.ads),'Ads: Inbox','CALL-IN','WALK-IN (PLAZA)',F.src].filter(Boolean))],F.src)}</select></div>
+ <div class="f"><span>AWB/BL</span><input class="in" id="jawb" value="${esc(F.awb)}"></div>
+ <div class="f c2"><span>REMARK</span><input class="in" id="jrem" value="${esc(F.remark)}"></div></div></details>
+ <div class="sum"><span style="margin-left:auto;display:flex;gap:8px"><button type="button" class="btn" data-close>ยกเลิก</button><button class="btn p" type="submit">บันทึก</button></span></div>`;
 }
 const pnum=v=>+String(v).replace(/[^\d.]/g,'')||0;
 function pickCus(c,q){F.cus=c.n;F.code=c.code;F.cid=c.id;F.ch=c.ch;F.br=c.br;F.no=J.some(j=>j.cus===c.n)?'เก่า':'ใหม่';F.src=F.no==='เก่า'?'ลูกค้าเก่า':(c.leadSrc||'');F.lead=c.leadId||'';F._last=c.last;F._hint=c.last?`ส่งล่าสุด ${c.last.sv} · ${c.last.c}`:'';if(!q)drawJob()}
-function pickLead(l,q){F.cus=l.n;F.lead=l.id;F.src=l.ads;F.ch=l.ch;F.no='ใหม่';F.io=l.sv[0]==='D'?'E':l.sv[0];F.mode=l.sv==='DOM'?'DOM':l.sv.slice(1);F.cty=l.cty;F.s=F.s||l.s;F._hint='';F.code='';F.cid=l.cid||null;if(!q)drawJob()}
+function pickLead(l,q){F.sv='';F.cus=l.n;F.lead=l.id;F.src=l.ads;F.ch=l.ch;F.no='ใหม่';F.io=l.sv[0]==='D'?'E':l.sv[0];F.mode=l.sv==='DOM'?'DOM':l.sv.slice(1);F.cty=l.cty;F.s=F.s||l.s;F._hint='';F.code='';F.cid=l.cid||null;if(!q)drawJob()}
 const nextNo=()=>TODAY.slice(2,4)+TODAY.slice(5,7)+'-'+String(seq).padStart(4,'0');
 const fj=$('fj');
 const nk=t=>String(t||'').toLowerCase().replace(/บริษัท|จำกัด|\(มหาชน\)|co\.?|ltd\.?|limited|คุณ/g,'').replace(/[^a-z0-9ก-๙]/g,'');
@@ -410,12 +425,12 @@ fj.addEventListener('input',e=>{
  if(t.id==='jnet')F.net=pnum(t.value);
  if(t.id==='jclose'||t.id==='jopen'){let v=t.value.replace(/[^\d]/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F[t.id==='jclose'?'close':'open']=m?m[3]+'-'+m[2]+'-'+m[1]:''}if(t.id==='jno')F.job=t.value;
 });
-fj.addEventListener('change',e=>{const t=e.target;if(t.id==='jsl'){F.s=t.value;if(F.as===F.s)F.as='';drawJob();return}if(t.id==='jas'){F.as=t.value;drawJob();return}const m={jno:'job',jcty:'cty',jso:'so',jch:'ch',jbr:'br',jpt:'pt',jawb:'awb',jrem:'remark',jsrc:'src'};if(m[t.id]){F[m[t.id]]=t.value;if(t.id==='jcty'||t.id==='jbr')drawJob()}});
+fj.addEventListener('change',e=>{const t=e.target;if(t.id==='jsl'){F.s=t.value;if(F.as===F.s)F.as='';drawJob();return}if(t.id==='jas'){F.as=t.value;drawJob();return}const m={jsv:'sv',jst:'st',jpay:'pay',jnew:'no',jno:'job',jcty:'cty',jso:'so',jch:'ch',jbr:'br',jpt:'pt',jawb:'awb',jrem:'remark',jsrc:'src'};if(m[t.id]){F[m[t.id]]=t.value;if(t.id==='jbr'&&F.inc){F.net=vatNet(F.inc,F.br);$('jnet').value=N(F.net,2)}}});
 fj.addEventListener('keydown',e=>{if(e.target.id==='jcus'&&e.key==='Enter'){e.preventDefault();const li=$('jsug').querySelector('li.on');if(li&&!$('jsug').hidden){if(li.dataset.li)pickLead(LD.find(x=>String(x.id)===li.dataset.li));else pickCus(CUS[+li.dataset.cu])}}});
 fj.addEventListener('click',e=>{const b=e.target.closest('button,li');if(!b)return;const d=b.dataset;
  if(d.ll){const l=LD.find(x=>String(x.id)===d.ll);if(l){F.lead=l.id;if(!F.src)F.src=l.ads;drawJob()}return}
  if(d.li)return pickLead(LD.find(x=>String(x.id)===d.li));if(d.cu!=null)return pickCus(CUS[+d.cu]);if(d.unl!=null){F.lead='';F.src='';drawJob();return}
- if(d.rep!=null){F.io=F._last.sv[0];F.mode=F._last.sv==='DOM'?'DOM':F._last.sv.slice(1);F.cty=F._last.c;F.pt=F._last.pt;F._hint='';drawJob();return}
+ if(d.rep!=null){F.sv='';F.io=F._last.sv[0];F.mode=F._last.sv==='DOM'?'DOM':F._last.sv.slice(1);F.cty=F._last.c;F.pt=F._last.pt;F._hint='';drawJob();return}
  if(d.io){if(d.io==='D')F.mode='DOM';else{F.io=d.io;if(F.mode==='DOM')F.mode='AX'}drawJob()}
  else if(d.md){F.mode=d.md;drawJob()}else if(d.cty){F.cty=d.cty;drawJob()}else if(d.st){F.st=d.st;drawJob()}else if(d.py){F.pay=d.py;drawJob()}
 });
