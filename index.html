@@ -77,6 +77,8 @@ body{background:linear-gradient(180deg,var(--bg),var(--bg)) ,var(--bg)}
 header{background:transparent;border-bottom:0;padding:22px 28px 6px}
 h1{font-size:22px;font-weight:600;letter-spacing:-.01em}
 main{padding:12px 28px 32px}
+body.hbon main{padding:0;max-width:none}body.hbon{overflow:hidden}#hbf{width:100%;height:100vh;height:100dvh;border:0;display:block}
+@media (max-width:760px){body.hbon{overflow:auto}#hbf{height:calc(100dvh - 56px)}}
 .tabs{padding:calc(env(safe-area-inset-top,0px) + 22px) 14px 16px;gap:6px;box-shadow:var(--sh)}
 .tabs::before{display:none}
 .logo{width:150px;height:auto;display:block;margin:0 auto 22px}
@@ -679,7 +681,7 @@ html.scl #fxbg,html.scl #fxban:after{animation-play-state:paused!important}
 <div id="vSO" class="hid"><div class="tabx"><div class="mktabs soNav"></div><div class="tabx-sub" id="soSub"></div></div><section class="soMain" id="soMain"></section>
 <dialog id="sod"><form id="sof" method="dialog"><h3 style="margin:0 0 12px">บันทึกการเยี่ยมลูกค้า</h3><div class="g"><label class="f">ลูกค้า<b class="rq">*</b><input name="so_n" list="so_dl" required autocomplete="off"></label><label class="f">ประเภทบริการ<input name="so_m" maxlength="60" placeholder="เช่น ทางเรือ FCL"></label><label class="f">วันที่<b class="rq">*</b><input type="text" name="so_d" data-dmy placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10" autocomplete="off" required></label><label class="f">เวลา<b class="rq">*</b><input type="time" name="so_t" required></label><label class="f">วัตถุประสงค์<input name="so_p" maxlength="120"></label></div><datalist id="so_dl"></datalist><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button type="button" class="btn" onclick="$('sod').close()">ยกเลิก</button><button type="submit" class="btn p">บันทึก</button></div></form></dialog>
 <dialog id="sodd"><form id="sodf" method="dialog"><h3 style="margin:0 0 12px">แก้ไขลูกค้า</h3><div class="g"><label class="f">ลูกค้า<b class="rq">*</b><input name="sd_n" required maxlength="160"></label><label class="f">ประเภทบริการ<input name="sd_m" maxlength="60" placeholder="เช่น ทางเรือ FCL"></label><label class="f">เซลล์เจ้าของ<select name="sd_s"></select></label></div><div class="acts"><button type="button" class="btn p dgr" id="sodd_del" style="margin-right:auto">ลบดีล</button><button type="button" class="btn" onclick="$('sodd').close()">ยกเลิก</button><button type="submit" class="btn p">บันทึก</button></div></form></dialog></div>
-<div id="vHB" class="hid"><iframe id="hbf" title="หน้าหลัก Beta" style="width:100%;height:calc(100vh - 24px);border:0;border-radius:14px;display:block"></iframe></div>
+<div id="vHB" class="hid"><iframe id="hbf" title="หน้าหลัก"></iframe></div>
 <div id="vRS" class="hid"><div class="seg csb hid"><button type="button" data-s="C">คำนวณ</button><button type="button" data-s="R" class="on">Rate</button></div><div class="rbw rsw">
  <div class="rs-hd"><div class="rs-cur" id="rs_cur"></div><div class="rb-seg" id="rs_svc"><button type="button" data-v="a" class="on">Air Courier</button><button type="button" data-v="t">Trucking</button></div></div>
  <div id="rsAir" class="rsv"><div class="mktabs" id="rs_tabs"><button type="button" data-r="f" class="on">ไฟล์เรท</button><button type="button" data-r="p">ราคาขาย</button><button type="button" data-r="m">Remote Area</button><button type="button" data-r="x">ค่าธรรมเนียมเสริม</button></div>
@@ -6990,7 +6992,7 @@ window.HB={sb:()=>sb,profile:()=>profile,sales:()=>(OPTS.sales||[]).map(o=>({val
 const ok=()=>!!(profile&&/jonus/i.test(profile.name||'')&&(typeof PVR==='undefined'||!PVR||profile===PVR));
 const gate=()=>{$('tHB').classList.toggle('hid',!ok());if(!ok()&&!$('vHB').classList.contains('hid'))tab('L')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
-const _t=tab;tab=function(k){if(k==='HB'){if(!ok())return;document.querySelectorAll('main>[id^="v"]').forEach(v=>v.classList.toggle('hid',v.id!=='vHB'));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.id==='tHB'));const f=$('fnb');if(f)f.classList.add('hid');const fr=$('hbf');if(!fr.src||fr.dataset.at&&Date.now()-fr.dataset.at>300000){fr.src='beta.html?v='+Date.now();fr.dataset.at=Date.now()}return}
+const _t=tab;tab=function(k){document.body.classList.toggle('hbon',k==='HB'&&ok());if(k==='HB'){if(!ok())return;document.querySelectorAll('main>[id^="v"]').forEach(v=>v.classList.toggle('hid',v.id!=='vHB'));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.id==='tHB'));const f=$('fnb');if(f)f.classList.add('hid');const fr=$('hbf');if(!fr.src||fr.dataset.at&&Date.now()-fr.dataset.at>300000){fr.src='beta.html?v='+Date.now();fr.dataset.at=Date.now()}return}
  $('vHB').classList.add('hid');$('tHB').classList.remove('on');return _t(k)};
 $('tHB').onclick=()=>tab('HB');gate();
 })();
