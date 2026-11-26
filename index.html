@@ -1123,7 +1123,7 @@ async function enter(){
 function applyRoleUI(p){tFlabel();const r=p.role,H=(id,h)=>$(id).classList.toggle('hid',!!h),has=a=>a.includes(r);
  H('add',!has(['admin','sales','sales_lead','keyer']));H('n_add',!has(['admin','marketing']));H('tS',r!=='admin');H('tC',has(['ads','keyer','zimp','ceo']));H('tSO',!canSO());
  const DR={admin:'AMKE',marketing:'AMK',ads:'A',sales:'',sales_lead:'K',keyer:'',zimp:'AM',ceo:'AMKE'}[r]||'';window.DRok=DR;H('tDB',!DR);
- H('tF',!has(['sales','sales_lead','admin','keyer']));H('tW',!has(['admin','marketing','zimp']));H('tL',0);H('tN',0);
+ H('tF',!has(['sales','admin','keyer']));H('tW',!has(['admin','marketing','zimp']));H('tL',0);H('tN',0);
  ['A','M','K','E'].forEach(k=>H('t'+k,1));H('rg',1);H('exp',r==='zimp')}
 let PVR=null,PVW=null;
 function pvApply(v){if(!PVR){PVR=profile;PVW=WHO}if(!PVR||PVR.role!=='admin')return;const[role,tm]=v.split(':'),p=role==='admin'?PVR:{...PVR,role,team:tm||PVR.team};
@@ -7012,7 +7012,7 @@ if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove
 
 /* ===== หน้าหลัก Beta (Jonus only) ===== */
 (function(){
-window.HB={go:k=>tab(k),lead:id=>{tab('L');if(rows.some(x=>x.id==id)&&typeof openDetail==='function')openDetail(rows.find(x=>x.id==id).id)},cus:id=>{if(window.cuGo)window.cuGo(isNaN(+id)?id:+id);else tab('CU')},sb:()=>sb,profile:()=>profile,sales:()=>(OPTS.sales||[]).map(o=>({value:o.value,team:o.team})),ST:{Y:ST_Y,N:ST_N,S:ST_S,H:ST_H}};
+window.HB={go:k=>tab(k),lead:id=>{tab('L');if(rows.some(x=>x.id==id)&&typeof openDetail==='function')openDetail(rows.find(x=>x.id==id).id)},cus:id=>{if(window.cuGo)window.cuGo(isNaN(+id)?id:+id);else tab('CU')},sb:()=>sb,profile:()=>profile,sales:()=>(OPTS.sales||[]).map(o=>({value:o.value,team:o.team})),brands:()=>[...new Set((OPTS.brand||[]).map(o=>o.value).filter(Boolean))],channels:()=>(typeof OPT!=='undefined'&&OPT.channel)||[],ST:{Y:ST_Y,N:ST_N,S:ST_S,H:ST_H}};
 const ok=()=>!!(profile&&/jonus/i.test(profile.name||'')&&(typeof PVR==='undefined'||!PVR||profile===PVR));
 const gate=()=>{$('tHB').classList.toggle('hid',!ok());if(!ok()&&!$('vHB').classList.contains('hid'))tab('L')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
