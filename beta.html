@@ -463,7 +463,7 @@ function pageRep(){
  return `<div class="pn" style="padding:8px 10px"><div class="scroll"><table><thead><tr><th>เซลล์</th>${MON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">รวม</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
-const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[]:[['rep','รายงานรายเดือน']])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
+const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน']])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
 function render(){
  renderNav();
  const c=$('ct');
@@ -583,7 +583,7 @@ document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{i
 /* ---------- page actions ---------- */
 $('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='jf_st'||t.id==='jf_pay'||t.id==='jf_x'||t.id==='jf_erp'){JF[t.id.slice(3)]=t.value;FIL='keep';return render()}if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
 $('ct').addEventListener('input',e=>{const t=e.target;if(t.id==='jp_f'||t.id==='jp_t'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v}});
-$('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2],[data-kp],[data-jfx]');if(!b)return;const d=b.dataset;
+$('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){if(sb.dataset.sub==='my'){try{HB.go('F')}catch(er){}return}PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2],[data-kp],[data-jfx]');if(!b)return;const d=b.dataset;
  if(d.nj!=null)return openJob();if(d.lj)return openJob(null,(LD.find(x=>String(x.id)===d.lj)||{}).raw);if(d.sal)return openSal(d.sal);if(d.lfil){LFIL=d.lfil;return render()}if(d.cx){COPEN=COPEN===d.cx?'':d.cx;return render()}if(d.cj)return openJob(null,null,CUS.find(c=>c.code===d.cj));
  if(b.hasAttribute('data-jfx')){JF={st:'',pay:'',x:'',erp:''};FIL='keep';return render()}if(d.kp){const[p,f]=d.kp.split('|');if(PAGE!=='job')JP={p:'m',f:'',t:''};PAGE=p;FIL=f||'all';return render()}if(d.go==='lead'){try{HB.go('L')}catch(e){}return}if(d.go==='F'){try{HB.go('F')}catch(e){}return}if(d.go){PAGE=d.go;return render()}if(d.ld2){try{HB.lead(+d.ld2||d.ld2)}catch(e){}return}if(d.cu2){try{HB.cus(d.cu2)}catch(e){}return}if(d.jv){JV=d.jv;return render()}if(d.fil){FIL=d.fil;return render()}
  const j=J.find(x=>String(x.id)===(d.adv||d.pay||d.ej));
@@ -606,7 +606,7 @@ async function reload(){await loadAll();render()}
  ROLE=ROLES.some(x=>x[0]===r0)?r0:'HEAD';
  {const p=HB.profile()||{};if(p.role==='sales_lead'&&!r0)ROLE='HEAD';if(!['admin','sales_lead'].includes(p.role)){const nm=p.name||'';if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
  $('role').innerHTML=ROLES.map(([k,t])=>`<option value="${esc(k)}">${esc(t)}</option>`).join('');$('role').value=ROLE;
- document.body.classList.add('notb');window.hbSetRole=v=>{ROLE=v;PAGE='home';try{localStorage.setItem('hb-role',ROLE)}catch(er){}render()};try{(parent.HB_roles||(()=>{}))(ROLES,ROLE)}catch(e){}
+ document.body.classList.add('notb');window.hbPage=p=>{PAGE=p;render()};window.hbSetRole=v=>{ROLE=v;PAGE='home';try{localStorage.setItem('hb-role',ROLE)}catch(er){}render()};try{(parent.HB_roles||(()=>{}))(ROLES,ROLE)}catch(e){}
  render();if(DBERR)toast('โหลดข้อมูลงานไม่สำเร็จ: '+DBERR);
 })();
 }
