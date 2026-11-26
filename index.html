@@ -1347,7 +1347,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
   else{const hl=op.filter(r=>tk(r)==='hot').sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,10);
    tb=hl.length?`<table class="stt"><thead><tr><th style="position:static">${TT('ลูกค้า Hot','Hot customers')}</th>${th(TT('วันที่','Date'))}${th(TT('สถานะ','Status'))}</tr></thead><tbody>${hl.map(r=>`<tr${can(r)?` class="clk" onclick="openDetail(${r.id})"`:''}><td>${esc(r.name||'-')}</td><td class="num">${esc(fmtD(r.date))}</td><td class="num">${esc(dispSt(r))}</td></tr>`).join('')}</tbody></table>`:''}
   return `<div class="pn w12"><h3>${TT('โอกาสปิดการขาย','Close chance')}${sl?' · '+esc(sl):''} <small class="sub" style="font-weight:400">${TT('Lead ที่ยังไม่ปิด ','Open leads ')}${N(op.length)}</small></h3>${tiles}${tb}</div>`})();
- const DET=(t,x)=>x?`<details class="pn w12 dtl"><summary>${t}</summary><div class="dg">${x}</div></details>`:'',sec=t=>`<h4 class="dsec w12">${t}</h4>`;
+ const DET=(t,x)=>x?`<h4 class="dsec w12">${t}</h4>`+x:'',sec=t=>`<h4 class="dsec w12">${t}</h4>`;
  const fuS=dashMode!=='K'?'':(()=>{const t=today(),nx=addDays(t,7),op=l.filter(r=>![ST_Y,ST_N].includes(effS(r))),bk=r=>{const d=fuDue(r);return d<t?'od':d===t?'td':d<=nx?'sn':'lt'},cn2=(v,k)=>v.filter(r=>bk(r)===k).length;
   const tl=[[TT('เลยกำหนด','Overdue'),cn2(op,'od')],[TT('ต้องติดตามวันนี้','Due today'),cn2(op,'td')],[TT('7 วันข้างหน้า','Next 7 days'),cn2(op,'sn')],[TT('Lead ที่ยังต้องติดตามทั้งหมด','All open leads'),op.length]];
   const th=x=>`<th class="num" style="position:static">${x}</th>`;let tb='';
@@ -1369,7 +1369,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  const opn=l.filter(r=>![ST_Y,ST_N].includes(effS(r))),t0=today(),fuOd=opn.filter(r=>fuDue(r)<t0).length,fuTd=opn.filter(r=>fuDue(r)===t0).length;
  const SJR=sjGet(lo,b),sjOk=!!SJR,sjT=s=>{const o=(OPTS.sales||[]).find(x=>x.value===s);return o?o.team:''},meS=profile&&profile.role==='sales'?profile.name:'';
  const SJ=(SJR||[]).filter(j=>{const d=j._d;if(!d||(lo&&d<lo)||(b&&d>b)||(vmv&&d.slice(0,7)!==vmv))return false;if(tm&&sjT(j.sales)!==tm&&!(j.assistant&&sjT(j.assistant)===tm))return false;if(sl&&j.sales!==sl&&j.assistant!==sl)return false;if(meS&&j.sales!==meS&&j.assistant!==meS)return false;return true});
- const jInc=j=>+j.income||+j.net||0,jSh=j=>j.assistant?(+j.income?(+j.income)/2:(+j.net||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>v.reduce((t,j)=>t+jV(j),0);
+ const jInc=j=>+j.income||+j.net||0,jSh=j=>j.assistant?(+j.income?(+j.income)/2:(+j.net||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>Math.round(v.reduce((t,j)=>t+jV(j),0));
  const LM=new Map();SJD.L.forEach((v,k)=>LM.set(k,v));pool.forEach(r=>LM.set(r.id,r));const jL=j=>j.lead_id&&LM.get(j.lead_id),jAds=j=>{const r=jL(j);return r?(r.ads||'(ไม่ระบุ Ads)'):'(ไม่ได้ผูก Lead)'};
  const jMd=j=>svMode(j.svc),jDir=j=>svDir(j.svc),jTy=j=>svType(j.svc),jCh=j=>normCh(j.channel),jCf=k=>c3h(k);
  const SJT=jSum(SJ),SJN=SJ.filter(j=>j.new_old==='ใหม่'),SJAds=SJ.filter(j=>{const a=jAds(j);return !adsX.includes(a)&&a!=='(ไม่ได้ผูก Lead)'}),SJAT=jSum(SJAds);
@@ -6980,6 +6980,8 @@ document.addEventListener('click',e=>{const o=e.target.closest&&e.target.closest
 
 
 #vD .st b,#vD #dk .st b{font-size:17px!important}#vD .st>span{font-size:12px!important}#vD .st b .sti svg,#vD #dk .st b .sti svg{width:17px!important;height:17px!important}
+
+#vD .dn{flex-direction:column!important;align-items:stretch!important;gap:12px!important}#vD .dn>svg{width:180px!important;height:180px!important;align-self:center}#vD .dnl{width:100%;min-width:0!important}#vD .dnl div{gap:8px}#vD .dnl>div>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}#vD .dnl>div>span .dicw,#vD .dnl>div>span span{flex:none!important}#vD .dnl b{flex:none}#vD .br .num{white-space:nowrap}#vD .dn>.dnl{flex:none!important;display:block!important;height:auto!important}#vD .dnl>div{justify-content:flex-start!important;height:auto!important;min-height:0!important}#vD .dnl>div>span{justify-content:flex-start!important;text-align:left!important}
 </style>
 <script>
 (function(){
