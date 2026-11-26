@@ -198,10 +198,12 @@ const fromRow=r=>({rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',
 const toRow=o=>({job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null});
 async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
- const [tg,jr,lr,cr]=await Promise.all([sb.from('sales_targets').select('*'),sb.from('sales_jobs').select('*').gte('open_date',MK[0]+'-01').order('open_date',{ascending:false}).limit(5000),
-  sb.from('leads').select('id,name,ads,channel,sales,status,date,dir,svc,country,team,customer_id').gte('date',(d=>(d.setMonth(d.getMonth()-14),d.toISOString().slice(0,10)))(new Date())).order('date',{ascending:false}).limit(3000),
-  sb.from('customers').select('id,name,owner').order('name').limit(5000)]);
- const cl=[];for(const k of['status','fu_status']){const x=await sb.from('leads').select('id,name,ads,channel,sales,status,date,dir,svc,country,team,customer_id,deal_amt,deal_date,detail').eq(k,ST.Y).gte('date',(d=>(d.setMonth(d.getMonth()-11),d.toISOString().slice(0,10)))(new Date())).limit(5000);(x.data||[]).forEach(r=>{if(!cl.some(y=>y.id===r.id))cl.push(r)})}
+ const all=async q=>{let out=[],err=null;for(let i=0;;i+=1000){const{data,error}=await q().range(i,i+999);if(error){err=error;break}out=out.concat(data||[]);if(!data||data.length<1000)break}return{data:out,error:err}};
+ const m0=MK[0],d0=m0+'-01',l0=(d=>(d.setMonth(d.getMonth()-14),d.toISOString().slice(0,10)))(new Date());
+ const [tg,jr,lr,cr]=await Promise.all([sb.from('sales_targets').select('*'),
+  all(()=>sb.from('sales_jobs').select('*').or(`rep_month.gte.${m0},close_date.gte.${d0},open_date.gte.${d0}`).order('id',{ascending:true})),
+  all(()=>sb.from('leads').select('id,name,ads,channel,sales,status,date,dir,svc,country,team,customer_id').gte('date',l0).order('id',{ascending:true})),
+  all(()=>sb.from('customers').select('id,name,owner').order('id',{ascending:true}))]);
  DBERR=(tg.error||jr.error||{}).message||'';
  const sal={};(tg.data||[]).forEach(x=>sal[x.sales]=+x.salary||0);
  SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL',sal:sal[o.value]||0}));
