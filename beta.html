@@ -494,7 +494,7 @@ function drawJob(){
  <div class="js-bd">
  ${sec(1,'ลูกค้า',`<div class="f sug c3"><span>Customer Name <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul>${F.lead?`<div class="lchip"><b>Lead</b>${esc(F._ln||'#'+F.lead)}<button type="button" data-unl aria-label="ยกเลิก Lead" title="ยกเลิก Lead">✕</button></div>`:''}</div>
   ${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
-  ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList(),F.ch),F.ch,'—')}</select>`,{c:2})}
+  ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`,{c:2})}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`)}
  ${sec(2,'รายละเอียดงาน',`${fld('Job No.',`<input class="in mono" id="jno" value="${esc(F.job||nextNo())}">`,{rq:1})}
   ${fld('Service',`<select class="in mono" id="jsv">${opt(withV(SVC,F.sv).map(k=>[k,k+' · '+(svDir(k)==='ในประเทศ'?'ในประเทศ':svDir(k)+' '+svType(k))]),F.sv,'—')}</select>`,{rq:1})}
