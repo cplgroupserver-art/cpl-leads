@@ -197,7 +197,7 @@ const MODES=[['AX','Courier Express','พัสดุด่วน'],['AE','Couri
 const SCOL=c=>c==='DOM'?'var(--gy)':c[0]==='E'?'var(--inf)':'var(--wn)';
 const CTY=[['USA','สหรัฐฯ'],['DEU','เยอรมนี'],['JPN','ญี่ปุ่น'],['SGP','สิงคโปร์'],['MYS','มาเลเซีย'],['GBR','อังกฤษ'],['CHN','จีน'],['AUS','ออสเตรเลีย'],['VNM','เวียดนาม'],['LAO','ลาว'],['FRA','ฝรั่งเศส'],['CAN','แคนาดา'],['NZL','นิวซีแลนด์'],['CHE','สวิตเซอร์แลนด์'],['KOR','เกาหลีใต้'],['HKG','ฮ่องกง'],['TWN','ไต้หวัน'],['IND','อินเดีย'],['ARE','สหรัฐอาหรับฯ'],['THA','ไทย']];
 const CH=['LINE@','LINE Private','FB PAGE','FB Private','CALL-IN','WHATAPP','E-MAIL','WEBSITE','WALK-IN (PLAZA)','WALK-IN (MIXT)','TIKTOK'];
-const BR=['CPL','IMTH','CLMV','CPLExJJ','CPLExDEU','CPLExUSA','CPLExGBP','OVERSEA'];
+const BR=['CPL-INTER','IMTHAI','CLMV','CPLExJJ','CPLEx DEU','CPLExUSA','CPLEx GBP','OVERSEA'];
 const PT=['SPARE PART','CLOTHES','BEAUTY&PERSONAL CARE','INSTANT FOOD','PERSONAL EFFECT','ELECTRONIC','INDUSTRY EQUIPMENT','FASHION ACCESSORY','FOOD SUPPLEMENT','DECORATION','TOOLS','OTHER'];
 const STS=['OPEN','DROP OFF','PICKUP','PACKED','BOOKING','BOOKED','RELEASED'];
 const STC={OPEN:'gy','DROP OFF':'wn',PICKUP:'wn',REGISTER:'wn',PACKING:'wn',PACKED:'wn',PAYMENT:'wn',BOOKING:'inf',BOOKED:'inf',RELEASED:'ok',ISSUE:'er',CANCELED:'gy'};
@@ -224,7 +224,7 @@ async function loadAll(){
   sb.from('leads').select(lc).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400)]);
  DBERR=(tg.error||jr.error||{}).message||'';
  const sal={};(tg.data||[]).forEach(x=>sal[x.sales]=+x.salary||0);
- SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL',sal:sal[o.value]||0}));
+ SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[o.value]||0}));
  SALES.forEach(s=>{s.t1=s.sal*20;s.t2=s.sal*30});
  J=(jr.data||[]).map(fromRow);
  SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>(j.s===s.id||j.as===s.id)&&inM(j,k)).reduce((a,j)=>a+share$(j),0)/1000));
@@ -411,11 +411,11 @@ const opt=(L,v,e)=>(e!=null?`<option value="">${e}</option>`:'')+L.map(x=>{const
 const withV=(L,v)=>v&&!L.includes(v)?[v,...L]:L;
 const meName=()=>{try{const n=(HB.profile()||{}).name||'';const m=SALES.find(s=>s.id.toLowerCase()===n.trim().toLowerCase());return m&&m.id}catch(e){return ''}};
 const chList=()=>{let a=[];try{a=HB.channels()||[]}catch(e){}return [...new Set([...a,...CH])]};
-const brList=()=>{let a=[];try{a=HB.brands()||[]}catch(e){}return a.length?a:['CPL-Inter','CPLEx','CLMV','IMTH']};
+const brList=()=>{let a=[];try{a=HB.brands()||[]}catch(e){}return a.length?a:['CPL-INTER','CPLEx','CLMV','IMTHAI','CPLEx DEU','CPLEx GBP']};
 const nextNo=()=>TODAY.slice(2,4)+TODAY.slice(5,7)+'-'+String(seq).padStart(4,'0');
 function openJob(j,lead){
  const sid=meName()||(isSales()?ROLE:(SALES[0]||{}).id||'');
- F=j?{...j}:{s:sid,cus:'',sv:'',cty:'',inc:'',net:'',no:'ใหม่',ch:'',br2:'',st:'PACKING',pay:'p',open:TODAY,close:'',awb:'',remark:'',as:'',lead:'',src:'',cid:null,br:(SALES.find(x=>x.id===sid)||{}).br||'CPL'};
+ F=j?{...j}:{s:sid,cus:'',sv:'',cty:'',inc:'',net:'',no:'ใหม่',ch:'',br2:'',st:'PACKING',pay:'p',open:TODAY,close:'',awb:'',remark:'',as:'',lead:'',src:'',cid:null,br:(SALES.find(x=>x.id===sid)||{}).br||'CPL-INTER'};
  F._edit=!!j;if(lead)pickLead(lead,true);drawJob();$('dj').showModal();setTimeout(()=>$(j?'jinc':'jcus').focus(),50);
 }
 const fld=(l,html,o={})=>`<label class="f${o.c?' c'+o.c:''}"><span>${l}${o.rq?' <b class="rq">*</b>':''}</span>${html}</label>`;
