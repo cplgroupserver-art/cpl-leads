@@ -2697,7 +2697,7 @@ html:not([data-theme=dark]) .tabs .sbr .btn:hover{background:rgba(255,255,255,.2
 #vD #dk .st b{font-size:27px!important;line-height:1.25;gap:10px!important}
 #vD #dk .st b .sti svg{width:27px;height:27px}
 #vD #dk .st span{font-size:15px!important;line-height:1.3}
-#vD #dk .st.stx b{font-size:20px!important;line-height:1.2!important;padding:3px 0;margin:-3px 0;display:flex!important;align-items:center;min-width:0}#vD .st.stx b>.sti{flex:none}
+#vD #dk .st.stx b{font-size:20px!important;line-height:1.2!important;padding:3px 0;margin:-3px 0;display:flex!important;align-items:center;min-width:0}#vD .st.stx b>.sti{flex:none}#vD .st b .stxt{min-width:0;flex:1 1 auto;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;display:block!important}
 #vD #dk .st{min-width:0;padding:8px 12px!important}#vD #dk .st b{font-size:20px!important;line-height:1.2;gap:8px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#vD #dk .st b .sti svg{width:18px;height:18px}#vD #dk .st span{font-size:13px!important;line-height:1.3}
 #vD .st{padding:8px 12px!important}#vD .st b{font-size:20px!important;line-height:1.2}#vD .st>span{font-size:13px!important}#vD .st b .sti svg{width:18px;height:18px}
 #vD .pn:has(.svs) .svs b{font-size:20px!important;line-height:1.2}#vD .pn:has(.svs) .svs span.s,#vD .pn:has(.svs) .svs em{font-size:13px!important}#vD .pn:has(.svs) .svs .ib{width:34px!important;height:34px!important}#vD .pn:has(.svs) .svs .ib svg{width:18px!important;height:18px!important}
@@ -6975,6 +6975,10 @@ if(profile&&profile.role==='sales'&&profile.team==='C'){$('tF').classList.remove
  $('dk').addEventListener('click',e=>{if(e.target.closest('[data-na]'))op()});$('dk').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('[data-na]'))op()});
  $('naB').addEventListener('click',e=>{const t=e.target.closest('[data-nid]');if(!t)return;const id=isNaN(+t.dataset.nid)?t.dataset.nid:+t.dataset.nid;$('naD').close();try{if(!rows.some(y=>y.id===id)){const x=(window.NAL||[]).find(y=>y.id===id);if(x)rows.push(x)}}catch(_){}if(typeof openForm==='function')openForm(id)});
 })();
+</script>
+<script>
+(function(){const fit=()=>{document.querySelectorAll('#dk .st b, #vD .stats .st b').forEach(b=>{b.style.removeProperty('font-size');if(!b.closest('.st'))return;let f=parseFloat(getComputedStyle(b).fontSize),n=0;while(b.scrollWidth>b.clientWidth+1&&f>15&&n<20){f-=1;b.style.setProperty('font-size',f+'px','important');n++}if(b.scrollWidth>b.clientWidth+1){b.title=b.textContent.trim();[...b.childNodes].forEach(x=>{if(x.nodeType===3&&x.textContent.trim()){const sp=document.createElement('span');sp.className='stxt';sp.textContent=x.textContent;x.replaceWith(sp)}})}})};
+ let t=0;const q=()=>{cancelAnimationFrame(t);t=requestAnimationFrame(fit)};const d=document.getElementById('vD');if(d)new MutationObserver(q).observe(d,{childList:true,subtree:true});addEventListener('resize',q)})();
 </script>
 </body>
 </html>
