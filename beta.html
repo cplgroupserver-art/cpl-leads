@@ -107,6 +107,7 @@ button.st{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:.
 /* Tags */
 .tag,.jst,.pay{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:500;white-space:nowrap;border:0;line-height:1.5}
 button.jst,button.pay{cursor:pointer}
+.etag{display:inline-block;margin-top:4px;padding:1px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:600;white-space:nowrap}.etag.ok{background:var(--okb);color:var(--ok)}.etag.er{background:var(--erb);color:var(--er)}.etag.wn{background:var(--wnb);color:var(--wn)}.etag.inf{background:var(--infb);color:var(--inf)}.etag.gy{background:var(--gyb);color:var(--gy)}.info.cr{background:var(--erb)}.info.cr>b{color:var(--er);display:inline-flex;align-items:center;gap:6px}
 .pills{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
 .tag.ok,.jst.ok,.pay.d{background:var(--okb);color:var(--ok)}.tag.wn,.jst.wn{background:var(--wnb);color:var(--wn)}.tag.er,.jst.er,.pay.p{background:var(--erb);color:var(--er)}.tag.gy,.jst.gy{background:var(--gyb);color:var(--gy)}.tag.inf,.jst.inf,.shr{background:var(--infb);color:var(--inf)}
 .shr{display:inline-block;padding:1px 8px;border-radius:var(--r-pill);font-size:12px;font-weight:500;white-space:nowrap}
@@ -238,8 +239,8 @@ const CUR=MK[8],inM=(j,k)=>(j.rm||j.close||j.open||'').startsWith(k);
 const LST={[ST.S]:'var(--wn)',[ST.H]:'var(--inf)',[ST.Y]:'var(--ok)'};
 const ctyCode=v=>{if(!v)return '';const t=String(v).trim(),u=t.toUpperCase();const c=CTY.find(x=>x[0]===u||x[1]===t);return c?c[0]:t};
 const leadSv=r=>{const io=r.dir==='นำเข้า'?'I':'E',sv=Array.isArray(r.svc)?r.svc[0]:r.svc;return io+(sv==='Sea'?'SL':sv==='Truck'?'TL':'AX')};
-const fromRow=r=>({br2:r.brand||'',rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:r.channel||'',br:r.branch||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||''});
-const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null});
+const fromRow=r=>({br2:r.brand||'',rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:r.channel||'',br:r.branch||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
+const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null,erp:o.erp||null,credit:!!o.cr,credit_due:o.cr&&o.cdue?o.cdue:null});
 async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
  const all=async q=>{const f=await q(true).range(0,999);if(f.error)return{data:[],error:f.error};const n=f.count||0,P=[];for(let i=1000;i<n;i+=1000)P.push(q().range(i,i+999));const R=await Promise.all(P);return{data:(f.data||[]).concat(...R.map(x=>x.data||[])),error:null}};
@@ -321,6 +322,13 @@ const isDone=j=>['BOOKED','RELEASED','CANCELED'].includes(j.st);
 const dleft=j=>j.close?Math.round((Date.parse(j.close)-Date.parse(TODAY))/864e5):null;
 const dueTxt=d=>d==null?'ยังไม่กำหนด':d<0?`เลย ${-d} วัน`:d===0?'วันนี้':d===1?'พรุ่งนี้':`อีก ${d} วัน`;
 const dueCol=d=>d==null?'var(--mu)':d<0?'var(--dgr)':d<=1?'var(--wn)':'var(--inf)';const dueCls=d=>d==null?'':d<0?'er':d<=1?'wn':'inf';
+const cleft=j=>j.cdue?Math.round((Date.parse(j.cdue)-Date.parse(TODAY))/864e5):null;
+const erpTag=j=>j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
+const crTag=j=>{if(!j.cr)return '';const d=cleft(j),c=j.pay==='d'?'gy':d==null?'wn':d<0?'er':d<=7?'wn':'inf';return `<div><span class="etag ${c}">เครดิต${j.cdue?' · '+fd(j.cdue).slice(0,5):''}${j.pay!=='d'&&d!=null?' · '+dueTxt(d):''}</span></div>`};
+const crDue=L=>L.filter(j=>j.cr&&j.pay!=='d'&&(!j.cdue||cleft(j)<=7)).sort((a,b)=>(a.cdue||'0').localeCompare(b.cdue||'0'));
+function crAlert(L){const A=crDue(L);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
+ return `<div class="info cr"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>ครบกำหนดชำระเครดิต</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${j.cdue?dueTxt(cleft(j)):'ยังไม่ใส่วันครบกำหนด'} · ${B(j.inc||j.net)}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|cr" style="margin-left:auto;font-weight:600">+${more} งาน</button>`:''}</div>`}
+const erpFollow=L=>L.filter(j=>j.erp==='follow');
 const shTag=j=>{if(!j.as)return '';const o=`${j.s} Owner`,a=`${j.as} Assistant`,t=ROLE===j.as?o:ROLE===j.s?a:`${o} · ${a}`;return `<span class="shr">${t} · 50%</span>`};
 const dueList=L=>L.filter(j=>!isDone(j)).sort((a,b)=>(a.close||'9999').localeCompare(b.close||'9999'));
 function lastClose(L){const C=dueList(L).slice(0,5);
@@ -351,7 +359,7 @@ function homeSales(){
  const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด<button class="r" data-kp="job|open">ดูทั้งหมด</button></h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานค้าง</div>'}</div>`;
  const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>String(j.lead)===String(l.id))).slice(0,6);
  const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3><div>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1;min-width:0"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div></div>`:'';
- return head+dueAlert(A)+k+`<div class="grid g2e">${target(s)}${lastClose(A)}</div><div class="grid g2e"><div class="stack">${jobs}${ld}</div>${payCard(A,Math.max(3,OP.length+(ld?3:0)))}</div>`+leadAlert(s.id);
+ return head+dueAlert(A)+crAlert(A)+k+`<div class="grid g2e">${target(s)}${lastClose(A)}</div><div class="grid g2e"><div class="stack">${jobs}${ld}</div>${payCard(A,Math.max(3,OP.length+(ld?3:0)))}</div>`+leadAlert(s.id);
 }
 function teamRows(list){return list.map(s=>{const v=netOf(s.id),L=mine(s.id),p=s.t2?v/s.t2*100:0;return `<tr><td class="nm"><b>${esc(s.id)}</b><div class="sub">${esc(s.team)}</div></td><td class="n">${N(v)}</td><td class="n">${s.sal?N(s.t2):'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1;--c:${p>=100?'var(--ok)':p>=s.t1/s.t2*100?'var(--br)':'var(--wn)'}"><b style="width:${Math.min(100,p)}%"></b></div><b style="width:42px;text-align:right">${Math.round(p)}%</b></div></td><td class="n">${(([r,c])=>r?`<b style="color:var(--ok)">${r}% · ${N(c)}</b>`:'—')(comm(v,s,commBase(s.id)))}</td><td class="n">${L.length}</td><td class="n">${pend(L).length}</td><td class="n">${L.filter(j=>!j.inc).length}</td><td class="n">${s.trend[8]>=s.trend[7]?'▲':'▼'} ${s.trend[7]?Math.abs(Math.round((s.trend[8]-s.trend[7])/s.trend[7]*100)):0}%</td></tr>`}).join('')}
 function homeHead(){
@@ -416,7 +424,7 @@ function pageCus(){
 }
 
 /* ---------- jobs page ---------- */
-let JP={p:'m',f:'',t:''},JF={st:'',pay:'',x:''};
+let JP={p:'m',f:'',t:''},JF={st:'',pay:'',x:'',erp:''};
 const iso=v=>{const m=String(v||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?m[3]+'-'+m[2]+'-'+m[1]:''};
 const mEnd=k=>{const[y,m]=k.split('-').map(Number);return k+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0')};
 function jpRange(){const t=TODAY,ym=t.slice(0,7),add=(k,n)=>{const[y,m]=k.split('-').map(Number),d=new Date(y,m-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
@@ -424,19 +432,19 @@ function jpRange(){const t=TODAY,ym=t.slice(0,7),add=(k,n)=>{const[y,m]=k.split(
 const jd=j=>j.rm?((j.close||'').slice(0,7)===j.rm?j.close:j.rm+'-15'):(j.close||j.open||'');
 const inJP=j=>{const[a,b]=jpRange(),d=jd(j);return(!a||d>=a)&&(!b||d<=b)};
 const PERL=[['7','7 วันล่าสุด'],['30','30 วันล่าสุด'],['m','เดือนนี้'],['pm','เดือนที่แล้ว'],['y','ปีนี้'],['all','ทั้งหมด'],['c','กำหนดเอง']];
-const perBar=()=>{const[a,b]=jpRange();return `<div class="fgbar"><div class="fg fg-per"><span class="fg-l"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>ช่วงเวลา</span></span><div class="fg-b"><select id="jp_p">${PERL.map(([k,t])=>`<option value="${k}"${JP.p===k?' selected':''}>${t}</option>`).join('')}</select><input id="jp_f" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(a)}"><span class="fg-dash">–</span><input id="jp_t" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(b)}"></div></div>${fgSel('สถานะ Job','jf_st',[['','ทุกสถานะ'],['open','ยังไม่ปิด'],...STA.map(x=>[x,x])],JF.st,FI.tag)}${fgSel('การชำระเงิน','jf_pay',[['','ทั้งหมด'],['p','Pending'],['d','Done']],JF.pay,FI.pay)}${fgSel('งาน','jf_x',[['','ทั้งหมด'],['o','ยังไม่ใส่ยอด'],['nl','ยังไม่ผูก Lead'],['new','ลูกค้าใหม่'],['old','ลูกค้าเก่า'],['due','ถึง Close Date']],JF.x,FI.doc)}${JF.st||JF.pay||JF.x?`<button type="button" class="btn sm fxc" data-jfx>ล้างตัวกรอง</button>`:''}</div>`};
+const perBar=()=>{const[a,b]=jpRange();return `<div class="fgbar"><div class="fg fg-per"><span class="fg-l"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>ช่วงเวลา</span></span><div class="fg-b"><select id="jp_p">${PERL.map(([k,t])=>`<option value="${k}"${JP.p===k?' selected':''}>${t}</option>`).join('')}</select><input id="jp_f" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(a)}"><span class="fg-dash">–</span><input id="jp_t" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(b)}"></div></div>${fgSel('สถานะ Job','jf_st',[['','ทุกสถานะ'],['open','ยังไม่ปิด'],...STA.map(x=>[x,x])],JF.st,FI.tag)}${fgSel('การชำระเงิน','jf_pay',[['','ทั้งหมด'],['p','Pending'],['d','Done']],JF.pay,FI.pay)}${fgSel('งาน','jf_x',[['','ทั้งหมด'],['o','ยังไม่ใส่ยอด'],['nl','ยังไม่ผูก Lead'],['new','ลูกค้าใหม่'],['old','ลูกค้าเก่า'],['due','ถึง Close Date'],['cr','เครดิต']],JF.x,FI.doc)}${fgSel('ERP','jf_erp',[['','ทั้งหมด'],['closed','Closed job ERP'],['follow','ต้องตาม Booking'],['none','ยังไม่ระบุ']],JF.erp,FI.doc)}${JF.st||JF.pay||JF.x||JF.erp?`<button type="button" class="btn sm fxc" data-jfx>ล้างตัวกรอง</button>`:''}</div>`};
 const FI={tag:'<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',pay:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>'};
 const fgSel=(l,id,O,v,ic)=>`<div class="fg"><span class="fg-l"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><span>${l}</span></span><div class="fg-b"><select id="${id}" class="one">${O.map(([k,t])=>`<option value="${k}"${v===k?' selected':''}>${t}</option>`).join('')}</select></div></div>`;
 function pageJob(){
  const base=(isSales()?mine(ROLE):J).filter(inJP);
- if(FIL!=='keep'){JF={st:'',pay:'',x:''};if(FIL==='p')JF.pay='p';else if(['open','new','nl','o','due'].includes(FIL))JF.x=FIL;else if(STA.includes(FIL))JF.st=FIL;FIL='keep'}
- const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?j.no==='ใหม่':JF.x==='old'?j.no==='เก่า':JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
+ if(FIL!=='keep'){JF={st:'',pay:'',x:'',erp:''};if(FIL==='p')JF.pay='p';else if(['open','new','nl','o','due','cr'].includes(FIL))JF.x=FIL;else if(FIL==='erpf')JF.erp='follow';else if(STA.includes(FIL))JF.st=FIL;FIL='keep'}
+ const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.erp||(JF.erp==='none'?!j.erp:j.erp===JF.erp))&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?j.no==='ใหม่':JF.x==='old'?j.no==='เก่า':JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:JF.x==='cr'?j.cr:true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
  const sc=!isSales();
  const sum=base.reduce((a,j)=>a+(sc?(+j.inc||+j.net||0):share$(j)),0);
  return ``+
  kpi([[N(base.length),'งาน','','job|all'],[B(sum),'รายได้สุทธิ','','job|all'],[N(pend(base).length),'ค้างชำระ',pend(base).length?'var(--dgr)':'','job|p'],[N(base.filter(j=>!j.lead).length),'ยังไม่ผูก Lead','','job|nl']])+
  `<div style="margin-top:14px">${perBar()}</div>
- <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n inc">รายได้</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr class="rc" data-ej="${j.id}"><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n inc">${j.inc?N(j.inc,2):'—'}${j.as&&j.inc?`<div class="split">Net · ${N(share$(j),2)}</div>`:''}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button></td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button></td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
+ <div class="pn" style="padding:6px 8px"><div class="scroll"><table class="jt"><thead><tr><th>วันที่เปิด</th><th>Close Date</th><th>Job No.</th><th>บริการ</th><th>ประเทศ</th><th>ลูกค้า</th>${sc?'<th>เซลล์</th>':''}<th class="n inc">รายได้</th><th>ใหม่/เก่า</th><th>Brand</th><th>สถานะงาน</th><th>ชำระเงิน</th><th></th></tr></thead><tbody>${L.map(j=>`<tr class="rc" data-ej="${j.id}"><td>${fd(j.open)}</td><td>${j.close?fd(j.close)+(isDone(j)?'':`<div style="font-size:12px;font-weight:700;color:${dueCol(dleft(j))}">${dueTxt(dleft(j))}</div>`):'—'}</td><td>${jnoB(j)}</td><td><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span></td><td>${j.cty}</td><td class="nm"><b>${cusB(j)}</b>${!sc&&j.as?`<div>${shTag(j)}</div>`:''}</td>${sc?`<td>${j.as?`<div>${j.s} Owner</div><span class="shr">${j.as} Assistant</span>`:j.s}</td>`:''}<td class="n inc">${j.inc?N(j.inc,2):'—'}${j.as&&j.inc?`<div class="split">Net · ${N(share$(j),2)}</div>`:''}</td><td>${j.no}</td><td>${esc(j.br2||j.br)}</td><td><button class="jst ${STC[j.st]}" data-adv="${j.id}">${j.st}</button>${erpTag(j)}</td><td><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button>${crTag(j)}</td><td><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></td></tr>`).join('')||`<tr><td colspan="14" class="empty">ไม่มีงาน</td></tr>`}</tbody></table></div></div>`;
 }
 function pageRep(){
  const rows=SALES.map(s=>`<tr><td class="nm"><b>${s.id}</b><div class="sub">${s.team}</div></td>${s.trend.map((v,i)=>`<td class="n" style="${v===Math.max(...s.trend)&&v?'background:var(--okb);color:var(--ok);font-weight:600':''}">${v?N(i===8?netOf(s.id):v*1000):'—'}</td>`).join('')}<td class="n"><b>${N(s.trend.slice(0,8).reduce((a,b)=>a+b*1000,0)+netOf(s.id))}</b></td></tr>`).join('');
@@ -451,7 +459,7 @@ function render(){
 }
 
 /* ---------- job entry ---------- */
-let F={},SUG=[],BRAND_OK=true;
+let F={},SUG=[],BRAND_OK=true,ERP_OK=true;
 const vatNet=(inc,br)=>br&&br.startsWith('CPLEx')?Math.round(inc/1.07*100)/100:inc;
 const SVC=['EAX','EAE','EAD','EAG','ETL','ETF','ESL','ESF','IAX','IAE','IAD','IAG','ITL','ITF','ISL','ISF','DOM','WH'];
 const CC=['DEU','USA','JPN','SGP','MYS','THA','GBR','AUS','CHN','HKG','CHE','TWN','PHL','NZL','ITA','KOR','CAN','VNM','ESP','NLD','IDN','FRA','SWE','IND','ARE','DNK','BEL','NOR','MAC','KWT','PRT','IRL','LAO','KHM','MMR','AUT','FIN','ISR','TUR','GRC','ZAF','SAU','QAT','BRA','MEX','POL','CZE','LKA','BGD','NPL','BRN','SVK','CHL','KAZ'];
@@ -483,12 +491,15 @@ function drawJob(){
   ${fld('สถานะ Job',`<select class="in" id="jst">${opt(withV(STA,F.st),F.st)}</select>`)}
   ${fld('Open Date',dIn('jopen',F.open))}
   ${fld('Closed Date',dIn('jclose',F.close),{rq:1})}
-  ${fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`,{c:2})}
+  ${fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`)}
+  ${fld('ERP',`<select class="in" id="jerp">${opt([['','—'],['follow','ต้องตาม Booking ปิด ERP'],['closed','Closed job ERP']],F.erp||'')}</select>`)}
   ${fld('Remark',`<input class="in" id="jrem" value="${esc(F.remark)}">`,{c:4,rq:isI})}`)}
  ${sec(3,'ยอดเงินและผู้รับผิดชอบ',`${fld('Sales',`<select class="in" id="jsl">${opt(withV(SALES.map(x=>x.id),F.s),F.s)}</select>`,{rq:1})}
   ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
   ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`)}
-  ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}`)}
+  ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
+  ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
+  ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1}):''}`)}
  </div>
  <div class="js-ft"><button type="button" class="btn" data-close>ยกเลิก</button><button class="btn p" type="submit">บันทึก</button></div>`;
 }
@@ -513,28 +524,31 @@ fj.addEventListener('input',e=>{const t=e.target;
  if(t.id==='jcus'){F.cus=t.value;F.cid=null;clearTimeout(_st);const q=t.value.trim();if(q.length<2){$('jsug').hidden=true;return}_st=setTimeout(()=>cusSearch(q),220);return}
  if(t.id==='jinc'){F.inc=pnum(t.value);const sp=$('jsplit');if(sp)sp.textContent=F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:'';return}
  if(t.id==='jnet'){F.net=pnum(t.value);return}
+ if(t.id==='jcdue'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F.cdue=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  if(t.id==='jclose'||t.id==='jopen'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F[t.id==='jclose'?'close':'open']=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  const m={jno:'job',jawb:'awb',jrem:'remark'};if(m[t.id])F[m[t.id]]=t.value});
-fj.addEventListener('change',e=>{const t=e.target,m={jas:'as',jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(m[t.id]){F[m[t.id]]=t.value;if(t.id==='jst'||t.id==='jas'||t.id==='jsl'){if(t.id==='jsl'&&F.as===F.s)F.as='';drawJob()}if(t.id==='jsl'){const s=SALES.find(x=>x.id===t.value);if(s)F.br=s.br}}});
+fj.addEventListener('change',e=>{const t=e.target,m={jerp:'erp',jas:'as',jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(t.id==='jcr'){F.cr=t.value==='1';return drawJob()}if(m[t.id]){F[m[t.id]]=t.value;
+ if(t.id==='jst'||t.id==='jas'||t.id==='jsl'){if(t.id==='jsl'&&F.as===F.s)F.as='';drawJob()}if(t.id==='jsl'){const s=SALES.find(x=>x.id===t.value);if(s)F.br=s.br}}});
 fj.addEventListener('focusout',e=>{if(e.target.id==='jcus')setTimeout(()=>{if(document.activeElement!==$('jcus')){const u=$('jsug');if(u)u.hidden=true;_sq++}},200)});
 fj.addEventListener('keydown',e=>{if(e.target.id==='jcus'&&e.key==='Enter'){e.preventDefault();const li=$('jsug').querySelector('li.on');if(li&&!$('jsug').hidden)pickSug(li.dataset.sg)}});
 fj.addEventListener('click',e=>{const b=e.target.closest('button,li');if(!b)return;const d=b.dataset;
  if(d.sg!=null)return pickSug(d.sg);if(d.unl!=null){F.lead='';F._ln='';drawJob()}});
 fj.addEventListener('submit',async e=>{e.preventDefault();
- const need=[['jcus',!F.cus.trim()],['jsv',!F.sv],['jcty',!F.cty],['jno',!(F.job||(F._edit?'':nextNo())).trim()],['jclose',!F.close],['jrem',F.st==='ISSUE'&&!String(F.remark||'').trim()]].filter(x=>x[1]);
+ const need=[['jcus',!F.cus.trim()],['jsv',!F.sv],['jcty',!F.cty],['jno',!(F.job||(F._edit?'':nextNo())).trim()],['jclose',!F.close],['jrem',F.st==='ISSUE'&&!String(F.remark||'').trim()],['jcdue',!!F.cr&&!F.cdue]].filter(x=>x[1]);
  fj.querySelectorAll('.in.em').forEach(x=>x.classList.remove('em'));need.forEach(([id])=>$(id)&&$(id).classList.add('em'));
  if(need.length){$(need[0][0]).focus();toast('กรอกช่องที่มี * ให้ครบ');return}
  const no=(F.job||nextNo()).trim();
- const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark};
+ const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark,erp:F.erp||'',cr:!!F.cr,cdue:F.cr?F.cdue||'':''};
  const btn=fj.querySelector('[type=submit]');btn.disabled=true;const sb=HB.sb();
  try{
   if(!F._edit&&!o.cid){const{data:ex}=await sb.from('customers').select('id').ilike('name',o.cus).limit(1);if(ex&&ex[0])o.cid=ex[0].id;else{const{data:c}=await sb.from('customers').insert({name:o.cus,owner:o.s||null}).select('id').single();if(c)o.cid=c.id}}
-  let row=toRow(o);if(!BRAND_OK)delete row.brand;
+  let row=toRow(o);if(!BRAND_OK)delete row.brand;if(!ERP_OK){delete row.erp;delete row.credit;delete row.credit_due}
   const go=()=>F._edit?sb.from('sales_jobs').update(row).eq('id',F.id).select().single():sb.from('sales_jobs').insert(row).select().single();
   let{data,error}=await go();
   if(error&&/brand/.test(error.message||'')){BRAND_OK=false;delete row.brand;({data,error}=await go())}
+  if(error&&/erp|credit/.test(error.message||'')){ERP_OK=false;delete row.erp;delete row.credit;delete row.credit_due;({data,error}=await go())}
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message);return}
-  const nj=fromRow(data);if(F._edit){const k=J.findIndex(x=>String(x.id)===String(F.id));if(k>=0)J[k]=nj}else{J.unshift(nj);seq++}
+  const nj=data?fromRow(data):fromRow({...toRow(o),id:F.id});if(F._edit){const k=J.findIndex(x=>String(x.id)===String(F.id));if(k>=0)J[k]=nj}else{J.unshift(nj);seq++}
   if(!F._edit&&o.lead){try{const{data:l}=await sb.from('leads').select('status,deal_amt,detail,customer_id').eq('id',o.lead).single();if(l){const dt={...(l.detail||{})},g=MG(o.sv),sv=g==='Sea'?'Sea':g==='Truck'?'Truck':'Air',dir=o.sv[0]==='I'?'นำเข้า':'ส่งออก',up={status:ST.Y};
    if(!+l.deal_amt&&!(dt.deals||[]).length){up.deal_amt=o.net||o.inc||0;up.deal_date=o.close;dt.cl={dir,svc:sv,cty:cname(o.cty)}}else dt.deals=[...(dt.deals||[]),{d:o.close,a:o.net||o.inc||0,dr:dir,s:sv,c:cname(o.cty)}];
    up.detail=dt;if(!l.customer_id&&o.cid)up.customer_id=o.cid;await sb.from('leads').update(up).eq('id',o.lead)}}catch(e){}}
@@ -552,11 +566,11 @@ $('fc').addEventListener('submit',async e=>{e.preventDefault();const v=pnum($('c
 document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
 
 /* ---------- page actions ---------- */
-$('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='jf_st'||t.id==='jf_pay'||t.id==='jf_x'){JF[t.id.slice(3)]=t.value;FIL='keep';return render()}if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
+$('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='jf_st'||t.id==='jf_pay'||t.id==='jf_x'||t.id==='jf_erp'){JF[t.id.slice(3)]=t.value;FIL='keep';return render()}if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
 $('ct').addEventListener('input',e=>{const t=e.target;if(t.id==='jp_f'||t.id==='jp_t'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v}});
 $('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2],[data-kp],[data-jfx]');if(!b)return;const d=b.dataset;
  if(d.nj!=null)return openJob();if(d.lj)return openJob(null,(LD.find(x=>String(x.id)===d.lj)||{}).raw);if(d.sal)return openSal(d.sal);if(d.lfil){LFIL=d.lfil;return render()}if(d.cx){COPEN=COPEN===d.cx?'':d.cx;return render()}if(d.cj)return openJob(null,null,CUS.find(c=>c.code===d.cj));
- if(b.hasAttribute('data-jfx')){JF={st:'',pay:'',x:''};FIL='keep';return render()}if(d.kp){const[p,f]=d.kp.split('|');if(PAGE!=='job')JP={p:'m',f:'',t:''};PAGE=p;FIL=f||'all';return render()}if(d.go==='lead'){try{HB.go('L')}catch(e){}return}if(d.go==='F'){try{HB.go('F')}catch(e){}return}if(d.go){PAGE=d.go;return render()}if(d.ld2){try{HB.lead(+d.ld2||d.ld2)}catch(e){}return}if(d.cu2){try{HB.cus(d.cu2)}catch(e){}return}if(d.jv){JV=d.jv;return render()}if(d.fil){FIL=d.fil;return render()}
+ if(b.hasAttribute('data-jfx')){JF={st:'',pay:'',x:'',erp:''};FIL='keep';return render()}if(d.kp){const[p,f]=d.kp.split('|');if(PAGE!=='job')JP={p:'m',f:'',t:''};PAGE=p;FIL=f||'all';return render()}if(d.go==='lead'){try{HB.go('L')}catch(e){}return}if(d.go==='F'){try{HB.go('F')}catch(e){}return}if(d.go){PAGE=d.go;return render()}if(d.ld2){try{HB.lead(+d.ld2||d.ld2)}catch(e){}return}if(d.cu2){try{HB.cus(d.cu2)}catch(e){}return}if(d.jv){JV=d.jv;return render()}if(d.fil){FIL=d.fil;return render()}
  const j=J.find(x=>String(x.id)===(d.adv||d.pay||d.ej));
  if(j&&j.ro&&(d.adv||d.pay))return toast('รายการนี้มาจาก Lead');if(j&&j.ro&&d.ej)return openJob({...j,id:null,job:'',ro:0,_conv:1});
  if(d.adv&&j){const i=STS.indexOf(j.st),st=STS[Math.min(STS.length-1,i+1)];return upd(j,{status:st},()=>{j.st=st;toast(j.job+' → '+st)})}
