@@ -359,7 +359,7 @@ function homeHead(){
  const alerts=[...dueList(J).filter(j=>j.close&&dleft(j)<=1).map(j=>[`${j.s} · ${j.job} · ${j.cus}`,`Close Date ${fd(j.close)} (${dueTxt(dleft(j))}) · ${j.st}`,'var(--ac)']),...pd.filter(j=>j.inc).map(j=>[`${j.s} · ${j.cus}`,`ค้างชำระ ${B(j.inc)}`,'var(--dgr)'])].slice(0,6);
  const groups=['CPL-Inter','CPLEx','Offline Team'].map(t=>[t,SALES.filter(s=>s.team===t)]);
  return ``+
- kpi([[B(tot),'ยอดสุทธิทั้งทีม','var(--ok)'],[Math.round(tot/tg*100)+'%','ของเป้ารวม','var(--br)'],[pd.length+' งาน','ค้างชำระ','var(--dgr)'],[J.filter(j=>!j.inc).length+' งาน','ยังไม่ใส่ยอด','var(--wn)']])+
+ kpi([[B(tot),'ยอดสุทธิทั้งทีม','var(--ok)'],[SALES.some(s=>s.t2)?Math.round(tot/tg*100)+'%':'—','ของเป้ารวม','var(--br)'],[pd.length+' งาน','ค้างชำระ','var(--dgr)'],[J.filter(j=>!j.inc).length+' งาน','ยังไม่ใส่ยอด','var(--wn)']])+
  `<div class="grid" style="margin-top:14px"><div class="pn"><h3>เป้ารายคน · ขั้นคอมคำนวณจากเงินเดือน (20 เท่า = 1%, 30 เท่า = 2%)</h3><div class="scroll"><table><thead><tr><th>เซลล์</th><th class="n">ยอดสุทธิ</th><th class="n">เป้า 2% (30 เท่า)</th><th>ความคืบหน้า</th><th class="n">ขั้นคอม</th><th class="n">งาน</th><th class="n">ค้างชำระ</th><th class="n">รอใส่ยอด</th><th class="n">เทียบ ต.ค.</th></tr></thead><tbody>${groups.map(([g,L])=>`<tr><td colspan="9" style="background:var(--infb);font-weight:600;color:var(--inf)">${g}</td></tr>`+teamRows(L)).join('')}</tbody></table></div></div>
  <div class="pn"><h3>ต้องตามต่อ</h3>${alerts.map(([a,b,c])=>`<div class="row"><span class="chip" style="--c:${c}">!</span><div><h4>${esc(a)}</h4><div class="s">${esc(b)}</div></div></div>`).join('')||'<div class="empty">ไม่มี</div>'}</div></div>`;
 }
@@ -575,8 +575,9 @@ async function reload(){await loadAll();render()}
  await loadAll();
  let r0='';try{r0=localStorage.getItem('hb-role')||''}catch(e){}
  ROLE=ROLES.some(x=>x[0]===r0)?r0:'HEAD';
- {const p=HB.profile()||{};if(p.role!=='admin'){const nm=p.name||'';if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
+ {const p=HB.profile()||{};if(p.role==='sales_lead'&&!r0)ROLE='HEAD';if(!['admin','sales_lead'].includes(p.role)){const nm=p.name||'';if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
  $('role').innerHTML=ROLES.map(([k,t])=>`<option value="${esc(k)}">${esc(t)}</option>`).join('');$('role').value=ROLE;
+ document.body.classList.add('notb');window.hbSetRole=v=>{ROLE=v;PAGE='home';try{localStorage.setItem('hb-role',ROLE)}catch(er){}render()};try{(parent.HB_roles||(()=>{}))(ROLES,ROLE)}catch(e){}
  render();if(DBERR)toast('โหลดข้อมูลงานไม่สำเร็จ: '+DBERR);
 })();
 }
