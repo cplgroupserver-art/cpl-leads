@@ -1367,8 +1367,8 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
   const lg=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mu)"><i style="width:10px;height:10px;border-radius:3px;background:${c}"></i>${t}</span>`;
   return `<div class="pn w12"><h3>${TT('ลูกค้าใหม่ / ลูกค้าเก่า แยกตาม Ads','New vs returning customers by Ads')}</h3><div style="display:flex;gap:16px;flex-wrap:wrap;margin:-4px 0 12px">${ltK.map((t,i)=>lg(LTC[t],ltName(t)+' '+N(S[i])+(i?'':' ('+pc(S[0],tot)+')'))).join('')}</div><table class="stt"><colgroup><col style="width:20%"><col style="width:18%"><col><col><col><col><col><col><col><col><col></colgroup><thead><tr>${th('Ads')}${th('')}${th('Lead',1)}${th(TT('ใหม่','New'),1)}${th(TT('ทักซ้ำ','Repeat'),1)}${th('Active',1)}${th('Win-back',1)}${th(TT('% ใหม่','% new'),1)}${th(TT('ใหม่ที่ปิดได้','New closed'),1)}${th(TT('เก่าที่ปิดได้','Returning closed'),1)}${th(TT('กิจกรรม','Activities'),1)}</tr></thead><tbody>${L.map(([k,n,c,wn,wo,ac])=>`<tr><td title="${esc(k)}">${esc(k)}</td><td>${bar(c)}</td><td class="num">${N(n)}</td>${c.map(x=>`<td class="num">${Z(x)}</td>`).join('')}<td class="num">${pc(c[0],n)}</td><td class="num">${Z(wn)}</td><td class="num">${Z(wo)}</td><td class="num">${Z(ac)}</td></tr>`).join('')}</tbody></table></div>`};
  const opn=l.filter(r=>![ST_Y,ST_N].includes(effS(r))),t0=today(),fuOd=opn.filter(r=>fuDue(r)<t0).length,fuTd=opn.filter(r=>fuDue(r)===t0).length;
- const SJR=sjGet(lo,b),sjOk=!!SJR,sjT=s=>{const o=(OPTS.sales||[]).find(x=>x.value===s);return o?o.team:''},meS=profile&&profile.role==='sales'?profile.name:'';
- const SJ=(SJR||[]).filter(j=>{const d=j._d;if(!d||(lo&&d<lo)||(b&&d>b)||(vmv&&d.slice(0,7)!==vmv))return false;if(tm&&sjT(j.sales)!==tm&&!(j.assistant&&sjT(j.assistant)===tm))return false;if(sl&&j.sales!==sl&&j.assistant!==sl)return false;if(meS&&j.sales!==meS&&j.assistant!==meS)return false;return true});
+ const SJR=sjGet(lo,b),sjOk=!!SJR,sjT=s=>{const o=(OPTS.sales||[]).find(x=>sCode(x.value)===sCode(s));return o?o.team:''},meS=profile&&profile.role==='sales'?sCode(profile.name):'';
+ const SJ=(SJR||[]).filter(j=>{const d=j._d;if(!d||(lo&&d<lo)||(b&&d>b)||(vmv&&d.slice(0,7)!==vmv))return false;if(tm&&sjT(j.sales)!==tm&&!(j.assistant&&sjT(j.assistant)===tm))return false;if(sl&&sCode(j.sales)!==sCode(sl)&&sCode(j.assistant)!==sCode(sl))return false;if(meS&&sCode(j.sales)!==meS&&sCode(j.assistant)!==meS)return false;return true});
  const jInc=j=>+j.income||+j.net||0,jSh=j=>j.assistant?(+j.income?(+j.income)/2:(+j.net||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>Math.round(v.reduce((t,j)=>t+jV(j),0));
  const LM=new Map();SJD.L.forEach((v,k)=>LM.set(k,v));pool.forEach(r=>LM.set(r.id,r));const jL=j=>j.lead_id&&LM.get(j.lead_id),jAds=j=>{const r=jL(j);return r?(r.ads||'(ไม่ระบุ Ads)'):'(ไม่ได้ผูก Lead)'};
  const jMd=j=>svMode(j.svc),jDir=j=>svDir(j.svc),jTy=j=>svType(j.svc),jCh=j=>normCh(j.channel),jCf=k=>c3h(k);
@@ -1411,6 +1411,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  else h=jsec('ตัวเลขการเงิน')+jMon()+(sl?'':jSB())+jPay()+jdn('New / Active / Win-back',jg(jNO,U2),4)+jSales()+fuS+tpP+(sl?'':stb('KPI รายเซลล์ (Lead)',grp(r=>r.sales,'(ยังไม่ระบุเซลล์)'),30,0,r=>r.sales,'(ยังไม่ระบุเซลล์)',null,1))+jsec('งานที่ปิดได้ของ <b>'+esc(sl||meS||'เซลล์ทุกคน')+'</b>')+jrb('ประเทศ',jg(j=>j.country,U2),8,jCf)+jrb('ประเภทบริการ',jg(jTy,U2),8)+jdn('Air / Sea / Truck / Courier',jg(jMd,U2))+pbars()+cases+qd+DET('Lead: สถานะและตารางสรุป',trend+sdn+sum);
  $('dg').innerHTML=(dashMode==='A'?'':sstrip)+h;
 }
+const sCode=v=>String(v||'').split(/\s+[-–]\s+|\s*\/\/\s*/)[0].trim().toUpperCase();
 const brN=v=>{const k=String(v||'').toUpperCase().replace(/[\s_-]/g,'');return ({CPL:'CPL-INTER',CPLINTER:'CPL-INTER',IMTH:'IMTHAI',IMTHAI:'IMTHAI',CPLEXDEU:'CPLEx DEU',CPLEXGBP:'CPLEx GBP',CPLEXUSA:'CPLEx USA',CLMV:'CLMV'})[k]||v||''};
 function jNw(j){return j.new_old==='ใหม่'||j.new_old==='New'}
 function jNO(j){const v=j.new_old;return v==='ใหม่'?'New':v==='เก่า'?'เก่า (ไม่ระบุ)':v||''}
@@ -7068,11 +7069,11 @@ window.pvSales=()=>{const w=$('hbrw'),sel=$('hbr');const on=!!(PVR&&PVR.role==='
 $('hbr').onchange=e=>{profile.name=e.target.value;applyRoleUI(profile);reload();const f=$('hbf');if(f&&f.getAttribute('src'))f.src=f.getAttribute('src').split('?')[0]+'?v='+Date.now()};
 const isS=()=>!!(profile&&profile.role==='sales');
 $('hbsub').addEventListener('click',e=>{const b=e.target.closest('[data-hp]');if(!b||b.dataset.hp==='my')return;tab('HB');const go=()=>{try{$('hbf').contentWindow.hbPage(b.dataset.hp)}catch(er){setTimeout(go,300)}};go()});
-const gate=()=>{$('tHB').classList.toggle('hid',!ok());$('tF').classList.toggle('hid',isS()&&ok());$('hbsub').classList.toggle('hid',!(isS()&&ok()));if(!ok()&&!$('vHB').classList.contains('hid'))tab('L')};
+const hmF=()=>ok()&&(isS()||(profile&&profile.role==='admin'));const gate=()=>{$('tHB').classList.toggle('hid',!ok());$('tF').classList.toggle('hid',hmF());$('hbsub').classList.toggle('hid',!hmF());if(!ok()&&!$('vHB').classList.contains('hid'))tab('L')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
 const fit=()=>{const n=document.querySelector('nav.tabs');if(!n)return;const b=n.getBoundingClientRect();document.documentElement.style.setProperty('--hbl',Math.round(b.right)+'px');document.documentElement.style.setProperty('--hbt',Math.round(b.bottom)+'px')};addEventListener('resize',fit);try{new ResizeObserver(fit).observe(document.querySelector('nav.tabs'))}catch(e){}
 const _t=tab;tab=function(k){document.body.classList.toggle('hbon',k==='HB'&&ok());if(k==='HB')fit();if(k==='HB'){if(!ok())return;document.querySelectorAll('main>[id^="v"]').forEach(v=>v.classList.toggle('hid',v.id!=='vHB'));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.id==='tHB'));const f=$('fnb');if(f)f.classList.add('hid');const fr=$('hbf');if(!fr.src||fr.dataset.at&&Date.now()-fr.dataset.at>300000){fr.src='beta.html?v='+Date.now();fr.dataset.at=Date.now()}return}
- $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'&&isS()&&ok()){$('tHB').classList.add('on');$('hbsub').classList.remove('hid')}return rv};
+ $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'&&hmF()){$('tHB').classList.add('on');$('hbsub').classList.remove('hid')}return rv};
 $('tHB').onclick=()=>tab('HB');gate();
 })();
 

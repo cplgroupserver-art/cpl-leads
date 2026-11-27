@@ -252,8 +252,9 @@ const CUR=MK[8],inM=(j,k)=>(j.rm||j.close||j.open||'').startsWith(k);
 const LST={[ST.S]:'var(--wn)',[ST.H]:'var(--inf)',[ST.Y]:'var(--ok)'};
 const ctyCode=v=>{if(!v)return '';const t=String(v).trim(),u=t.toUpperCase();const c=CTY.find(x=>x[0]===u||x[1]===t);return c?c[0]:t};
 const leadSv=r=>{const io=r.dir==='นำเข้า'?'I':'E',sv=Array.isArray(r.svc)?r.svc[0]:r.svc;return io+(sv==='Sea'?'SL':sv==='Truck'?'TL':'AX')};
+const sCode=v=>String(v||'').split(/\s+[-–]\s+|\s*\/\/\s*/)[0].trim().toUpperCase();
 const brN=v=>{const k=String(v||'').toUpperCase().replace(/[\s_-]/g,'');return ({CPL:'CPL-INTER',CPLINTER:'CPL-INTER',IMTH:'IMTHAI',IMTHAI:'IMTHAI',CPLEXDEU:'CPLEx DEU',CPLEXGBP:'CPLEx GBP',CPLEXUSA:'CPLEx USA',CLMV:'CLMV'})[k]||v||''};
-const fromRow=r=>({br2:brN(r.brand),rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:brN(r.branch)||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',promo:r.promo||'',fin:r.fin||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
+const fromRow=r=>({br2:brN(r.brand),rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:sCode(r.sales),as:sCode(r.assistant),cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:brN(r.branch)||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',promo:r.promo||'',fin:r.fin||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
 const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null,promo:o.promo||null,fin:o.fin||null,erp:o.erp||null,credit:!!o.cr,credit_due:o.cr&&o.cdue?o.cdue:null});
 async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
@@ -264,13 +265,13 @@ async function loadAll(){
   all(c=>sb.from('sales_jobs').select('*',c?{count:'exact'}:undefined).or(`rep_month.gte.${m0},close_date.gte.${d0},open_date.gte.${d0}`).order('id',{ascending:true})),
   (async()=>{const f=x=>sb.from('leads').select(x).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400);const r=await f(lc+',lead_type');return r.error?f(lc):r})()]);
  DBERR=(tg.error||jr.error||{}).message||'';
- const sal={},TG={};(tg.data||[]).forEach(x=>{sal[x.sales]=+x.salary||0;TG[x.sales]=x});
- SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,tm:o.team||'',team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[o.value]||0}));
+ const sal={},TG={};(tg.data||[]).forEach(x=>{const k=sCode(x.sales);sal[k]=+x.salary||0;TG[k]=x});
+ SALES=HB.sales().filter(o=>o.value).map(o=>({id:sCode(o.value),name:o.value,tm:o.team||'',team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[sCode(o.value)]||0}));
  SALES.forEach(s=>{const g=TG[s.id]||{};s.t1=+g.t1||s.sal*20;s.t2=+g.t2||s.sal*30;if(!s.sal&&(+g.t1||+g.t2))s.sal=1});
  J=(jr.data||[]).map(fromRow);
  try{const lv=await sb.from('duty_leave').select('*').order('d',{ascending:true});LV=lv.error?[]:(lv.data||[])}catch(e){LV=[]}
  SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>(j.s===s.id||j.as===s.id)&&inM(j,k)).reduce((a,j)=>a+share$(j),0)/1000));
- LD=(lr.data||[]).filter(r=>r.status!==ST.N).map(r=>({raw:r,id:r.id,in:r.date,t:'',n:r.name||'',ph:'',ads:r.ads||r.channel||'',ch:r.channel||'',s:r.sales||'',sv:leadSv(r),cty:ctyCode(r.country),st:r.status||ST.S,cid:r.customer_id}));
+ LD=(lr.data||[]).filter(r=>r.status!==ST.N).map(r=>({raw:r,id:r.id,in:r.date,t:'',n:r.name||'',ph:'',ads:r.ads||r.channel||'',ch:r.channel||'',s:sCode(r.sales),sv:leadSv(r),cty:ctyCode(r.country),st:r.status||ST.S,cid:r.customer_id}));
  const pre=TODAY.slice(2,4)+TODAY.slice(5,7)+'-';seq=1+Math.max(0,...J.filter(j=>j.job.startsWith(pre)).map(j=>+j.job.slice(5)||0));
  ROLES=[...SALES.map(s=>[s.id,`${s.id} · ${s.team}`]),['HEAD','หัวหน้าเซลล์ (ทุกคน)'],['CEO','ผู้บริหาร']];
 }
@@ -385,7 +386,7 @@ function homeSales(){
  const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3><div>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1;min-width:0"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div></div>`:'';
  return head+dutyToday()+k+`<div class="grid g2e">${target(s)}${payCard(A,5)}</div>`+crCard(A)+`${ld?`<div class="grid g2e">${jobs}${ld}</div>`:jobs}`+erpAlert(A)+leadAlert(s.id);
 }
-function teamRows(list){return list.map(s=>{const v=netOf(s.id),L=mine(s.id),p=s.t2?v/s.t2*100:0;return `<tr><td class="nm"><b>${esc(s.id)}</b><div class="sub">${esc(s.team)}</div></td><td class="n">${N(v)}</td><td class="n">${s.sal?N(s.t2):'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1;--c:${p>=100?'var(--ok)':p>=s.t1/s.t2*100?'var(--br)':'var(--wn)'}"><b style="width:${Math.min(100,p)}%"></b></div><b style="width:42px;text-align:right">${Math.round(p)}%</b></div></td><td class="n">${(([r,c])=>r?`<b style="color:var(--ok)">${r}% · ${N(c)}</b>`:'—')(comm(v,s,commBase(s.id)))}</td><td class="n">${L.length}</td><td class="n">${pend(L).length}</td><td class="n">${L.filter(j=>!j.inc).length}</td><td class="n">${s.trend[8]>=s.trend[7]?'▲':'▼'} ${s.trend[7]?Math.abs(Math.round((s.trend[8]-s.trend[7])/s.trend[7]*100)):0}%</td></tr>`}).join('')}
+function teamRows(list){return list.map(s=>{const v=netOf(s.id),L=mine(s.id),p=s.t2?v/s.t2*100:0;return `<tr><td class="nm"><b>${esc(s.name||s.id)}</b><div class="sub">${esc(s.team)}</div></td><td class="n">${N(v)}</td><td class="n">${s.sal?N(s.t2):'—'}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1;--c:${p>=100?'var(--ok)':p>=s.t1/s.t2*100?'var(--br)':'var(--wn)'}"><b style="width:${Math.min(100,p)}%"></b></div><b style="width:42px;text-align:right">${Math.round(p)}%</b></div></td><td class="n">${(([r,c])=>r?`<b style="color:var(--ok)">${r}% · ${N(c)}</b>`:'—')(comm(v,s,commBase(s.id)))}</td><td class="n">${L.length}</td><td class="n">${pend(L).length}</td><td class="n">${L.filter(j=>!j.inc).length}</td><td class="n">${s.trend[8]>=s.trend[7]?'▲':'▼'} ${s.trend[7]?Math.abs(Math.round((s.trend[8]-s.trend[7])/s.trend[7]*100)):0}%</td></tr>`}).join('')}
 function homeHead(){
  const tot=SALES.reduce((a,s)=>a+netOf(s.id),0),tg=SALES.reduce((a,s)=>a+s.t2,0)||1,pd=pend(J);
  const alerts=[...dueList(J).filter(j=>j.close&&dleft(j)<=1).map(j=>[`${j.s} · ${j.job} · ${j.cus}`,`Close Date ${fd(j.close)} (${dueTxt(dleft(j))}) · ${j.st}`,'var(--ac)']),...pd.filter(j=>j.inc).map(j=>[`${j.s} · ${j.cus}`,`ค้างชำระ ${B(j.inc)}`,'var(--dgr)'])].slice(0,6);
@@ -525,11 +526,11 @@ function pageRep(){
  return `<div class="pn" style="padding:8px 10px"><div class="scroll"><table><thead><tr><th>เซลล์</th>${MON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">รวม</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
-const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน']]),...(dutyOk()?[['duty','ตารางเวร']]:[])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
+const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน'],...((()=>{try{return (HB.profile()||{}).role==='admin'}catch(e){return false}})()?[['my','งานของฉัน']]:[])]),...(dutyOk()?[['duty','ตารางเวร']]:[])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
 function render(){try{erpSync()}catch(e){}
  renderNav();
  const c=$('ct');
- c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${isBoss()?`<label class="vsel"><span>เซลล์</span><select id="vs_r" aria-label="เลือกเซลล์">${[['HEAD','ทุกคน'],...SALES.map(x=>[x.id,x.id+' · '+x.team])].map(([k,t])=>`<option value="${esc(k)}"${ROLE===k||(k==='HEAD'&&!isSales())?' selected':''}>${esc(t)}</option>`).join('')}</select></label>${PAGE==='job'?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}`:(PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':'')}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
+ c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${isBoss()?`<label class="vsel"><span>เซลล์</span><select id="vs_r" aria-label="เลือกเซลล์">${[['HEAD','ทุกคน'],...SALES.map(x=>[x.id,(x.name||x.id)+' · '+x.team])].map(([k,t])=>`<option value="${esc(k)}"${ROLE===k||(k==='HEAD'&&!isSales())?' selected':''}>${esc(t)}</option>`).join('')}</select></label>${PAGE==='job'?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}`:(PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':'')}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
 }
 
 /* ---------- job entry ---------- */
@@ -540,7 +541,7 @@ const CC=['DEU','USA','JPN','SGP','MYS','THA','GBR','AUS','CHN','HKG','CHE','TWN
 const STA=['PACKING','PAYMENT','BOOKED','RELEASED','ISSUE','CANCELED'];
 const opt=(L,v,e)=>(e!=null?`<option value="">${e}</option>`:'')+L.map(x=>{const[k,t]=Array.isArray(x)?x:[x,x];return `<option value="${esc(k)}"${String(v)===String(k)?' selected':''}>${esc(t)}</option>`}).join('');
 const withV=(L,v)=>v&&!L.includes(v)?[v,...L]:L;
-const meName=()=>{try{const n=(HB.profile()||{}).name||'';const m=SALES.find(s=>s.id.toLowerCase()===n.trim().toLowerCase());return m&&m.id}catch(e){return ''}};
+const meName=()=>{try{const n=(HB.profile()||{}).name||'';const m=SALES.find(s=>s.id===sCode(n));return m&&m.id}catch(e){return ''}};
 const prList=()=>{let a=[];try{a=HB.promos(((SALES.find(x=>x.id===F.s)||{}).tm)||'')||[]}catch(e){}return a};
 const chList=()=>{let a=[];try{a=HB.channels()||[]}catch(e){}return [...new Set([...a,...CH])]};
 const ctyOpt=v=>withV(CC,v).map(k=>[k,k+' · '+c3(k).n]);
@@ -681,7 +682,7 @@ async function reload(){await loadAll();render()}
  await loadAll();
  let r0='';try{r0=localStorage.getItem('hb-role')||''}catch(e){}
  ROLE=ROLES.some(x=>x[0]===r0)?r0:'HEAD';
- {const p=HB.profile()||{};if(p.role==='sales_lead'&&!r0)ROLE='HEAD';if(!['admin','sales_lead'].includes(p.role)){const nm=p.name||'';if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
+ {const p=HB.profile()||{};if(p.role==='sales_lead'&&!r0)ROLE='HEAD';if(!['admin','sales_lead'].includes(p.role)){const nm=sCode(p.name);if(!SALES.some(x=>x.id===nm))SALES.push({id:nm,name:nm,team:'',br:'CPL-INTER',sal:0,trend:MK.map(()=>0)});ROLES=[[nm,nm]];ROLE=nm;document.body.classList.add('notb')}}
  $('role').innerHTML=ROLES.map(([k,t])=>`<option value="${esc(k)}">${esc(t)}</option>`).join('');$('role').value=ROLE;
  document.body.classList.add('notb');window.hbPage=p=>{PAGE=p;render()};window.hbSetRole=v=>{ROLE=v;PAGE='home';try{localStorage.setItem('hb-role',ROLE)}catch(er){}render()};try{(parent.HB_roles||(()=>{}))(ROLES,ROLE)}catch(e){}
  render();if(DBERR)toast('โหลดข้อมูลงานไม่สำเร็จ: '+DBERR);
