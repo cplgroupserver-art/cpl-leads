@@ -1103,6 +1103,9 @@ async function start(){
  document.body.classList.add('out');
  if(!window.supabase||SUPABASE_URL.startsWith('PASTE')){$('lge').textContent='ยังไม่ได้ใส่ SUPABASE_URL / SUPABASE_KEY ในไฟล์ index.html';return}
  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+ try{const SNT=/\/rest\/v1\/(so_deals|so_visits|so_calls|so_call_logs|so_activity)(\?|$)/,SNF=['sales','assignee','last_call_by','actor','calling_by'],fx=o=>{if(o&&typeof o==='object')SNF.forEach(k=>{if(typeof o[k]==='string'&&o[k])o[k]=sName(o[k])});return o};
+  let pr=Object.getPrototypeOf(sb.from('so_deals').select('id'));while(pr&&!Object.prototype.hasOwnProperty.call(pr,'then'))pr=Object.getPrototypeOf(pr);
+  if(pr&&!pr.__sn){const ot=pr.then;pr.then=function(a,b){const u=String(this.url||'');if(!SNT.test(u))return ot.call(this,a,b);return ot.call(this,r=>{try{if(r&&r.data){if(Array.isArray(r.data))r.data.forEach(fx);else fx(r.data)}}catch(_){}return a?a(r):r},b)};pr.__sn=1}}catch(_){}
  const SK='cpl_sess';try{if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange((ev,ss)=>{try{if(ss&&ss.refresh_token)localStorage.setItem(SK,JSON.stringify({access_token:ss.access_token,refresh_token:ss.refresh_token}));else if(ev==='SIGNED_OUT')localStorage.removeItem(SK)}catch(e){}})}catch(e){}
  $('lgf').onsubmit=async e=>{e.preventDefault();$('lge').textContent='';const{error}=await sb.auth.signInWithPassword({email:$('lgm').value.trim(),password:$('lgp').value});if(error)$('lge').textContent='อีเมลหรือรหัสผ่านไม่ถูกต้อง';else enter()};
  $('lo').onclick=async()=>{try{localStorage.removeItem(SK)}catch(e){}await (()=>{try{localStorage.removeItem('gtk')}catch(e){}return sb.auth.signOut()})();location.reload()};
@@ -3551,7 +3554,7 @@ const soDeal=id=>SO.deals.find(x=>String(x.id)===String(id));
 const TEMP={hot:['Hot','#e0452f'],warm:['Warm','#c27100'],cold:['Cold','#1d7fd6']},tpOf=d=>((d&&d.data)||{}).temp||'',tpChip=k=>TEMP[k]?`<span class="so2-chip" style="--c:${TEMP[k][1]}">${TEMP[k][0]}</span>`:'';
 const tpPick=n=>`<div class="tp-pk">${Object.entries(TEMP).map(([k,[l,c]])=>`<label style="--c:${c}"><input type="radio" name="${n}" value="${k}"><span><i></i>${l}</span></label>`).join('')}</div>`;
 const soMy=()=>profile&&profile.role==='sales'?SO.deals.filter(d=>(d.sales||'')===soActor()):SO.deals;
-const soActor=()=>(profile&&profile.name)||'';
+const soActor=()=>profile&&profile.name?sName(profile.name):'';
 async function soLog(action_text){try{await sb.from('so_activity').insert({team:'C',actor_name:soActor(),action_text})}catch(e){}}
 async function soLoad(){
  const[d,v,a]=await Promise.all([
@@ -7002,7 +7005,7 @@ document.addEventListener('click',e=>{const o=e.target.closest&&e.target.closest
 <script>
 (function(){
 const isOff=()=>!!profile&&profile.role==='sales'&&profile.team==='C';
-const me=()=>(profile&&profile.name)||'';
+const me=()=>profile&&profile.name?sName(profile.name):'';
 let CB=[],FV='d',TK=null;
 const p2=v=>String(v).padStart(2,'0'),hm=d=>p2(d.getHours())+':'+p2(d.getMinutes());
 const dueAt=c=>new Date(c.callback_date+'T'+(((c.data||{}).cbt)||'09:00')+':00');
