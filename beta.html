@@ -261,7 +261,7 @@ async function loadAll(){
  const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu,promo';
  const [tg,jr,lr]=await Promise.all([sb.from('sales_targets').select('*'),
   all(c=>sb.from('sales_jobs').select('*',c?{count:'exact'}:undefined).or(`rep_month.gte.${m0},close_date.gte.${d0},open_date.gte.${d0}`).order('id',{ascending:true})),
-  sb.from('leads').select(lc).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400)]);
+  (async()=>{const f=x=>sb.from('leads').select(x).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400);const r=await f(lc+',lead_type');return r.error?f(lc):r})()]);
  DBERR=(tg.error||jr.error||{}).message||'';
  const sal={},TG={};(tg.data||[]).forEach(x=>{sal[x.sales]=+x.salary||0;TG[x.sales]=x});
  SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,tm:o.team||'',team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[o.value]||0}));
@@ -377,7 +377,7 @@ function checklist(br){const L=CKD[br==='CPLExJJ'?'BR':'HO'];return `<div class=
 function homeSales(){
  const s=me(),M=J.filter(j=>j.s===s.id&&inM(j,CUR)),A=mine(s.id),pd=A.filter(j=>j.pay==='p'),nl=M.filter(j=>!j.lead);
  const head=``;
- const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(j=>j.no==='ใหม่').length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
+ const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(isNewJ).length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
  const NC=A.filter(j=>!j.close&&j.st!=='CANCELED').sort((a,b)=>(b.open||'').localeCompare(a.open||'')),OP=NC.slice(0,5);
  const jobs=`<div class="pn col"><h3>ยังไม่มี Close Date · ${N(NC.length)}${NC.length>OP.length?'<button class="r" data-kp="job|nc">ดูทั้งหมด</button>':''}</h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานที่ยังไม่ใส่ Close Date</div>'}</div>`;
  const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>String(j.lead)===String(l.id))).slice(0,6);
@@ -418,7 +418,7 @@ function bars(rows,col){const mx=Math.max(1,...rows.map(x=>x[1]));return rows.ma
 const grp=(L,f)=>{const m={};L.forEach(j=>{const k=f(j);m[k]=m[k]||[0,0];m[k][0]+=+j.net||0;m[k][1]++});return Object.entries(m).sort((a,b)=>b[1][0]-a[1][0])};
 function pageDb(){
  const L=(isSales()?mine(ROLE):J).filter(j=>inM(j,CUR)),W=L.filter(j=>j.net),tot=W.reduce((a,j)=>a+(!isSales()||j.s===ROLE?j.net:0),0);
- const fromLead=W.filter(j=>j.lead),nw=W.filter(j=>j.no==='ใหม่');
+ const fromLead=W.filter(j=>j.lead),nw=W.filter(isNewJ);
  return ``+
  kpi([[B(tot),'ยอดสุทธิ','var(--ok)'],[W.length+' งาน','งานที่ใส่ยอดแล้ว','var(--br)'],[nw.length+' ราย','ลูกค้าใหม่','var(--inf)'],[fromLead.length+' งาน','ปิดจาก Lead','var(--wn)']])+
  `<div class="grid g2" style="margin-top:14px">
@@ -511,7 +511,7 @@ function pageDuty(){
 function pageJob(){
  const base=(isSales()?mine(ROLE):J).filter(inJP);
  if(FIL!=='keep'){JF={st:'',pay:'',x:'',erp:'',fin:'',q:'',cd:''};if(FIL==='p')JF.pay='p';else if(['open','new','nl','o','due','cr'].includes(FIL))JF.x=FIL;else if(FIL==='nc')JF.cd='none';else if(FIL==='erpf')JF.erp='follow';else if(STA.includes(FIL))JF.st=FIL;FIL='keep'}
- const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.erp||(JF.erp==='none'?!j.erp:j.erp===JF.erp))&&(!JF.cd||(JF.cd==='none'?!j.close:!!j.close))&&(!JF.fin||(JF.fin==='none'?!j.fin:j.fin===JF.fin))&&(!JF.q||[j.job,j.cus,j.awb,j.so,j.cty,j.sv].some(x=>String(x||'').toLowerCase().includes(JF.q.toLowerCase())))&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?j.no==='ใหม่':JF.x==='old'?j.no==='เก่า':JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:JF.x==='cr'?j.cr:JF.x==='nc'?!j.close&&j.st!=='CANCELED':true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
+ const L=base.filter(j=>(!JF.st||(JF.st==='open'?!isDone(j):j.st===JF.st))&&(!JF.pay||j.pay===JF.pay)&&(!JF.erp||(JF.erp==='none'?!j.erp:j.erp===JF.erp))&&(!JF.cd||(JF.cd==='none'?!j.close:!!j.close))&&(!JF.fin||(JF.fin==='none'?!j.fin:j.fin===JF.fin))&&(!JF.q||[j.job,j.cus,j.awb,j.so,j.cty,j.sv].some(x=>String(x||'').toLowerCase().includes(JF.q.toLowerCase())))&&(!JF.x||(JF.x==='open'?!isDone(j):JF.x==='new'?isNewJ(j):JF.x==='old'?!isNewJ(j):JF.x==='due'?!isDone(j)&&j.close&&dleft(j)<=1&&dleft(j)>=0:JF.x==='nl'?!j.lead:JF.x==='o'?!j.inc:JF.x==='cr'?j.cr:JF.x==='nc'?!j.close&&j.st!=='CANCELED':true))).sort((a,b)=>(b.open||'').localeCompare(a.open||''));
  const sc=!isSales();
  const sum=base.reduce((a,j)=>a+(sc?(+j.inc||+j.net||0):share$(j)),0);
  return ``+
@@ -544,11 +544,12 @@ const prList=()=>{let a=[];try{a=HB.promos(((SALES.find(x=>x.id===F.s)||{}).tm)|
 const chList=()=>{let a=[];try{a=HB.channels()||[]}catch(e){}return [...new Set([...a,...CH])]};
 const ctyOpt=v=>withV(CC,v).map(k=>[k,k+' · '+c3(k).n]);
 const brList=()=>{let a=[];try{a=HB.brands()||[]}catch(e){}return a.length?a:['CPL-INTER','CPLEx','CLMV','IMTHAI','CPLEx DEU','CPLEx GBP']};
+const LTJ={new:'New',repeat_inquiry:'New',active:'Active',winback:'Win-back'};const noN=v=>v==='ใหม่'?'New':v||'New';const isNewJ=j=>j.no==='ใหม่'||j.no==='New';
 const nextNo=()=>TODAY.slice(2,4)+TODAY.slice(5,7)+'-'+String(seq).padStart(4,'0');
 function openJob(j,lead){
  const sid=meName()||(isSales()?ROLE:(SALES[0]||{}).id||'');
- F=j?{...j}:{s:sid,cus:'',sv:'',cty:'',inc:'',net:'',no:'ใหม่',ch:'',br2:'',st:'PACKING',pay:'p',open:TODAY,close:'',awb:'',remark:'',as:'',lead:'',src:'',cid:null,br:(SALES.find(x=>x.id===sid)||{}).br||'CPL-INTER'};
- F._edit=!!j;if(lead)pickLead(lead,true);drawJob();$('dj').showModal();setTimeout(()=>$(j?'jinc':'jcus').focus(),50);
+ F=j?{...j}:{s:sid,cus:'',sv:'',cty:'',inc:'',net:'',no:'New',ch:'',br2:'',st:'PACKING',pay:'p',open:TODAY,close:'',awb:'',remark:'',as:'',lead:'',src:'',cid:null,br:(SALES.find(x=>x.id===sid)||{}).br||'CPL-INTER'};
+ F._edit=!!j;F.no=noN(F.no);if(lead)pickLead(lead,true);drawJob();if(j&&j.lead&&F.no==='เก่า'){HB.sb().from('leads').select('lead_type').eq('id',j.lead).single().then(({data})=>{if(data&&LTJ[data.lead_type]&&F.id===j.id&&F.no==='เก่า'){F.no=LTJ[data.lead_type];drawJob()}},()=>{})}$('dj').showModal();setTimeout(()=>$(j?'jinc':'jcus').focus(),50);
 }
 const fld=(l,html,o={})=>`<label class="f${o.c?' c'+o.c:''}"><span>${l}${o.rq?' <b class="rq">*</b>':''}</span>${html}</label>`;
 const dIn=(id,v)=>`<input class="in" id="${id}" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(v)}">`;
@@ -576,7 +577,7 @@ function drawJob(){
   ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
   ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1,c:2}):''}
   ${fld('โปรโมชันที่ใช้',`<select class="in" id="jpromo">${opt(withV(prList(),F.promo),F.promo||'','ไม่ได้ใช้โปรโมชัน')}</select>`,{c:2})}`)}
- ${sec(3,'ข้อมูลจาก Lead',`${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
+ ${sec(3,'ข้อมูลจาก Lead',`${fld('ประเภทลูกค้า',`<select class="in" id="jnew">${opt([['New','New'],['Active','Active'],['Win-back','Win-back'],...(F.no==='เก่า'?[['เก่า','เก่า (ไม่ระบุ)']]:[])],F.no||'New')}</select>`)}
   ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`)}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`,'auto')}
  </div></div>
@@ -585,10 +586,10 @@ function drawJob(){
 const pnum=v=>+String(v).replace(/[^\d.]/g,'')||0;
 function pickLead(l,q){
  F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=l.brand||F.br2;F.src=l.ads||F.src;if(l.promo&&!F.promo)F.promo=l.promo;
- F.no=l.lead_type?(l.lead_type==='new'?'ใหม่':'เก่า'):(l.ads==='ลูกค้าเก่า'?'เก่า':'ใหม่');
+ F.no=l.lead_type&&LTJ[l.lead_type]?LTJ[l.lead_type]:(l.ads==='ลูกค้าเก่า'?'Active':'New');
  const c=ctyCode(l.country);if(!F.cty&&CC.includes(c))F.cty=c;if(!F.sv)F.sv=leadSv(l);
  if(!q)drawJob()}
-function pickCus(c){F.cus=c.name;F.cid=c.id;F.no='เก่า';drawJob()}
+function pickCus(c){F.cus=c.name;F.cid=c.id;const l=J.filter(x=>String(x.cid)===String(c.id)&&x.close&&x.id!==F.id).map(x=>x.close).sort().pop();F.no=!l?'New':(Date.parse(TODAY)-Date.parse(l))/864e5<=90?'Active':'Win-back';drawJob()}
 const fj=$('fj');
 let _sq=0,_st=null;
 async function cusSearch(q){const id=++_sq,sb=HB.sb(),like='%'+q.replace(/[%_,()]/g,' ').trim()+'%';
@@ -617,7 +618,7 @@ fj.addEventListener('submit',async e=>{e.preventDefault();
  fj.querySelectorAll('.in.em').forEach(x=>x.classList.remove('em'));need.forEach(([id])=>$(id)&&$(id).classList.add('em'));
  if(need.length){$(need[0][0]).focus();toast('กรอกช่องที่มี * ให้ครบ');return}
  const no=(F.job||nextNo()).trim();
- const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark,promo:F.promo||'',fin:F.fin||'',erp:ERP_ON?(F.erp||''):(F.erp||''),cr:!!F.cr,cdue:F.cr?F.cdue||'':''};
+ const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'New',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark,promo:F.promo||'',fin:F.fin||'',erp:ERP_ON?(F.erp||''):(F.erp||''),cr:!!F.cr,cdue:F.cr?F.cdue||'':''};
  const btn=fj.querySelector('[type=submit]');btn.disabled=true;const sb=HB.sb();
  try{
   if(!F._edit&&!o.cid){const{data:ex}=await sb.from('customers').select('id').ilike('name',o.cus).limit(1);if(ex&&ex[0])o.cid=ex[0].id;else{const{data:c}=await sb.from('customers').insert({name:o.cus,owner:o.s||null}).select('id').single();if(c)o.cid=c.id}}
