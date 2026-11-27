@@ -527,7 +527,7 @@ function pageRep(){
  return `<div class="pn" style="padding:8px 10px"><div class="scroll"><table><thead><tr><th>เซลล์</th>${MON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">รวม</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
-const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน'],...((()=>{try{return (HB.profile()||{}).role==='admin'}catch(e){return false}})()?[['my','งานของฉัน']]:[])]),...(dutyOk()?[['duty','ตารางเวร']]:[])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
+const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน'],...(isBoss()?[['my','งานของฉัน']]:[])]),...(dutyOk()?[['duty','ตารางเวร']]:[])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
 function render(){try{erpSync()}catch(e){}
  renderNav();
  const c=$('ct');
