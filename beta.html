@@ -252,7 +252,8 @@ const CUR=MK[8],inM=(j,k)=>(j.rm||j.close||j.open||'').startsWith(k);
 const LST={[ST.S]:'var(--wn)',[ST.H]:'var(--inf)',[ST.Y]:'var(--ok)'};
 const ctyCode=v=>{if(!v)return '';const t=String(v).trim(),u=t.toUpperCase();const c=CTY.find(x=>x[0]===u||x[1]===t);return c?c[0]:t};
 const leadSv=r=>{const io=r.dir==='นำเข้า'?'I':'E',sv=Array.isArray(r.svc)?r.svc[0]:r.svc;return io+(sv==='Sea'?'SL':sv==='Truck'?'TL':'AX')};
-const fromRow=r=>({br2:r.brand||'',rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:r.branch||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',promo:r.promo||'',fin:r.fin||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
+const brN=v=>{const k=String(v||'').toUpperCase().replace(/[\s_-]/g,'');return ({CPL:'CPL-INTER',CPLINTER:'CPL-INTER',IMTH:'IMTHAI',IMTHAI:'IMTHAI',CPLEXDEU:'CPLEx DEU',CPLEXGBP:'CPLEx GBP',CPLEXUSA:'CPLEx USA',CLMV:'CLMV'})[k]||v||''};
+const fromRow=r=>({br2:brN(r.brand),rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:brN(r.branch)||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',promo:r.promo||'',fin:r.fin||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
 const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null,promo:o.promo||null,fin:o.fin||null,erp:o.erp||null,credit:!!o.cr,credit_due:o.cr&&o.cdue?o.cdue:null});
 async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
@@ -342,7 +343,7 @@ const cleft=j=>j.cdue?Math.round((Date.parse(j.cdue)-Date.parse(TODAY))/864e5):n
 const erpTag=j=>j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
 const finCell=j=>j.fin==='ok'?'<span class="etag ok">ตรงกับบัญชี</span>':j.fin==='diff'?'<span class="etag er">ไม่ตรงบัญชี</span>':'<span class="etag gy">ยังไม่ตรวจ</span>';
 const erpCell=j=>j.erp==='closed'?'<span class="etag ok">Closed ERP</span>':j.erp==='follow'?'<span class="etag er">ตาม Booking</span>':'<span class="etag gy">ยังไม่ปิด ERP</span>';
-const crTag=j=>{if(!j.cr)return '';const d=cleft(j),c=j.pay==='d'?'gy':d==null?'wn':d<0?'er':d<=7?'wn':'inf';return `<div><span class="etag ${c}">เครดิต${j.cdue?' · '+fd(j.cdue).slice(0,5):''}${j.pay!=='d'&&d!=null?' · '+dueTxt(d):''}</span></div>`};
+const crTag=j=>{if(!j.cr)return '<div><span class="etag gy">เงินสด / โอน</span></div>';const d=cleft(j),c=j.pay==='d'?'gy':d==null?'wn':d<0?'er':d<=7?'wn':'inf';return `<div><span class="etag ${c}">เครดิต${j.cdue?' · '+fd(j.cdue).slice(0,5):''}${j.pay!=='d'&&d!=null?' · '+dueTxt(d):''}</span></div>`};
 const crDue=L=>L.filter(j=>j.cr&&j.pay!=='d'&&(!j.cdue||cleft(j)<=7)).sort((a,b)=>(a.cdue||'0').localeCompare(b.cdue||'0'));
 function crAlert(L){const A=crDue(L);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
  return `<div class="info cr"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>ครบกำหนดชำระเครดิต</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${j.cdue?dueTxt(cleft(j)):'ยังไม่ใส่วันครบกำหนด'} · ${B(j.inc||j.net)}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|cr" style="margin-left:auto;font-weight:600">+${more} งาน</button>`:''}</div>`}
@@ -584,7 +585,7 @@ function drawJob(){
 }
 const pnum=v=>+String(v).replace(/[^\d.]/g,'')||0;
 function pickLead(l,q){
- F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=l.brand||F.br2;F.src=l.ads||F.src;if(l.promo&&!F.promo)F.promo=l.promo;
+ F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=brN(l.brand)||F.br2;F.src=l.ads||F.src;if(l.promo&&!F.promo)F.promo=l.promo;
  F.no=l.lead_type&&LTJ[l.lead_type]?LTJ[l.lead_type]:(l.ads==='ลูกค้าเก่า'?'Active':'New');
  const c=ctyCode(l.country);if(!F.cty&&CC.includes(c))F.cty=c;if(!F.sv)F.sv=leadSv(l);
  if(!q)drawJob()}

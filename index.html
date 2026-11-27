@@ -1267,7 +1267,7 @@ async function sjLoad(lo,hi,k){SJD.busy=k;try{const cols='id,job_no,rep_month,cl
  let f=await q(1).range(0,999);if(f.error){C2=cols+',brand';f=await q(1).range(0,999)}if(f.error){C2=cols;f=await q(1).range(0,999)}if(f.error)throw f.error;let all=f.data||[];const n=f.count||all.length;
  if(n>1000){const P=[];for(let i=1000;i<n;i+=1000)P.push(q().range(i,i+999));(await Promise.all(P)).forEach(x=>{if(!x.error)all=all.concat(x.data||[])})}
  let br=null;
- all=all.filter(j=>j.status!=='CANCELED').map(j=>{const cm=(j.close_date||'').slice(0,7),d=j.rep_month&&cm!==j.rep_month?j.rep_month+'-01':(j.close_date||j.open_date||(j.rep_month?j.rep_month+'-01':''));return{...j,brand:j.brand||j.branch||'',_d:d}});
+ all=all.filter(j=>j.status!=='CANCELED').map(j=>{const cm=(j.close_date||'').slice(0,7),d=j.rep_month&&cm!==j.rep_month?j.rep_month+'-01':(j.close_date||j.open_date||(j.rep_month?j.rep_month+'-01':''));return{...j,brand:brN(j.brand||j.branch),_d:d}});
  const need=[...new Set(all.map(j=>j.lead_id).filter(id=>id&&!SJD.L.has(id)&&!rows.some(r=>r.id===id)))];
  const P=[];for(let i=0;i<need.length;i+=200)P.push(sb.from('leads').select('id,ads,channel,brand,date').in('id',need.slice(i,i+200)));(await Promise.all(P)).forEach(x=>(x.data||[]).forEach(r=>SJD.L.set(r.id,r)));
  SJD.k=k;SJD.rows=all}catch(e){SJD.k=k;SJD.rows=[]}SJD.busy=null;if(!$('vD').classList.contains('hid'))renderDash()}
@@ -1411,6 +1411,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  else h=jsec('ตัวเลขการเงิน')+jMon()+(sl?'':jSB())+jPay()+jdn('New / Active / Win-back',jg(jNO,U2),4)+jSales()+fuS+tpP+(sl?'':stb('KPI รายเซลล์ (Lead)',grp(r=>r.sales,'(ยังไม่ระบุเซลล์)'),30,0,r=>r.sales,'(ยังไม่ระบุเซลล์)',null,1))+jsec('งานที่ปิดได้ของ <b>'+esc(sl||meS||'เซลล์ทุกคน')+'</b>')+jrb('ประเทศ',jg(j=>j.country,U2),8,jCf)+jrb('ประเภทบริการ',jg(jTy,U2),8)+jdn('Air / Sea / Truck / Courier',jg(jMd,U2))+pbars()+cases+qd+DET('Lead: สถานะและตารางสรุป',trend+sdn+sum);
  $('dg').innerHTML=(dashMode==='A'?'':sstrip)+h;
 }
+const brN=v=>{const k=String(v||'').toUpperCase().replace(/[\s_-]/g,'');return ({CPL:'CPL-INTER',CPLINTER:'CPL-INTER',IMTH:'IMTHAI',IMTHAI:'IMTHAI',CPLEXDEU:'CPLEx DEU',CPLEXGBP:'CPLEx GBP',CPLEXUSA:'CPLEx USA',CLMV:'CLMV'})[k]||v||''};
 function jNw(j){return j.new_old==='ใหม่'||j.new_old==='New'}
 function jNO(j){const v=j.new_old;return v==='ใหม่'?'New':v==='เก่า'?'เก่า (ไม่ระบุ)':v||''}
 function formEff(f){f=f||$('fm_');const s=stv(f.status.value);return closedR({status:s,fu_status:f.fu_status.value})?ST_Y:(okS(f.fu_status.value)||s)}
