@@ -7113,6 +7113,7 @@ window.HB_roles=()=>{};
 window.pvSales=()=>{const w=$('hbrw'),sel=$('hbr');const on=!!(PVR&&PVR.role==='admin'&&profile&&profile!==PVR&&profile.role==='sales');w.classList.toggle('on',on);if(!on)return;const L=[...new Set((OPTS.sales||[]).filter(o=>o.value&&(!profile.team||o.team===profile.team)).map(o=>o.value))];sel.innerHTML=L.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');if(!L.includes(profile.name)&&L.length)profile.name=L[0];sel.value=profile.name};
 $('hbr').onchange=e=>{profile.name=e.target.value;applyRoleUI(profile);reload();const f=$('hbf');if(f&&f.getAttribute('src'))f.src=f.getAttribute('src').split('?')[0]+'?v='+Date.now()};
 const isS=()=>!!(profile&&profile.role==='sales');
+window.hbCall=async(id,co)=>{try{if(!SO.loaded&&typeof soLoad==='function')await soLoad();const k=String(co||'').trim().toLowerCase(),d=k&&(SO.deals||[]).find(z=>String(z.company||'').trim().toLowerCase()===k);if(d&&window.soInfo)return window.soInfo(d.id);if(id&&window.soCallOpen)return window.soCallOpen(id)}catch(_){}};
 window.hbSo=x=>{tab('SO');const b=document.querySelector('#vSO .soNav [data-so="'+x+'"]');if(b)b.click();soHbSync()};
 function soHbSync(){const v=$('vSO'),off=isOffSales();v.classList.toggle('offhb',off);let w=$('soHb');if(!off){if(w)w.remove();return}
  if(!w){w=document.createElement('div');w.id='soHb';w.className='hbrow';v.prepend(w)}const a=(document.querySelector('#vSO .soNav button.on')||{}).dataset||{};
