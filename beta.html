@@ -586,7 +586,7 @@ function drawJob(){
 const pnum=v=>+String(v).replace(/[^\d.]/g,'')||0;
 function pickLead(l,q){
  F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=brN(l.brand)||F.br2;F.src=l.ads||F.src;if(l.promo&&!F.promo)F.promo=l.promo;
- F.no=l.lead_type&&LTJ[l.lead_type]?LTJ[l.lead_type]:(l.ads==='ลูกค้าเก่า'?'Active':'New');
+ F.no=l.ads==='ลูกค้าเก่า'&&(!l.lead_type||l.lead_type==='new'||l.lead_type==='repeat_inquiry')?'Active':l.lead_type&&LTJ[l.lead_type]?LTJ[l.lead_type]:'New';
  const c=ctyCode(l.country);if(!F.cty&&CC.includes(c))F.cty=c;if(!F.sv)F.sv=leadSv(l);
  if(!q)drawJob()}
 function pickCus(c){F.cus=c.name;F.cid=c.id;const l=J.filter(x=>String(x.cid)===String(c.id)&&x.close&&x.id!==F.id).map(x=>x.close).sort().pop();F.no=!l?'New':(Date.parse(TODAY)-Date.parse(l))/864e5<=90?'Active':'Win-back';drawJob()}
