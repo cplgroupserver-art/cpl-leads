@@ -19,7 +19,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .sb,.mnav{display:none!important}
 .app{display:block}.mn{display:block}
 .tb{position:absolute;top:18px;right:28px;display:flex;align-items:center;gap:8px;z-index:2}
-.topr{display:flex;align-items:center;gap:16px;margin:0 256px 16px 0;min-height:46px}.notb .tb{display:none}.notb .topr{margin-right:0}.topr .tabs2{margin:0!important;flex:none}.dtop{font-size:13px;color:var(--mu);white-space:nowrap}.topr .btn{margin-left:auto}
+.topr{display:flex;align-items:center;gap:16px;margin:0 256px 16px 0;min-height:46px}.notb .tb{display:none}.notb .topr{margin-right:44px}.vsel{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}.vsel select{height:40px;padding:0 34px 0 14px;border:0;border-radius:12px;background:var(--fld);font:600 14px var(--font);color:var(--tx);cursor:pointer;min-width:180px}.topr .tabs2{margin:0!important;flex:none}.dtop{font-size:13px;color:var(--mu);white-space:nowrap}.topr .btn{margin-left:auto}
 .role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu)}
 .role select{min-height:var(--h-md);border-radius:var(--r-md);border:1px solid transparent;background:var(--fld);padding:0 12px;font-weight:500;color:var(--tx)}
 .ct{padding:12px 28px 40px}
@@ -277,6 +277,7 @@ let ROLE='',PAGE='home',JV='mine',FIL='all';
 
 const me=()=>SALES.find(s=>s.id===ROLE);
 const isSales=()=>!!me();
+const isBoss=()=>{try{const p=HB.profile()||{};return ['admin','sales_lead'].includes(p.role)}catch(e){return false}};
 const mine=id=>J.filter(j=>j.s===id||j.as===id);
 const share=j=>j.as?.5:1;
 const monthJ=id=>mine(id).filter(j=>inM(j,CUR));
@@ -503,7 +504,7 @@ const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tabli
 function render(){try{erpSync()}catch(e){}
  renderNav();
  const c=$('ct');
- c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
+ c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${isBoss()?`<label class="vsel"><span>เซลล์</span><select id="vs_r" aria-label="เลือกเซลล์">${[['HEAD','ทุกคน'],...SALES.map(x=>[x.id,x.id+' · '+x.team])].map(([k,t])=>`<option value="${esc(k)}"${ROLE===k||(k==='HEAD'&&!isSales())?' selected':''}>${esc(t)}</option>`).join('')}</select></label>`:(PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':'')}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
 }
 
 /* ---------- job entry ---------- */
@@ -624,7 +625,7 @@ $('fc').addEventListener('submit',async e=>{e.preventDefault();const v=pnum($('c
 document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
 
 /* ---------- page actions ---------- */
-$('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='tg_m'){SM=t.value;return render()}if(t.id==='dt_m'){DTM=t.value;return render()}if(t.id==='jf_st'||t.id==='jf_pay'||t.id==='jf_x'||t.id==='jf_erp'||t.id==='jf_fin'||t.id==='jf_cd'){JF[t.id.slice(3)]=t.value;FIL='keep';return render()}if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
+$('ct').addEventListener('change',e=>{const t=e.target;if(t.id==='vs_r'){ROLE=t.value;PAGE=PAGE==='duty'&&!dutyOk()?'home':PAGE;try{localStorage.setItem('hb-role',ROLE)}catch(er){}return render()}if(t.id==='tg_m'){SM=t.value;return render()}if(t.id==='dt_m'){DTM=t.value;return render()}if(t.id==='jf_st'||t.id==='jf_pay'||t.id==='jf_x'||t.id==='jf_erp'||t.id==='jf_fin'||t.id==='jf_cd'){JF[t.id.slice(3)]=t.value;FIL='keep';return render()}if(t.id==='jp_p'){JP={p:t.value,f:'',t:''};return render()}if(t.id==='jp_f'||t.id==='jp_t'){const v=iso(t.value);if(!v)return;const[a,b]=jpRange();JP={p:'c',f:t.id==='jp_f'?v:a,t:t.id==='jp_t'?v:b};render()}});
 $('ct').addEventListener('input',e=>{const t=e.target;if(t.id==='jp_f'||t.id==='jp_t'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v}});
 $('ct').addEventListener('click',e=>{const sb=e.target.closest('[data-sub]');if(sb){if(sb.dataset.sub==='my'){try{HB.go('F')}catch(er){}return}PAGE=sb.dataset.sub;return render()}const b=e.target.closest('[data-nj],[data-nc],[data-adv],[data-pay],[data-ej],[data-go],[data-jv],[data-fil],[data-ck],[data-cbd],[data-ld],[data-lj],[data-lfil],[data-cx],[data-cj],[data-sal],[data-ld2],[data-cu2],[data-kp],[data-jfx]');if(!b)return;const d=b.dataset;
  if(d.nj!=null)return openJob();if(d.lj)return openJob(null,(LD.find(x=>String(x.id)===d.lj)||{}).raw);if(d.sal)return openSal(d.sal);if(d.lfil){LFIL=d.lfil;return render()}if(d.cx){COPEN=COPEN===d.cx?'':d.cx;return render()}if(d.cj)return openJob(null,null,CUS.find(c=>c.code===d.cj));

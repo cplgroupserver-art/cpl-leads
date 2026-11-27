@@ -218,6 +218,7 @@ function telHtml(f){const k=f[0],cc=S.v[k+'__cc']||'+66';
 function addrHtml(f){const k=f[0],rq=f[4],e=S.err[k+'__p']||{};
  return `<div class="ad">${AP.map(([i,th,en,r,w])=>`<label class="${w?'w':''}${e[i]?' e':''}"><span>${esc(T(th,en))}${rq&&r?' <span class="rq">*</span>':''}</span><input data-k="${k}__${i}"${i==='5'?' inputmode="numeric"':''} autocomplete="off" value="${esc(S.v[k+'__'+i]||'')}"></label>`).join('')}</div>`}
 Object.values(FORMS).forEach(F=>F.steps.forEach(([,fs])=>fs.forEach(f=>{f[4]=0})));
+FORMS.book.steps.forEach(([,fs])=>fs.forEach(f=>{if(f[0]==='f_idc')f[4]=1}));
 function fromSchema(sc){sc=sc||{};const pages=(sc.pages||[]).filter(p=>p&&(p.fields||[]).length);
  return{th:sc.title||'ฟอร์ม',en:sc.title_en||sc.title||'Form',custom:1,steps:pages.map(p=>[[p.title||sc.title||'ฟอร์ม',p.title_en||p.title||sc.title_en||sc.title||'Form'],
   p.fields.map(f=>[f.id,f.label||'',f.label_en||f.label||'',f.type||'text',f.req?1:0,null,(f.type==='select'||f.type==='multi')?(f.options||[]).map(o=>[o,o]):(f.map?{map:f.map}:null)])])}}
@@ -253,7 +254,7 @@ function dispV(f){const v=S.v[f[0]];if(Array.isArray(v))return v.join(', ');if(f
 function validDate(s){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s||'');if(!m)return false;const d=new Date(+m[3],+m[2]-1,+m[1]);return d.getDate()==+m[1]&&d.getMonth()==+m[2]-1}
 function check(){const[,fs]=steps()[S.step];S.err={};fs.forEach(cmb);
  fs.forEach(f=>{const[k,,,ty,rq,,x]=f,v=ty==='file'||ty==='sign'?S.files[k]:S.v[k];
-  if(rq&&(!v||(typeof v==='string'&&!v.trim())||(Array.isArray(v)&&!v.length)))S.err[k]=ty==='check'?T('กรุณายืนยัน','Please confirm'):ty==='sign'?T('กรุณาลงลายมือชื่อ','Please sign'):T('กรุณากรอกช่องนี้','This field is required');
+  if(rq&&(!v||(typeof v==='string'&&!v.trim())||(Array.isArray(v)&&!v.length)))S.err[k]=ty==='check'?T('กรุณายืนยัน','Please confirm'):ty==='file'?T('กรุณาแนบไฟล์','Please attach a file'):ty==='sign'?T('กรุณาลงลายมือชื่อ','Please sign'):T('กรุณากรอกช่องนี้','This field is required');
   else if(v&&ty==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))S.err[k]=T('รูปแบบอีเมลไม่ถูกต้อง','Invalid email');
   else if(v&&ty==='date'&&!validDate(v))S.err[k]=T('รูปแบบวันที่ต้องเป็น dd/mm/yyyy','Use dd/mm/yyyy');
   else if(v&&x&&x.tax&&!/^\d{13}$/.test(v))S.err[k]=T('ต้องเป็นตัวเลข 13 หลัก','Must be 13 digits');
