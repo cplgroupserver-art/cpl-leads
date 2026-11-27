@@ -4427,7 +4427,7 @@ async function make(){if(FO.busy)return;const f=$('fof'),me=(profile&&profile.na
  FO.busy=true;$('fo_mk').disabled=true;
  const kv=f.kind.value,tp=/^c\d/.test(kv)?(FO.tpl||[]).find(t=>'c'+t.id===kv):null,cu=cuPick(),row={kind:tp?'custom':kv,brand:tp?tp.brand:f.brand.value,team:profile&&profile.role==='sales'?profile.team:null,sales:me||null,company:cu?cu.name:'',prefill:{sales:me}};
  if(tp){row.template_id=tp.id;row.schema=tp.schema;row.prefill.title=tp.name;row.prefill.title_en=tp.name_en||tp.name}if(cu&&FO.hasCx)row.customer_id=String(cu.id);
- if(row.kind==='tc'&&window.tcGet){try{const t=await window.tcGet(row.brand);if(t){if(t.th)row.prefill.terms=t.th;if(t.en)row.prefill.terms_en=t.en}}catch(e){}}
+ if((row.kind==='tc'||row.kind==='book')&&window.tcGet){try{const t=await window.tcGet(row.brand);if(t){if(t.th)row.prefill.terms=t.th;if(t.en)row.prefill.terms_en=t.en}}catch(e){}}
  const{data,error}=await sb.from('cust_forms').insert(row).select('id,token,lead_id,kind,brand,team,sales,company,prefill,status,answers,files,sheet_url,created_by,created_at,submitted_at,source'+(FO.hasCx?',template_id,customer_id':'')).single();if(data)foNorm(data);
  FO.busy=false;$('fo_mk').disabled=false;
  if(error||!data)return alert(TT('สร้างฟอร์มไม่สำเร็จ','Failed to create form'));

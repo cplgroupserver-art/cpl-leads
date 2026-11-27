@@ -116,10 +116,15 @@ const FORMS={
    ['dims','ขนาดกล่อง (ยาว × กว้าง × สูง ซม.)','Box size (L × W × H cm)','text',0],
    ['value','มูลค่าสินค้า','Value of goods','num',0,'value',{u:['บาท','THB'],d:1}],
    ['ready','วันที่พร้อมส่ง','Ready date','date',1]]],
-  [['เอกสารและยืนยัน','Documents & confirm'],[
+  [['เอกสาร','Documents'],[
    ['f_invoice','Invoice / Packing list','Invoice / Packing list','file',0],
-   ['note','หมายเหตุ','Notes','textarea',0],
-   ['consent','ยินยอมให้บริษัทเก็บและใช้ข้อมูลส่วนบุคคลเพื่อการให้บริการขนส่ง','I consent to the company collecting and using my personal data to provide shipping services','check',1]]]]},
+   ['f_idc','สำเนาบัตรประชาชน หรือ หนังสือรับรองบริษัท','Copy of ID card or company certificate','file',1],
+   ['note','หมายเหตุ','Notes','textarea',0]]],
+  [['เงื่อนไขและลงชื่อ','Terms & signature'],[
+   ['terms','ข้อตกลงและเงื่อนไขการใช้บริการ','Terms & Conditions of Service','terms',0],
+   ['signer','ชื่อผู้ส่งสินค้า / ผู้มีอำนาจลงนาม','Shipper / authorized signatory','text',1,'contact'],
+   ['sign','ลายมือชื่อ','Signature','sign',1],
+   ['consent','ข้าพเจ้าได้อ่านและยอมรับข้อตกลงและเงื่อนไขการใช้บริการ และยินยอมให้บริษัทเก็บและใช้ข้อมูลส่วนบุคคลเพื่อการให้บริการขนส่ง','I have read and accept the terms and conditions of service, and consent to the company collecting and using my personal data to provide shipping services','check',1]]]]},
  acc:{th:'ใบสมัครบัญชีลูกค้า',en:'Customer Account Application',steps:[
   [['ข้อมูลบริษัท','Company'],[
    ['co_name','ชื่อนิติบุคคล','Registered company name','text',1,'company'],
@@ -221,6 +226,7 @@ function fieldHtml(f){const[k,th,en,ty,rq,,x]=f,lb=`<span class="lb">${esc(T(th,
  if(ty==='head')return `<div class="fhd"><b>${esc(T(th,en))}</b></div>`;
  if(ty==='multi'){const a=Array.isArray(v)?v:[];return `<div class="f${e?' err':''}">${lb}<div class="mc">${opts(f).map(([o,oe])=>`<label class="mcx"><input type="checkbox" data-mk="${k}" value="${esc(o)}"${a.includes(o)?' checked':''}><span>${esc(T(o,oe))}</span></label>`).join('')}</div>${em}</div>`}
  if(k==='t_sales'&&!x&&S.form&&S.form.kind==='tc'){const p=S.form.prefill||{},tx=(LANG==='en'?(p.terms_en||p.terms):(p.terms||p.terms_en))||'';if(tx)return `<div class="tcx"><b>${T('ข้อตกลงและเงื่อนไขการใช้บริการ','Terms & Conditions of Service')}</b><div class="tcb">${tx.split('\n').map(l=>{const t=l.trim();return !t?'':(t.length<=60?'<b class="tch">'+esc(t)+'</b>':'<p>'+esc(t)+'</p>')}).join('')}</div></div>`+fieldHtml([k,th,en,ty,rq,f[5],1])}
+ if(ty==='terms'){const p=S.form.prefill||{},tx=(LANG==='en'?(p.terms_en||p.terms):(p.terms||p.terms_en))||'';return tx?`<div class="tcx"><b>${esc(T(th,en))}</b><div class="tcb">${tx.split('\n').map(l=>{const t=l.trim();return !t?'':(t.length<=60?'<b class="tch">'+esc(t)+'</b>':'<p>'+esc(t)+'</p>')}).join('')}</div></div>`:''}
  if(ty==='check'||ty==='check2')return `<label class="ck${e?' err':''}"><input type="checkbox" data-k="${k}"${v?' checked':''}><span>${esc(T(th,en))}${rq?'&nbsp;<span class="rq" style="color:var(--dgr)">*</span>':''}</span></label>${em}`;
  if(ty==='sign')return `<div class="f${e?' err':''}" style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500">${lb}<div class="sg"><canvas data-sig="${k}"></canvas><span class="sgh">${T('เซ็นชื่อในกรอบนี้','Sign inside this box')}</span><button type="button" class="sgc" data-sgc="${k}">${T('ล้าง','Clear')}</button></div>${em}</div>`;
  if(ty==='file'){const fl=S.files[k];return `<div class="f${e?' err':''}" style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500">${lb}<label class="up${fl?' has':''}"><input type="file" data-k="${k}" accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx,.xls,.xlsx"><span>${fl?esc(fl.name):T('แนบไฟล์ (PDF / รูปภาพ ไม่เกิน 10 MB)','Attach file (PDF / image, up to 10 MB)')}</span><b>${fl?T('เปลี่ยน','Change'):T('เลือกไฟล์','Choose')}</b></label>${em}</div>`}
@@ -241,7 +247,7 @@ function render(){const app=$('app');document.documentElement.lang=LANG;
  if(S.form.status!=='sent'){app.innerHTML=head()+`<div class="msg"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div><b>${T('ส่งข้อมูลเรียบร้อย','Submitted')}</b><span>${T('ทีมงาน '+S.form.brand+' ได้รับข้อมูลแล้ว และจะติดต่อกลับ','The '+S.form.brand+' team has received your details and will be in touch.')}</span>${S.up==='busy'?`<span class="upn"><i class="spn"></i>${T('กำลังอัปโหลดไฟล์แนบ กรุณาอย่าปิดหน้านี้','Uploading attachments, please keep this page open')}</span>`:S.up==='fail'?`<span class="upn bad">${T('อัปโหลดไฟล์แนบไม่สำเร็จ','Attachments could not be uploaded')}</span><button type="button" class="btn p" id="reup">${T('ลองอีกครั้ง','Try again')}</button>`:''}</div>`;return}
  const st=steps(),last=S.step===st.length-1,[h,fs]=st[S.step];
  app.innerHTML=head(st)+`<main><h2>${esc(T(h[0],h[1]))}</h2>${fs.map(fieldHtml).join('')}${last?summary():''}</main><footer><button type="button" class="btn" id="back"${S.step?'':' disabled'}>${T('ย้อนกลับ','Back')}</button><button type="button" class="btn p" id="next">${last?T('ส่งข้อมูล','Submit'):T('ถัดไป','Next')}</button></footer>`}
-function summary(){cmbAll();const st=steps(),rows=[];st.slice(0,-1).forEach(([,fs])=>fs.forEach(f=>{if(f[3]==='sign')return;if(f[3]==='file'){if(S.files[f[0]])rows.push([T(f[1],f[2]),S.files[f[0]].name])}else if(S.v[f[0]])rows.push([T(f[1],f[2]),dispV(f)])}));
+function summary(){cmbAll();const st=steps(),rows=[];st.slice(0,-1).forEach(([,fs])=>fs.forEach(f=>{if(f[3]==='sign'||f[3]==='terms')return;if(f[3]==='file'){if(S.files[f[0]])rows.push([T(f[1],f[2]),S.files[f[0]].name])}else if(S.v[f[0]])rows.push([T(f[1],f[2]),dispV(f)])}));
  return rows.length?`<div class="sum">${rows.map(([a,b])=>`<div><em>${esc(a)}</em><span>${esc(b)}</span></div>`).join('')}</div>`:''}
 function dispV(f){const v=S.v[f[0]];if(Array.isArray(v))return v.join(', ');if(f[3]==='select'){const o=opts(f).find(x=>x[0]===v);return o?T(o[0],o[1]):v}if(f[3]==='num'&&f[6]&&f[6].u)return v+' '+T(f[6].u[0],f[6].u[1]);return v}
 function validDate(s){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s||'');if(!m)return false;const d=new Date(+m[3],+m[2]-1,+m[1]);return d.getDate()==+m[1]&&d.getMonth()==+m[2]-1}
@@ -304,7 +310,7 @@ document.addEventListener('click',e=>{const l=e.target.closest('[data-lang]');if
  if(!sb||!/^[0-9a-f-]{36}$/i.test(S.k)){render();return}
  const{data,error}=await sb.rpc('form_get',{p_token:S.k});
  if(!error&&data&&data.kind==='custom'&&data.schema)FORMS.custom=fromSchema(data.schema);
- if(!error&&data&&data.kind==='tc'){const p=data.prefill=data.prefill||{};if(!p.terms){try{const r=await fetch('assets/terms/'+encodeURIComponent(data.brand||'CPL-Inter')+'.json',{cache:'no-cache'});if(r.ok){const j=await r.json();p.terms=j.th||'';p.terms_en=j.en||''}}catch(e){}}}
+ if(!error&&data&&(data.kind==='tc'||data.kind==='book')){const p=data.prefill=data.prefill||{};if(!p.terms){try{const r=await fetch('assets/terms/'+encodeURIComponent(data.brand||'CPL-Inter')+'.json',{cache:'no-cache'});if(r.ok){const j=await r.json();p.terms=j.th||'';p.terms_en=j.en||''}}catch(e){}}}
  if(!error&&data&&FORMS[data.kind]){S.form=data;['s_address','reg_address','c_address','j_address'].forEach(k=>{S.v[k+'__6']=data.brand==='CLMV'?'':'ไทย'});if(!sv&&data.brand==='CLMV')LANG='en';const p=data.prefill||{};FORMS[data.kind].steps.forEach(([,fs])=>fs.forEach(f=>{if(f[5]&&p[f[5]]!=null&&p[f[5]]!==''){let v=String(p[f[5]]);if(f[3]==='select'&&!opts(f).some(o=>o[0]===v))return;if(f[3]==='num')v=fmtN(v,f[6]&&f[6].d);if(f[3]==='tel'){const m=/^(\+\d{1,4})\s*(.*)$/.exec(v.trim());if(m&&CC.some(c=>c[1]===m[1])){S.v[f[0]+'__cc']=m[1];S.v[f[0]+'__n']=m[2]}else S.v[f[0]+'__n']=v;return}if(f[3]==='addr'){S.v[f[0]+'__1']=v;return}S.v[f[0]]=v}}))}
  render()})();
 </script>
