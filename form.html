@@ -78,7 +78,7 @@ footer{padding:12px 20px calc(18px + env(safe-area-inset-bottom,0px));border-top
 .err .mcx{outline:1px solid var(--dgr)}
 .tcx{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}.tcx>b{font-size:14px}.tcb p{margin:0 0 6px}.tcb .tch{display:block;margin:12px 0 4px;color:#0e2238}.tcb{max-height:340px;overflow:auto;padding:14px 16px;border:1px solid #e0e8f0;border-radius:12px;background:#f7f9fc;font-size:13.5px;line-height:1.7;color:#24364b;overscroll-behavior:contain}
 .pvb{position:sticky;top:0;z-index:5;background:#fff4d6;color:#7a5a00;text-align:center;font-size:13px;font-weight:600;padding:8px}
-</style>
+.cpop{position:fixed;z-index:9999;width:292px;padding:14px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 12px 36px rgba(11,34,64,.25);font-family:inherit}.cpop .cph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.cpop .cph span{display:flex;gap:4px}.cpop .cph button{width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:var(--tx);font-size:20px;line-height:1;cursor:pointer}.cpop .cph button:hover,.cpf button:hover{background:var(--fill)}.cpg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}.cpg i{font-style:normal;font-size:12px;color:var(--mu);padding:4px 0}.cd{height:34px;border:0;border-radius:50%;background:transparent;color:var(--tx);font-size:14px;cursor:pointer;padding:0;font-family:inherit}.cd:hover{background:var(--fill)}.cd.o{color:var(--mu);opacity:.5}.cd.t{box-shadow:inset 0 0 0 1.5px var(--pr)}.cd.s{background:var(--pr);color:#fff;opacity:1}.cpf{margin-top:8px}.cpf button{border:0;background:transparent;color:var(--pr);font-weight:600;font-size:14px;padding:6px 8px;border-radius:8px;cursor:pointer;font-family:inherit}</style>
 </head>
 <body>
 <div class="wrap" id="app"><div class="msg" id="ld">…</div></div>
@@ -314,6 +314,25 @@ document.addEventListener('click',e=>{const l=e.target.closest('[data-lang]');if
  if(!error&&data&&(data.kind==='tc'||data.kind==='book')){const p=data.prefill=data.prefill||{};if(!p.terms){try{const r=await fetch('assets/terms/'+encodeURIComponent(data.brand||'CPL-Inter')+'.json',{cache:'no-cache'});if(r.ok){const j=await r.json();p.terms=j.th||'';p.terms_en=j.en||''}}catch(e){}}}
  if(!error&&data&&FORMS[data.kind]){S.form=data;['s_address','reg_address','c_address','j_address'].forEach(k=>{S.v[k+'__6']=data.brand==='CLMV'?'':'ไทย'});if(!sv&&data.brand==='CLMV')LANG='en';const p=data.prefill||{};FORMS[data.kind].steps.forEach(([,fs])=>fs.forEach(f=>{if(f[5]&&p[f[5]]!=null&&p[f[5]]!==''){let v=String(p[f[5]]);if(f[3]==='select'&&!opts(f).some(o=>o[0]===v))return;if(f[3]==='num')v=fmtN(v,f[6]&&f[6].d);if(f[3]==='tel'){const m=/^(\+\d{1,4})\s*(.*)$/.exec(v.trim());if(m&&CC.some(c=>c[1]===m[1])){S.v[f[0]+'__cc']=m[1];S.v[f[0]+'__n']=m[2]}else S.v[f[0]+'__n']=v;return}if(f[3]==='addr'){S.v[f[0]+'__1']=v;return}S.v[f[0]]=v}}))}
  render()})();
+
+(function(){const NV=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');let pop=null,inp=null,vy,vm;
+const MT=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'],ME=['January','February','March','April','May','June','July','August','September','October','November','December'],WT=['อา','จ','อ','พ','พฤ','ศ','ส'],WE=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const p2=n=>String(n).padStart(2,'0');
+function cur(){const m=(NV.get.call(inp)||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?{d:+m[1],m:+m[2]-1,y:+m[3]}:null}
+function close(){if(pop){pop.remove();pop=null;inp=null}}
+function draw(){const c=cur(),t=new Date(),W=LANG==='en'?WE:WT,M=LANG==='en'?ME:MT;const f=new Date(vy,vm,1).getDay(),n=new Date(vy,vm+1,0).getDate(),pn=new Date(vy,vm,0).getDate();let h='<div class="cph"><b>'+M[vm]+' '+vy+'</b><span><button type="button" data-a="p">‹</button><button type="button" data-a="n">›</button></span></div><div class="cpg">'+W.map(x=>'<i>'+x+'</i>').join('');
+for(let i=0;i<42;i++){let d,m=vm,y=vy,o='';if(i<f){d=pn-f+i+1;m--;o=' o'}else if(i>=f+n){d=i-f-n+1;m++;o=' o'}else d=i-f+1;if(m<0){m=11;y--}if(m>11){m=0;y++}
+if(c&&c.d===d&&c.m===m&&c.y===y)o+=' s';else if(t.getDate()===d&&t.getMonth()===m&&t.getFullYear()===y)o+=' t';h+='<button type="button" class="cd'+o+'" data-v="'+p2(d)+'/'+p2(m+1)+'/'+y+'">'+d+'</button>'}
+h+='</div><div class="cpf"><button type="button" data-a="t">'+(LANG==='en'?'Today':'วันนี้')+'</button></div>';pop.innerHTML=h}
+function place(){const r=inp.getBoundingClientRect(),w=pop.offsetWidth,hh=pop.offsetHeight;let x=Math.min(Math.max(8,r.left),innerWidth-w-8),y=r.bottom+6;if(y+hh>innerHeight-8)y=Math.max(8,r.top-hh-6);const cb=pop.offsetParent&&pop.offsetParent!==document.body?pop.offsetParent.getBoundingClientRect():{left:0,top:0};pop.style.left=(x-cb.left)+'px';pop.style.top=(y-cb.top)+'px'}
+function pick(v){NV.set.call(inp,v);inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));const i=inp;close();i.focus({preventScroll:true})}
+function open(i){if(inp===i)return;close();inp=i;const c=cur(),t=new Date();vy=c?c.y:t.getFullYear();vm=c?c.m:t.getMonth();pop=document.createElement('div');pop.className='cpop';pop.addEventListener('mousedown',e=>e.preventDefault());pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.v)return pick(b.dataset.v);const a=b.dataset.a;if(a==='t'){const x=new Date();return pick(p2(x.getDate())+'/'+p2(x.getMonth()+1)+'/'+x.getFullYear())}vm+=a==='n'?1:-1;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}draw()});(i.closest('dialog')||document.body).appendChild(pop);draw();place()}
+document.addEventListener('focusin',e=>{const t=e.target;if(t.matches&&t.matches('input[data-date]'))open(t);else if(!(pop&&pop.contains(t)))close()});
+document.addEventListener('click',e=>{const t=e.target;if(t.matches&&t.matches('input[data-date]'))open(t);else if(pop&&t.isConnected&&!pop.contains(t))close()});
+document.addEventListener('input',e=>{if(pop&&e.target===inp){const c=cur();if(c){vy=c.y;vm=c.m}draw()}});
+document.addEventListener('keydown',e=>{if(pop&&(e.key==='Escape'||e.key==='Tab')){if(e.key==='Escape'){e.preventDefault();e.stopPropagation()}close()}},true);
+addEventListener('resize',close);document.addEventListener('scroll',()=>{if(pop)place()},true);
+})();
 </script>
 </body>
 </html>
