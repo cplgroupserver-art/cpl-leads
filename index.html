@@ -832,6 +832,7 @@ const isSl=r=>r==='sales'||r==='sales_lead';
 const can=r=>profile&&(profile.role==='admin'||profile.role==='keyer'||profile.role==='sales_lead'||(profile.role==='sales'&&r.team===profile.team));
 const seeAll=()=>!!profile&&['admin','keyer','sales_lead'].includes(profile.role);
 const isBeta=()=>!!(profile&&['admin','sales','sales_lead','keyer','marketing'].includes(profile.role));
+function adsAl(v,t){const x=String(v||'').trim();if(!/^(ads:\s*)?(inbox( cpl-inter| cplex| offline)?|ไม่ระบุ ads)$/i.test(x))return v;const L=(typeof OPTS!=='undefined'&&OPTS.ads||[]).filter(o=>/inbox/i.test(o.value)&&!/^(inbox( cpl-inter| cplex| offline)?)$/i.test(o.value.trim()));const o=L.find(o=>o.team===t)||(!t&&L.length===1?L[0]:null);return o?o.value:v}
 function isOffSales(){return !!profile&&profile.role==='sales'&&profile.team==='C'}
 function soHome(){return isOffSales()||(!!profile&&profile.role==='sales_lead')}
 const canSO=()=>!!profile&&(profile.role==='admin'||profile.role==='sales_lead'||(profile.role==='sales'&&profile.team==='C'));
@@ -848,7 +849,7 @@ async function dupCheck(o){const d=o.detail||{},ph=[d.ph,d.cpt,d.ctt].filter(Boo
  return(data||[]).filter(r=>{const dd=r.detail||{};return(key&&dupKey(r.name)===key)||[dd.ph,dd.cpt,dd.ctt].map(dupPh).some(x=>x&&mine.has(x))})}
 const teamsVisible=()=>profile&&profile.role==='sales'?[profile.team]:Object.keys(TEAMS);
 async function fetchRows(from,to){let out=[],i=0;for(;;){let q=sb.from('leads').select(cols()).order('date',{ascending:false}).order('id',{ascending:false}).range(i,i+999);if(from)q=q.gte('date',from);if(to)q=q.lte('date',to);const{data,error}=await q;if(error){if(LT_OK&&/lead_type/.test(error.message||'')){LT_OK=false;return fetchRows(from,to)}if(DEAL_OK&&/deal_/.test(error.message||'')){DEAL_OK=false;return fetchRows(from,to)}throw error}out=out.concat(data);if(data.length<1000)return out;i+=1000}}
-const norm=r=>{const o={...r,svc:r.svc||[],sales:sName(r.sales)};['ads','country','note','dir','channel','reason','quo','sales','brand','promo','fu','fu_status'].forEach(k=>o[k]=o[k]||'');if(o.ads==='ไม่ระบุ Ads')o.ads='Inbox';o.status=o.status||ST_S;if(o.status===ST_H)o.status=ST_S;if(o.fu_status===ST_H)o.fu_status=ST_S;o.deal_amt=(r.deal_amt==null||r.deal_amt==='')?null:+r.deal_amt;o.deal_date=r.deal_date||'';if(r.team==='C'){if(SO_KEY[o.status])o.stage=SO_LAB[SO_KEY[o.status]];else o.stage=({[ST_Y]:SO_LAB.closed,[ST_N]:SO_LAB.lost})[o.status]||SO_LAB.lead;o.status=stv(o.status)}return o};
+const norm=r=>{const o={...r,svc:r.svc||[],sales:sName(r.sales)};['ads','country','note','dir','channel','reason','quo','sales','brand','promo','fu','fu_status'].forEach(k=>o[k]=o[k]||'');o.ads=adsAl(o.ads==='ไม่ระบุ Ads'?'Inbox':o.ads,o.team);o.status=o.status||ST_S;if(o.status===ST_H)o.status=ST_S;if(o.fu_status===ST_H)o.fu_status=ST_S;o.deal_amt=(r.deal_amt==null||r.deal_amt==='')?null:+r.deal_amt;o.deal_date=r.deal_date||'';if(r.team==='C'){if(SO_KEY[o.status])o.stage=SO_LAB[SO_KEY[o.status]];else o.stage=({[ST_Y]:SO_LAB.closed,[ST_N]:SO_LAB.lost})[o.status]||SO_LAB.lead;o.status=stv(o.status)}return o};
 
 const MTH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],MTE=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function fLabels(){const d=new Date(),y=d.getFullYear(),M=LANG==='en'?MTE:MTH,mo=k=>{const x=new Date(y,d.getMonth()-k,1);return M[x.getMonth()]+' '+x.getFullYear()},rg=a=>{const x=new Date(y,d.getMonth()-a,1);return M[x.getMonth()]+(x.getFullYear()!==y?' '+x.getFullYear():'')+'–'+mo(0)},dm=x=>x.getDate()+' '+M[x.getMonth()],ago=n=>new Date(Date.now()-n*864e5);
@@ -1279,7 +1280,7 @@ async function sjLoad(lo,hi,k){SJD.busy=k;try{const cols='id,job_no,rep_month,cl
  let br=null;
  all=all.filter(j=>j.status!=='CANCELED').map(j=>{const cm=(j.close_date||'').slice(0,7),d=j.rep_month&&cm!==j.rep_month?j.rep_month+'-01':(j.close_date||j.open_date||(j.rep_month?j.rep_month+'-01':''));return{...j,sales:sName(j.sales),assistant:sName(j.assistant),brand:brN(j.brand||j.branch),_d:d}});
  const need=[...new Set(all.map(j=>j.lead_id).filter(id=>id&&!SJD.L.has(id)&&!rows.some(r=>r.id===id)))];
- const P=[];for(let i=0;i<need.length;i+=200)P.push(sb.from('leads').select('id,ads,channel,brand,date').in('id',need.slice(i,i+200)));(await Promise.all(P)).forEach(x=>(x.data||[]).forEach(r=>SJD.L.set(r.id,r)));
+ const P=[];for(let i=0;i<need.length;i+=200)P.push(sb.from('leads').select('id,ads,channel,brand,date,team').in('id',need.slice(i,i+200)));(await Promise.all(P)).forEach(x=>(x.data||[]).forEach(r=>SJD.L.set(r.id,r)));
  SJD.k=k;SJD.rows=all}catch(e){SJD.k=k;SJD.rows=[]}SJD.busy=null;if(!$('vD').classList.contains('hid'))renderDash()}
 function renderDash(){
  const offV=$('dtm').value==='C'||(!!profile&&profile.role==='sales'&&profile.team==='C');if(offV&&dashMode==='A')dashMode='M';
@@ -1380,7 +1381,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  const SJR=sjGet(lo,b),sjOk=!!SJR,sjT=s=>{const o=(OPTS.sales||[]).find(x=>sCode(x.value)===sCode(s));return o?o.team:''},meS=profile&&profile.role==='sales'?sCode(profile.name):'';
  const SJ=(SJR||[]).filter(j=>{const d=j._d;if(!d||(lo&&d<lo)||(b&&d>b)||(vmv&&d.slice(0,7)!==vmv))return false;if(tm&&sjT(j.sales)!==tm&&!(j.assistant&&sjT(j.assistant)===tm))return false;if(sl&&sCode(j.sales)!==sCode(sl)&&sCode(j.assistant)!==sCode(sl))return false;if(meS&&sCode(j.sales)!==meS&&sCode(j.assistant)!==meS)return false;return true});
  const jSh=j=>+j.net||(j.assistant?(+j.income||0)/2:(+j.income||0)),jInc=j=>j.assistant?(+j.net?(+j.net)*2:(+j.income||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>Math.round(v.reduce((t,j)=>t+jV(j),0));
- const LM=new Map();SJD.L.forEach((v,k)=>LM.set(k,v));pool.forEach(r=>LM.set(r.id,r));const jL=j=>j.lead_id&&LM.get(j.lead_id),jAds=j=>{const r=jL(j);return r?(r.ads||'(ไม่ระบุ Ads)'):'(ไม่ได้ผูก Lead)'};
+ const LM=new Map();SJD.L.forEach((v,k)=>LM.set(k,v));pool.forEach(r=>LM.set(r.id,r));const jL=j=>j.lead_id&&LM.get(j.lead_id),jAds=j=>{const r=jL(j);return r?(adsAl(r.ads,r.team)||'(ไม่ระบุ Ads)'):'(ไม่ได้ผูก Lead)'};
  const jMd=j=>svMode(j.svc),jDir=j=>svDir(j.svc),jTy=j=>svType(j.svc),jCh=j=>normCh(j.channel),jCf=k=>c3h(k);
  const SJT=jSum(SJ),SJN=SJ.filter(j=>jNw(j)),SJAds=SJ.filter(j=>{const a=jAds(j);return !adsX.includes(a)&&a!=='(ไม่ได้ผูก Lead)'}),SJAT=jSum(SJAds);
  const jg=(fn,e,src)=>{const m={};(src||SJ).forEach(j=>{[].concat(fn(j)).forEach(k=>{k=k||e;if(!k)return;(m[k]=m[k]||[]).push(j)})});return Object.entries(m).sort((x,y)=>jSum(y[1])-jSum(x[1]))};
