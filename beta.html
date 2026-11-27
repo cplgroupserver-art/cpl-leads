@@ -249,19 +249,19 @@ const CUR=MK[8],inM=(j,k)=>(j.rm||j.close||j.open||'').startsWith(k);
 const LST={[ST.S]:'var(--wn)',[ST.H]:'var(--inf)',[ST.Y]:'var(--ok)'};
 const ctyCode=v=>{if(!v)return '';const t=String(v).trim(),u=t.toUpperCase();const c=CTY.find(x=>x[0]===u||x[1]===t);return c?c[0]:t};
 const leadSv=r=>{const io=r.dir==='นำเข้า'?'I':'E',sv=Array.isArray(r.svc)?r.svc[0]:r.svc;return io+(sv==='Sea'?'SL':sv==='Truck'?'TL':'AX')};
-const fromRow=r=>({br2:r.brand||'',rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:r.branch||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
-const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null,erp:o.erp||null,credit:!!o.cr,credit_due:o.cr&&o.cdue?o.cdue:null});
+const fromRow=r=>({br2:r.brand||'',rm:r.rep_month||'',ms:r.match_score,id:r.id,job:r.job_no||'',open:r.open_date||'',close:r.close_date||'',s:r.sales||'',as:r.assistant||'',cus:r.customer_name||'',cid:r.customer_id||null,lead:r.lead_id||'',sv:r.svc||'EAX',cty:r.country||'',inc:+r.income||0,net:+r.net||0,no:r.new_old||'',ch:normCh(r.channel),br:r.branch||'',st:r.status||'OPEN',pay:r.pay||'p',src:r.src||'',so:r.so||'',awb:r.awb||'',pt:r.product||'',remark:r.remark||'',promo:r.promo||'',erp:r.erp||'',cr:!!r.credit,cdue:r.credit_due||''});
+const toRow=o=>({brand:o.br2||null,job_no:o.job,open_date:o.open||null,close_date:o.close||null,sales:o.s,assistant:o.as||null,customer_name:o.cus,customer_id:o.cid||null,lead_id:o.lead||null,svc:o.sv,country:o.cty,income:o.inc||0,net:o.net||0,new_old:o.no||null,channel:o.ch||null,branch:o.br||null,status:o.st,pay:o.pay,src:o.src||null,so:o.so||null,awb:o.awb||null,product:o.pt||null,remark:o.remark||null,promo:o.promo||null,erp:o.erp||null,credit:!!o.cr,credit_due:o.cr&&o.cdue?o.cdue:null});
 async function loadAll(){
  const sb=HB.sb(),TN={A:'CPL-Inter',B:'CPLEx',C:'Offline Team'};
  const all=async q=>{const f=await q(true).range(0,999);if(f.error)return{data:[],error:f.error};const n=f.count||0,P=[];for(let i=1000;i<n;i+=1000)P.push(q().range(i,i+999));const R=await Promise.all(P);return{data:(f.data||[]).concat(...R.map(x=>x.data||[])),error:null}};
  const m0=MK[0],d0=m0+'-01',l0=(d=>(d.setDate(d.getDate()-90),d.toISOString().slice(0,10)))(new Date());
- const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu';
+ const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu,promo';
  const [tg,jr,lr]=await Promise.all([sb.from('sales_targets').select('*'),
   all(c=>sb.from('sales_jobs').select('*',c?{count:'exact'}:undefined).or(`rep_month.gte.${m0},close_date.gte.${d0},open_date.gte.${d0}`).order('id',{ascending:true})),
   sb.from('leads').select(lc).gte('date',l0).not('status','in',`("${ST.Y}","${ST.N}")`).order('date',{ascending:false}).limit(400)]);
  DBERR=(tg.error||jr.error||{}).message||'';
  const sal={};(tg.data||[]).forEach(x=>sal[x.sales]=+x.salary||0);
- SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[o.value]||0}));
+ SALES=HB.sales().filter(o=>o.value).map(o=>({id:o.value,name:o.value,tm:o.team||'',team:TN[o.team]||o.team,br:o.team==='B'?'CPLExJJ':'CPL-INTER',sal:sal[o.value]||0}));
  SALES.forEach(s=>{s.t1=s.sal*20;s.t2=s.sal*30});
  J=(jr.data||[]).map(fromRow);
  SALES.forEach(s=>s.trend=MK.map(k=>J.filter(j=>(j.s===s.id||j.as===s.id)&&inM(j,k)).reduce((a,j)=>a+share$(j),0)/1000));
@@ -473,7 +473,7 @@ function render(){try{erpSync()}catch(e){}
 }
 
 /* ---------- job entry ---------- */
-let F={},SUG=[],BRAND_OK=true,ERP_OK=true;
+let F={},SUG=[],BRAND_OK=true,ERP_OK=true,PROMO_OK=true;
 const vatNet=(inc,br)=>br&&br.startsWith('CPLEx')?Math.round(inc/1.07*100)/100:inc;
 const SVC=['EAX','EAE','EAD','EAG','ETL','ETF','ESL','ESF','IAX','IAE','IAD','IAG','ITL','ITF','ISL','ISF','DOM','WH'];
 const CC=['DEU','USA','JPN','SGP','MYS','THA','GBR','AUS','CHN','HKG','CHE','TWN','PHL','NZL','ITA','KOR','CAN','VNM','ESP','NLD','IDN','FRA','SWE','IND','ARE','DNK','BEL','NOR','MAC','KWT','PRT','IRL','LAO','KHM','MMR','AUT','FIN','ISR','TUR','GRC','ZAF','SAU','QAT','BRA','MEX','POL','CZE','LKA','BGD','NPL','BRN','SVK','CHL','KAZ'];
@@ -481,6 +481,7 @@ const STA=['PACKING','PAYMENT','BOOKED','RELEASED','ISSUE','CANCELED'];
 const opt=(L,v,e)=>(e!=null?`<option value="">${e}</option>`:'')+L.map(x=>{const[k,t]=Array.isArray(x)?x:[x,x];return `<option value="${esc(k)}"${String(v)===String(k)?' selected':''}>${esc(t)}</option>`}).join('');
 const withV=(L,v)=>v&&!L.includes(v)?[v,...L]:L;
 const meName=()=>{try{const n=(HB.profile()||{}).name||'';const m=SALES.find(s=>s.id.toLowerCase()===n.trim().toLowerCase());return m&&m.id}catch(e){return ''}};
+const prList=()=>{let a=[];try{a=HB.promos(((SALES.find(x=>x.id===F.s)||{}).tm)||'')||[]}catch(e){}return a};
 const chList=()=>{let a=[];try{a=HB.channels()||[]}catch(e){}return [...new Set([...a,...CH])]};
 const ctyOpt=v=>withV(CC,v).map(k=>[k,k+' · '+c3(k).n]);
 const brList=()=>{let a=[];try{a=HB.brands()||[]}catch(e){}return a.length?a:['CPL-INTER','CPLEx','CLMV','IMTHAI','CPLEx DEU','CPLEx GBP']};
@@ -513,7 +514,8 @@ function drawJob(){
   ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`,{c:2})}
   ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
   ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
-  ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1,c:2}):''}`)}
+  ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1,c:2}):''}
+  ${fld('โปรโมชันที่ใช้',`<select class="in" id="jpromo">${opt(withV(prList(),F.promo),F.promo||'','ไม่ได้ใช้โปรโมชัน')}</select>`,{c:2})}`)}
  ${sec(3,'ข้อมูลจาก Lead',`${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
   ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`)}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`,'auto')}
@@ -522,7 +524,7 @@ function drawJob(){
 }
 const pnum=v=>+String(v).replace(/[^\d.]/g,'')||0;
 function pickLead(l,q){
- F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=l.brand||F.br2;F.src=l.ads||F.src;
+ F.lead=l.id;F._ln=l.name;if(!F._edit||!F.cus)F.cus=l.name||F.cus;F.cid=l.customer_id||F.cid;F.ch=l.channel||F.ch;F.br2=l.brand||F.br2;F.src=l.ads||F.src;if(l.promo&&!F.promo)F.promo=l.promo;
  F.no=l.lead_type?(l.lead_type==='new'?'ใหม่':'เก่า'):(l.ads==='ลูกค้าเก่า'?'เก่า':'ใหม่');
  const c=ctyCode(l.country);if(!F.cty&&CC.includes(c))F.cty=c;if(!F.sv)F.sv=leadSv(l);
  if(!q)drawJob()}
@@ -530,7 +532,7 @@ function pickCus(c){F.cus=c.name;F.cid=c.id;F.no='เก่า';drawJob()}
 const fj=$('fj');
 let _sq=0,_st=null;
 async function cusSearch(q){const id=++_sq,sb=HB.sb(),like='%'+q.replace(/[%_,()]/g,' ').trim()+'%';
- const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu';
+ const lc='id,name,ads,channel,brand,sales,status,date,dir,svc,country,team,customer_id,fu,promo';
  let lr=await sb.from('leads').select(lc+',lead_type').ilike('name',like).order('date',{ascending:false}).limit(6);if(lr.error)lr=await sb.from('leads').select(lc).ilike('name',like).order('date',{ascending:false}).limit(6);
  const cr=await sb.from('customers').select('id,name,owner').ilike('name',like).limit(4);
  if(id!==_sq)return;const ul=$('jsug');if(!ul)return;
@@ -544,7 +546,7 @@ fj.addEventListener('input',e=>{const t=e.target;
  if(t.id==='jcdue'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F.cdue=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  if(t.id==='jclose'||t.id==='jopen'){let v=t.value.replace(/\D/g,'').slice(0,8);t.value=v.length>4?v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4):v.length>2?v.slice(0,2)+'/'+v.slice(2):v;const m=t.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);F[t.id==='jclose'?'close':'open']=m?m[3]+'-'+m[2]+'-'+m[1]:'';return}
  const m={jno:'job',jawb:'awb',jrem:'remark'};if(m[t.id])F[m[t.id]]=t.value});
-fj.addEventListener('change',e=>{const t=e.target,m={jerp:'erp',jas:'as',jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(t.id==='jcr'){F.cr=t.value==='1';return drawJob()}if(m[t.id]){F[m[t.id]]=t.value;
+fj.addEventListener('change',e=>{const t=e.target,m={jpromo:'promo',jerp:'erp',jas:'as',jsl:'s',jsv:'sv',jcty:'cty',jnew:'no',jch:'ch',jbrand:'br2',jpay:'pay',jst:'st'};if(t.id==='jcr'){F.cr=t.value==='1';return drawJob()}if(m[t.id]){F[m[t.id]]=t.value;
  if(t.id==='jst'||t.id==='jas'||t.id==='jsl'){if(t.id==='jsl'&&F.as===F.s)F.as='';drawJob()}if(t.id==='jsl'){const s=SALES.find(x=>x.id===t.value);if(s)F.br=s.br}}});
 fj.addEventListener('focusout',e=>{if(e.target.id==='jcus')setTimeout(()=>{if(document.activeElement!==$('jcus')){const u=$('jsug');if(u)u.hidden=true;_sq++}},200)});
 fj.addEventListener('keydown',e=>{if(e.target.id==='jcus'&&e.key==='Enter'){e.preventDefault();const li=$('jsug').querySelector('li.on');if(li&&!$('jsug').hidden)pickSug(li.dataset.sg)}});
@@ -555,13 +557,14 @@ fj.addEventListener('submit',async e=>{e.preventDefault();
  fj.querySelectorAll('.in.em').forEach(x=>x.classList.remove('em'));need.forEach(([id])=>$(id)&&$(id).classList.add('em'));
  if(need.length){$(need[0][0]).focus();toast('กรอกช่องที่มี * ให้ครบ');return}
  const no=(F.job||nextNo()).trim();
- const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark,erp:ERP_ON?(F.erp||''):(F.erp||''),cr:!!F.cr,cdue:F.cr?F.cdue||'':''};
+ const o={job:no,s:F.s,as:F.as||'',lead:F.lead||'',cid:F.cid||null,src:F.src||'',cus:F.cus.trim(),sv:F.sv,cty:F.cty,inc:+F.inc||0,net:F.as?(+F.inc||0)/2:(+F.inc||0),no:F.no||'ใหม่',ch:F.ch,br:F.br,br2:F.br2,st:F.st,pay:F.pay,open:F.open,close:F.close,pt:F.pt,awb:F.awb,so:F.so,remark:F.remark,promo:F.promo||'',erp:ERP_ON?(F.erp||''):(F.erp||''),cr:!!F.cr,cdue:F.cr?F.cdue||'':''};
  const btn=fj.querySelector('[type=submit]');btn.disabled=true;const sb=HB.sb();
  try{
   if(!F._edit&&!o.cid){const{data:ex}=await sb.from('customers').select('id').ilike('name',o.cus).limit(1);if(ex&&ex[0])o.cid=ex[0].id;else{const{data:c}=await sb.from('customers').insert({name:o.cus,owner:o.s||null}).select('id').single();if(c)o.cid=c.id}}
-  let row=toRow(o);if(!BRAND_OK)delete row.brand;if(!ERP_OK){delete row.erp;delete row.credit;delete row.credit_due}
+  let row=toRow(o);if(!BRAND_OK)delete row.brand;if(!PROMO_OK)delete row.promo;if(!ERP_OK){delete row.erp;delete row.credit;delete row.credit_due}
   const go=()=>F._edit?sb.from('sales_jobs').update(row).eq('id',F.id).select().single():sb.from('sales_jobs').insert(row).select().single();
   let{data,error}=await go();
+  if(error&&/promo/.test(error.message||'')){PROMO_OK=false;delete row.promo;({data,error}=await go())}
   if(error&&/brand/.test(error.message||'')){BRAND_OK=false;delete row.brand;({data,error}=await go())}
   if(error&&/erp|credit/.test(error.message||'')){ERP_OK=false;delete row.erp;delete row.credit;delete row.credit_due;({data,error}=await go())}
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message);return}
