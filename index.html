@@ -1375,7 +1375,7 @@ const osg=(()=>{const m={};l.forEach(r=>{const q=r.detail&&r.detail.qt;if(q&&q.f
  const opn=l.filter(r=>![ST_Y,ST_N].includes(effS(r))),t0=today(),fuOd=opn.filter(r=>fuDue(r)<t0).length,fuTd=opn.filter(r=>fuDue(r)===t0).length;
  const SJR=sjGet(lo,b),sjOk=!!SJR,sjT=s=>{const o=(OPTS.sales||[]).find(x=>sCode(x.value)===sCode(s));return o?o.team:''},meS=profile&&profile.role==='sales'?sCode(profile.name):'';
  const SJ=(SJR||[]).filter(j=>{const d=j._d;if(!d||(lo&&d<lo)||(b&&d>b)||(vmv&&d.slice(0,7)!==vmv))return false;if(tm&&sjT(j.sales)!==tm&&!(j.assistant&&sjT(j.assistant)===tm))return false;if(sl&&sCode(j.sales)!==sCode(sl)&&sCode(j.assistant)!==sCode(sl))return false;if(meS&&sCode(j.sales)!==meS&&sCode(j.assistant)!==meS)return false;return true});
- const jInc=j=>+j.income||+j.net||0,jSh=j=>j.assistant?(+j.income?(+j.income)/2:(+j.net||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>Math.round(v.reduce((t,j)=>t+jV(j),0));
+ const jSh=j=>+j.net||(j.assistant?(+j.income||0)/2:(+j.income||0)),jInc=j=>j.assistant?(+j.net?(+j.net)*2:(+j.income||0)):(+j.net||+j.income||0),jV=j=>(sl||meS)?jSh(j):jInc(j),jSum=v=>Math.round(v.reduce((t,j)=>t+jV(j),0));
  const LM=new Map();SJD.L.forEach((v,k)=>LM.set(k,v));pool.forEach(r=>LM.set(r.id,r));const jL=j=>j.lead_id&&LM.get(j.lead_id),jAds=j=>{const r=jL(j);return r?(r.ads||'(ไม่ระบุ Ads)'):'(ไม่ได้ผูก Lead)'};
  const jMd=j=>svMode(j.svc),jDir=j=>svDir(j.svc),jTy=j=>svType(j.svc),jCh=j=>normCh(j.channel),jCf=k=>c3h(k);
  const SJT=jSum(SJ),SJN=SJ.filter(j=>jNw(j)),SJAds=SJ.filter(j=>{const a=jAds(j);return !adsX.includes(a)&&a!=='(ไม่ได้ผูก Lead)'}),SJAT=jSum(SJAds);
@@ -3556,13 +3556,14 @@ const tpPick=n=>`<div class="tp-pk">${Object.entries(TEMP).map(([k,[l,c]])=>`<la
 const soMy=()=>profile&&profile.role==='sales'?SO.deals.filter(d=>(d.sales||'')===soActor()):SO.deals;
 const soActor=()=>profile&&profile.name?sName(profile.name):'';
 async function soLog(action_text){try{await sb.from('so_activity').insert({team:'C',actor_name:soActor(),action_text})}catch(e){}}
+function soN(r){if(!r||typeof sName!=='function')return r;['sales','assignee','last_call_by','calling_by','by','actor','created_by_name'].forEach(k=>{if(typeof r[k]==='string'&&r[k])r[k]=sName(r[k])});return r}
 async function soLoad(){
  const[d,v,a]=await Promise.all([
   sb.from('so_deals').select('*').eq('team','C').order('created_at',{ascending:false}).limit(1000),
   sb.from('so_visits').select('*').eq('team','C').order('visit_date',{ascending:false}).order('visit_time',{ascending:false}).limit(1000),
   sb.from('so_activity').select('*').eq('team','C').order('created_at',{ascending:false}).limit(30)
  ]);
- SO.deals=d.error?[]:(d.data||[]);SO.visits=v.error?[]:(v.data||[]);SO.acts=a.error?[]:(a.data||[]);SO.loaded=true}
+ SO.deals=(d.error?[]:(d.data||[])).map(soN);SO.visits=(v.error?[]:(v.data||[])).map(soN);SO.acts=(a.error?[]:(a.data||[])).map(soN);SO.loaded=true}
 function soDlg(){const f=$('sof');f.reset();f.so_d.value=fmtD(today());f.so_t.value=soHM(new Date().toISOString());
  $('so_dl').innerHTML=SO.deals.map(r=>`<option value="${H(r.company)}"></option>`).join('');$('sod').showModal()}
 async function soSubmit(e){e.preventDefault();const f=$('sof'),nm=f.so_n.value.trim();if(!nm)return;
@@ -5418,7 +5419,7 @@ const seeAll=()=>!!profile&&['admin','sales_lead','marketing'].includes(profile.
 const chip=k=>{const s=ST[k]||ST.new;return `<span class="so2-chip" style="--c:${s[2]}">${E(TT(s[0],s[1]))}</span>`};
 const dt=iso=>{if(!iso)return'';const d=new Date(iso),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()};
 const locked=c=>c.calling_by&&c.calling_by!==me()&&c.calling_at&&Date.now()-new Date(c.calling_at).getTime()<LOCK;
-async function callsLoad(){let o=[],i=0;for(;;){const{data,error}=await sb.from('so_calls').select('*').eq('team',TM).order('id').range(i,i+999);if(error){SO.callsOk=false;SO.calls=[];return}o=o.concat(data||[]);if(!data||data.length<1000)break;i+=1000}SO.calls=o;SO.callsOk=true;if(Date.now()-(SO.synced||0)>3e5&&(boss()||(profile&&profile.team==='C'))){SO.synced=Date.now();syncOnline().then(n=>{if(n&&onC())callsLoad().then(soRender)}).catch(()=>{})}}
+async function callsLoad(){let o=[],i=0;for(;;){const{data,error}=await sb.from('so_calls').select('*').eq('team',TM).order('id').range(i,i+999);if(error){SO.callsOk=false;SO.calls=[];return}o=o.concat(data||[]);if(!data||data.length<1000)break;i+=1000}SO.calls=o.map(soN);SO.callsOk=true;if(Date.now()-(SO.synced||0)>3e5&&(boss()||(profile&&profile.team==='C'))){SO.synced=Date.now();syncOnline().then(n=>{if(n&&onC())callsLoad().then(soRender)}).catch(()=>{})}}
 function callsV(){
  if(SO.callsOk===null){callsLoad().then(()=>{if(onC())soRender()});return `<div class="so2-p"><div class="so2-emp">${E(TT('กำลังโหลด…','Loading…'))}</div></div>`}
  const f=SO.cf,td=today(),mine=!seeAll(),who=mine?me():f.who;
@@ -7010,7 +7011,7 @@ let CB=[],FV='d',TK=null;
 const p2=v=>String(v).padStart(2,'0'),hm=d=>p2(d.getHours())+':'+p2(d.getMinutes());
 const dueAt=c=>new Date(c.callback_date+'T'+(((c.data||{}).cbt)||'09:00')+':00');
 const mine=c=>(c.assignee||c.last_call_by)===me();
-async function cbLoad(){if(!profile)return;const r=await sb.from('so_calls').select('id,company,contact,phone,callback_date,status,data,assignee,last_call_by,last_call_at,note').eq('team','C').eq('status','cb');if(!r.error)CB=(r.data||[]).filter(c=>c.callback_date&&mine(c));offBadge();if(isOff()&&!$('vF').classList.contains('hid'))offRender();cbTick()}
+async function cbLoad(){if(!profile)return;const r=await sb.from('so_calls').select('id,company,contact,phone,callback_date,status,data,assignee,last_call_by,last_call_at,note').eq('team','C').eq('status','cb');if(!r.error)CB=(r.data||[]).map(c=>typeof soN==='function'?soN(c):c).filter(c=>c.callback_date&&mine(c));offBadge();if(isOff()&&!$('vF').classList.contains('hid'))offRender();cbTick()}
 window.cbRefresh=()=>cbLoad();
 function offBadge(){const b=$('fdot');if(!b)return;const t=today(),n=CB.filter(c=>c.callback_date<=t).length;b.textContent=n;b.classList.toggle('hid',!n)}
 function ensure(){let b=$('fOff');if(!b){b=document.createElement('div');b.id='fOff';b.className='hid';$('vF').append(b);

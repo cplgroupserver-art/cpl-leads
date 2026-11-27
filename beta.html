@@ -285,7 +285,7 @@ const isBoss=()=>{try{const p=HB.profile()||{};return ['admin','sales_lead'].inc
 const mine=id=>J.filter(j=>j.s===id||j.as===id);
 const share=j=>j.as?.5:1;
 const monthJ=id=>mine(id).filter(j=>inM(j,CUR));
-const share$=j=>j.as?(+j.inc?(+j.inc)/2:(+j.net||0)):(+j.net||+j.inc||0);
+const share$=j=>+j.net||(j.as?(+j.inc||0)/2:(+j.inc||0));
 let SM='';const netOf=(id,m)=>J.filter(j=>(j.s===id||j.as===id)&&inM(j,m||CUR)).reduce((a,j)=>a+share$(j),0);
 const commBase=id=>netOf(id);
 const pend=l=>l.filter(j=>j.pay==='p');
