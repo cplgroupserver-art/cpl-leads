@@ -165,7 +165,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .svg button b{display:block;font-size:14px;font-weight:600}.svg button span{font-size:12px;color:var(--mu)}
 .svg button.on{background:var(--infb);border-color:var(--br)}.svg button.on b{color:var(--pr)}
 .four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 12px}.four .c2{grid-column:span 2}.four .c3{grid-column:span 3}
-#dj{width:min(1120px,96vw)}.js-bd{display:grid!important;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.js-col{display:flex;flex-direction:column;gap:16px;min-width:0}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}.two .c2{grid-column:1/-1}@media(max-width:820px){.js-bd{grid-template-columns:1fr}}#fj{padding:0;max-height:92vh;display:flex;flex-direction:column;overflow:visible}
+#dj{width:min(1120px,96vw)}.js-bd{display:grid!important;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.js-col{display:flex;flex-direction:column;gap:16px;min-width:0}fieldset.js.auto{background:color-mix(in srgb,var(--fld) 55%,var(--card));border-style:dashed}fieldset.js.auto .js-n{background:var(--gyb);color:var(--mu)}fieldset.js.auto>legend{color:var(--mu)}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}.two .c2{grid-column:1/-1}@media(max-width:820px){.js-bd{grid-template-columns:1fr}}#fj{padding:0;max-height:92vh;display:flex;flex-direction:column;overflow:visible}
 .js-hd{display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--bd);flex:none}.js-hd h2{margin:0!important;font-size:19px}
 .js-tm{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;background:color-mix(in srgb,var(--br) 12%,transparent);color:var(--pr);font-size:12.5px;font-weight:600}.js-tm::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}
 .js-bd{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);padding:20px 24px;display:flex;flex-direction:column;gap:16px}
@@ -332,15 +332,15 @@ const isDone=j=>['BOOKED','RELEASED','CANCELED'].includes(j.st);
 const dleft=j=>j.close?Math.round((Date.parse(j.close)-Date.parse(TODAY))/864e5):null;
 const dueTxt=d=>d==null?'ยังไม่กำหนด':d<0?`เลย ${-d} วัน`:d===0?'วันนี้':d===1?'พรุ่งนี้':`อีก ${d} วัน`;
 const dueCol=d=>d==null?'var(--mu)':d<0?'var(--dgr)':d<=1?'var(--wn)':'var(--inf)';const dueCls=d=>d==null?'':d<0?'er':d<=1?'wn':'inf';
-const ERP_ON=false;
+const ERP_T=['EARTH'];let ERP_ON=false;const erpSync=()=>{ERP_ON=ERP_T.includes(ROLE)};
 const cleft=j=>j.cdue?Math.round((Date.parse(j.cdue)-Date.parse(TODAY))/864e5):null;
-const erpTag=j=>!ERP_ON?'':j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
+const erpTag=j=>!(ERP_T.includes(j.s)&&(ERP_T.includes(ROLE)||ROLE==='HEAD'))?'':j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
 const crTag=j=>{if(!j.cr)return '';const d=cleft(j),c=j.pay==='d'?'gy':d==null?'wn':d<0?'er':d<=7?'wn':'inf';return `<div><span class="etag ${c}">เครดิต${j.cdue?' · '+fd(j.cdue).slice(0,5):''}${j.pay!=='d'&&d!=null?' · '+dueTxt(d):''}</span></div>`};
 const crDue=L=>L.filter(j=>j.cr&&j.pay!=='d'&&(!j.cdue||cleft(j)<=7)).sort((a,b)=>(a.cdue||'0').localeCompare(b.cdue||'0'));
 function crAlert(L){const A=crDue(L);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;
  return `<div class="info cr"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>ครบกำหนดชำระเครดิต</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)} · ${j.cdue?dueTxt(cleft(j)):'ยังไม่ใส่วันครบกำหนด'} · ${B(j.inc||j.net)}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|cr" style="margin-left:auto;font-weight:600">+${more} งาน</button>`:''}</div>`}
 const erpFollow=L=>L.filter(j=>j.erp==='follow');
-function erpAlert(L){if(!ERP_ON)return '';const A=erpFollow(L);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;return `<div class="info erpw"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>ตาม Booking ปิด ERP ${N(A.length)}</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|erpf" style="margin-left:auto;font-weight:600">+${more} งาน</button>`:''}</div>`}
+function erpAlert(L){erpSync();if(!ERP_ON)return '';const A=erpFollow(L);if(!A.length)return '';const D=A.slice(0,3),more=A.length-D.length;return `<div class="info erpw"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>ตาม Booking ปิด ERP ${N(A.length)}</b>${D.map(j=>`<span>${jnoB(j)} ${esc(j.cus)}</span>`).join('<i>·</i>')}${more?`<button class="r lk" data-kp="job|erpf" style="margin-left:auto;font-weight:600">+${more} งาน</button>`:''}</div>`}
 const shTag=j=>{if(!j.as)return '';const o=`${j.s} Owner`,a=`${j.as} Assistant`,t=ROLE===j.as?o:ROLE===j.s?a:`${o} · ${a}`;return `<span class="shr">${t} · 50%</span>`};
 const dueList=L=>L.filter(j=>!isDone(j)).sort((a,b)=>(a.close||'9999').localeCompare(b.close||'9999'));
 function lastClose(L){const C=dueList(L).slice(0,5);
@@ -464,7 +464,7 @@ function pageRep(){
 }
 
 const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tablist">${[['home','ภาพรวม'],['job','งานปิดการขาย'],...(isSales()?[['my','งานของฉัน']]:[['rep','รายงานรายเดือน']])].map(([k,t])=>`<button class="${PAGE===k?'on':''}" data-sub="${k}" role="tab">${t}</button>`).join('')}</div>`;
-function render(){
+function render(){try{erpSync()}catch(e){}
  renderNav();
  const c=$('ct');
  c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}</div>`+(PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
@@ -491,30 +491,30 @@ function openJob(j,lead){
 const fld=(l,html,o={})=>`<label class="f${o.c?' c'+o.c:''}"><span>${l}${o.rq?' <b class="rq">*</b>':''}</span>${html}</label>`;
 const dIn=(id,v)=>`<input class="in" id="${id}" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(v)}">`;
 function drawJob(){
- const isI=F.st==='ISSUE',sec=(n,t,b)=>`<fieldset class="js"><legend><span class="js-n">${n}</span>${t}</legend><div class="two">${b}</div></fieldset>`;
+ erpSync();const isI=F.st==='ISSUE',sec=(n,t,b,cls)=>`<fieldset class="js${cls?' '+cls:''}"><legend><span class="js-n">${n}</span>${t}</legend><div class="two">${b}</div></fieldset>`;
+ const erpF=ERP_ON?fld('สถานะ ERP',`<select class="in" id="jerp">${opt([['','ยังไม่ระบุ'],['follow','ต้องตาม Booking ปิด ERP'],['closed','Closed job ERP']],F.erp||'')}</select>`,{c:2}):'';
  $('fj').innerHTML=`<div class="js-hd"><h2 id="djt">${F._edit?'แก้ไขงาน '+esc(F.job):'ลงงานปิดการขาย'}</h2>${F.s?`<span class="js-tm">${esc(F.s)}</span>`:''}</div>
  <div class="js-bd"><div class="js-col">
- ${sec(1,'ลูกค้า',`<div class="f sug c2"><span>Customer Name <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul>${F.lead?`<div class="lchip"><b>Lead</b>${esc(F._ln||'#'+F.lead)}<button type="button" data-unl aria-label="ยกเลิก Lead" title="ยกเลิก Lead">✕</button></div>`:''}</div>
-  ${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
-  ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`)}
-  ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`)}
- ${sec(3,'ยอดเงินและผู้รับผิดชอบ',`${fld('Sales',`<select class="in" id="jsl">${opt(withV(SALES.map(x=>x.id),F.s),F.s)}</select>`,{rq:1})}
-  ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
-  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`)}
-  ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
-  ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
-  ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1}):''}`)}
- </div><div class="js-col">
- ${sec(2,'รายละเอียดงาน',`${fld('Job No.',`<input class="in mono" id="jno" value="${esc(F.job||nextNo())}">`,{rq:1})}
+ ${sec(1,'ข้อมูลงาน',`<div class="f sug c2"><span>Customer Name <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul>${F.lead?`<div class="lchip"><b>Lead</b>${esc(F._ln||'#'+F.lead)}<button type="button" data-unl aria-label="ยกเลิก Lead" title="ยกเลิก Lead">✕</button></div>`:''}</div>
+  ${fld('Job No.',`<input class="in mono" id="jno" value="${esc(F.job||nextNo())}">`,{rq:1})}
   ${fld('สถานะ Job',`<select class="in" id="jst">${opt(withV(STA,F.st),F.st)}</select>`)}
   ${fld('Service',`<select class="in mono" id="jsv">${opt(withV(SVC,F.sv).map(k=>[k,k+' · '+(svDir(k)==='ในประเทศ'?'ในประเทศ':svDir(k)+' '+svType(k))]),F.sv,'—')}</select>`,{rq:1})}
   ${fld('Country',`<select class="in mono" id="jcty">${opt(ctyOpt(F.cty),F.cty,'—')}</select>`,{rq:1})}
   ${fld('Open Date',dIn('jopen',F.open))}
   ${fld('Closed Date',dIn('jclose',F.close),{rq:1})}
-  ${ERP_ON?'':fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`,{c:2})}
+  ${fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`,{c:2})}
+  ${erpF}
   ${fld('Remark',`<input class="in" id="jrem" value="${esc(F.remark)}">`,{c:2,rq:isI})}`)}
- ${ERP_ON?sec(4,'ERP',`${fld('สถานะ ERP',`<select class="in" id="jerp">${opt([['','ยังไม่ระบุ'],['follow','ต้องตาม Booking ปิด ERP'],['closed','Closed job ERP']],F.erp||'')}</select>`,{c:2})}
-  ${fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`,{c:2})}`):''}
+ </div><div class="js-col">
+ ${sec(2,'ยอดเงินและผู้รับผิดชอบ',`${fld('Sales',`<select class="in" id="jsl">${opt(withV(SALES.map(x=>x.id),F.s),F.s)}</select>`,{rq:1})}
+  ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
+  ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`,{c:2})}
+  ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
+  ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
+  ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1,c:2}):''}`)}
+ ${sec(3,'ข้อมูลจาก Lead',`${fld('ลูกค้าเก่า/ใหม่',`<select class="in" id="jnew">${opt([['ใหม่','ใหม่'],['เก่า','เก่า']],F.no||'ใหม่')}</select>`)}
+  ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`)}
+  ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`,'auto')}
  </div></div>
  <div class="js-ft"><button type="button" class="btn" data-close>ยกเลิก</button><button class="btn p" type="submit">บันทึก</button></div>`;
 }
