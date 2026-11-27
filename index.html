@@ -185,7 +185,7 @@ input[list]::-webkit-calendar-picker-indicator,input[data-dl]::-webkit-calendar-
 .ut{width:100%;border-collapse:collapse;min-width:640px}.ut th{text-align:left;font-size:12px;color:var(--mu);font-weight:500;padding:6px 8px}.ut td{padding:6px 8px;border-top:1px solid var(--bd);vertical-align:middle}.ut input,.ut select{width:100%;min-width:0}.ut .wait{display:inline-block;padding:2px 9px;border-radius:99px;background:#fff0d6;color:#8a5200;font-size:12px;margin-top:4px}
 
 .svrow{display:flex;gap:6px;margin-bottom:6px}.svrow select{flex:1;min-width:0}
-#tF,#tHB{position:relative}.hbrow{display:flex;align-items:center;gap:18px;margin-bottom:14px}#hbsub{margin:0}.hbrow:has(#hbsub.hid){display:none}.hbdt{font-size:13.5px;color:var(--mu);white-space:nowrap}#fdot{position:absolute;top:4px;right:6px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--dgr);color:#fff;font-size:11px;font-style:normal;display:flex;align-items:center;justify-content:center;box-sizing:border-box}#fdot.hid{display:none}
+#tF,#tHB{position:relative}.hbrow{display:flex;align-items:center;gap:18px;margin-bottom:14px}#hbsub{margin:0}.hbrow:has(#hbsub.hid){display:none}#vSO.offhb .tabx .soNav{display:none!important}#soHb .seg button{font-weight:500!important}#soHb .seg button.on{font-weight:600!important}.offhb .tabx:has(#soSub:empty){display:none}#soHb{margin-bottom:14px}.hbdt{font-size:13.5px;color:var(--mu);white-space:nowrap}#fdot{position:absolute;top:4px;right:6px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--dgr);color:#fff;font-size:11px;font-style:normal;display:flex;align-items:center;justify-content:center;box-sizing:border-box}#fdot.hid{display:none}
 .ib{border:1px dashed rgba(120,130,150,.5);border-radius:12px;padding:10px;margin-bottom:10px}.ibh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-weight:600}.svsel{display:flex;gap:6px}.svsel select{flex:1;min-width:0}
 .clk{cursor:pointer}.clk:hover td{background:rgba(30,100,200,.07)}#flist table{width:100%;min-width:0!important}#flist th,#flist td{white-space:normal!important;position:static!important;vertical-align:top}#flist td:nth-child(1),#flist .fg td:nth-child(4),#flist .fg td:nth-child(5),#flist td:last-child,#flist .tag,#flist .btn{white-space:nowrap!important}#flist .tag{display:inline-block}#flist td:last-child{text-align:right}
 .chart{width:100%;height:auto;display:block}.chart text{fill:currentColor;font-size:10px}.dn{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.dn svg{width:150px;height:150px;flex:none}.dnl{flex:1;min-width:140px;font-size:12px}.dnl span{overflow-wrap:anywhere}.dnl b{white-space:nowrap}.dnl div{display:flex;align-items:center;gap:6px;padding:2px 0}.dnl i{width:10px;height:10px;border-radius:3px;flex:none}.dnl b{margin-left:auto;padding-left:8px}.clg{display:flex;gap:12px;font-size:12px;margin-bottom:4px}.clg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
@@ -832,6 +832,7 @@ const isSl=r=>r==='sales'||r==='sales_lead';
 const can=r=>profile&&(profile.role==='admin'||profile.role==='keyer'||profile.role==='sales_lead'||(profile.role==='sales'&&r.team===profile.team));
 const seeAll=()=>!!profile&&['admin','keyer','sales_lead'].includes(profile.role);
 const isBeta=()=>!!(profile&&['admin','sales','sales_lead','keyer','marketing'].includes(profile.role));
+function isOffSales(){return !!profile&&profile.role==='sales'&&profile.team==='C'}
 const canSO=()=>!!profile&&(profile.role==='admin'||profile.role==='sales_lead'||(profile.role==='sales'&&profile.team==='C'));
 const dupKey=s=>String(s||'').toLowerCase().replace(/บริษัท|บจก\.?|หจก\.?|ห้างหุ้นส่วนจำกัด|จำกัด|\(มหาชน\)|คุณ/g,'').replace(/[\s.,()\-_\/]+/g,'');
 const dupPh=s=>{const d=String(s||'').replace(/\D/g,'');return d.length>=8?d.slice(-9):''};
@@ -1127,7 +1128,7 @@ async function enter(){
 }
 
 function applyRoleUI(p){tFlabel();const r=p.role,H=(id,h)=>$(id).classList.toggle('hid',!!h),has=a=>a.includes(r);
- H('add',!has(['admin','sales','sales_lead','keyer']));H('n_add',!has(['admin','marketing']));H('tS',r!=='admin');H('tC',has(['ads','keyer','zimp','ceo']));H('tSO',!canSO());
+ H('add',!has(['admin','sales','sales_lead','keyer']));H('n_add',!has(['admin','marketing']));H('tS',r!=='admin');H('tC',has(['ads','keyer','zimp','ceo']));H('tSO',!canSO()||isOffSales());
  const DR={admin:'AMKE',marketing:'AMK',ads:'A',sales:'',sales_lead:'K',keyer:'',zimp:'AM',ceo:'AMKE'}[r]||'';window.DRok=DR;H('tDB',!DR);
  H('tF',!has(['sales','admin','keyer']));H('tW',!has(['admin','marketing','zimp']));H('tL',0);H('tN',0);
  ['A','M','K','E'].forEach(k=>H('t'+k,1));H('rg',1);H('exp',r==='zimp')}
@@ -3656,7 +3657,7 @@ tab=function(k){
   ['L','A','M','K','E','C','S','N','F','W','RS','CU'].forEach(x=>{const b=$('t'+x);if(b)b.classList.remove('on')});
   $('tDB').classList.remove('on');$('fnb').classList.add('hid');
   $('tSO').classList.add('on');$('vSO').classList.remove('hid');soOpenView();return}
- $('vSO').classList.add('hid');$('tSO').classList.remove('on');$('tSO').classList.toggle('hid',!canSO());
+ $('vSO').classList.add('hid');$('tSO').classList.remove('on');$('tSO').classList.toggle('hid',!canSO()||isOffSales());
  return _tSO(k)};
 $('tSO').onclick=()=>tab('SO');
 document.querySelectorAll('#vSO [data-so]').forEach(b=>b.addEventListener('click',()=>{SO.page=b.dataset.so;soRender()}));
@@ -3671,7 +3672,7 @@ $('soMain').addEventListener('dragleave',e=>{const col=e.target.closest('.soCol[
 $('soMain').addEventListener('drop',e=>{const col=e.target.closest('.soCol[data-stage]');if(!col)return;e.preventDefault();col.classList.remove('soOver');const id=e.dataTransfer.getData('text/plain');if(id)soMove(id,col.dataset.stage)});
 $('soMain').addEventListener('input',e=>{if(e.target.id==='so_lq'){soRender();const el=$('so_lq');if(el){el.focus();const v=el.value;el.setSelectionRange(v.length,v.length)}}});
 $('sof').addEventListener('submit',soSubmit);
-const _arSO=applyRoleUI;applyRoleUI=function(p){_arSO(p);$('tSO').classList.toggle('hid',!canSO())};
+const _arSO=applyRoleUI;applyRoleUI=function(p){_arSO(p);$('tSO').classList.toggle('hid',!canSO()||isOffSales())};
 const _renderSO=render;render=function(){_renderSO();if(SO.page==='L'&&!$('vSO').classList.contains('hid'))soRender()};
 if(typeof EN==='object')Object.assign(EN,{"Pipeline":"Pipeline","แผนเยี่ยมลูกค้า":"Customer Visit Plan","เยี่ยมแล้ววันนี้":"Visited today","ดีลที่เปิดอยู่":"Open deals","ปิดดีลเดือนนี้":"Closed deals this month","กิจกรรมทีม":"Team activity","ยังไม่มีกิจกรรม":"No activity yet","สถานะ Shipment ของลูกค้า":"Customer shipment status","ตัวอย่าง":"Example","ระหว่างขนส่ง":"In transit","รอเอกสาร":"Pending documents","ส่งมอบแล้ว":"Delivered","+ บันทึกการเยี่ยมลูกค้า":"+ Log customer visit","Lead ใหม่":"New lead","นัดพบ / เยี่ยม":"Visit / meeting","ส่ง Quotation":"Quotation sent","เจรจา":"Negotiating","ปิดดีล":"Closed deals","ถัดไป →":"Next →","แผนเยี่ยมลูกค้าวันนี้":"Today's visit plan","ยังไม่มีแผนเยี่ยมวันนี้":"No visits planned today","เปิดเส้นทางใน Maps":"Open route in Maps","เช็กอิน":"Check in","บันทึกการเยี่ยมลูกค้า":"Log customer visit","ประเภทบริการ":"Service type","เช่น ทางเรือ FCL":"e.g. FCL by sea","เวลา":"Time","วัตถุประสงค์":"Purpose","กำลังโหลด…":"Loading…","ภาพรวมทีมขายภาคสนาม":"Field sales team overview","เยี่ยมลูกค้าโดยตรง":"Direct customer visit","แก้ไขลูกค้า":"Edit customer","ลบดีล":"Delete deal","ลบดีลนี้?":"Delete this deal?","เซลล์เจ้าของ":"Sales owner","ปิดไม่สำเร็จ":"Closed lost"});
 </script>
@@ -7034,14 +7035,14 @@ async function offRender(){const b=ensure();const t=today(),now=Date.now();
   const lab=o?TT('เลย ','Late ')+ago(now-due.getTime()):soon?TT('อีก ','In ')+Math.max(1,Math.round((due.getTime()-now)/60e3))+TT(' นาที',' min'):(dl||TT('วันนี้','Today'));
   return `<div class="cbi${o?' late':soon?' nw':''}"><div class="t"><b>${esc(dd.cbt||'—')}</b><span>${esc(lab)}</span></div><div style="min-width:0;flex:1"><h4>${esc(c.company||'')}</h4><div class="s">${esc([c.contact,c.phone].filter(Boolean).join(' · '))}</div>${c.note?`<span class="q">“${esc(c.note)}”</span>`:''}</div><div class="ac"><button type="button" class="btn sm cbg" data-cbo="${c.id}">${TT('บันทึกผล','Log result')}</button><button type="button" class="btn sm" data-cbz="${c.id}">${TT('เลื่อน 1 ชม.','Snooze 1 h')}</button></div></div>`};
  const drow=c=>`<div class="cbi dn"><div class="t"><b>${esc(soHM2(c.last_call_at))}</b><span>${TT('โทรแล้ว','Called')}</span></div><div style="min-width:0;flex:1"><h4>${esc(c.company||'')}</h4><div class="s">${esc([c.contact,c.phone].filter(Boolean).join(' · '))}</div></div><div class="ac"><button type="button" class="btn sm" data-cbo="${c.id}">${TT('เปิด','Open')}</button></div></div>`;
- b.innerHTML=`<div class="nh"><h3 style="margin:0">${TT('งานของฉัน','My work')}</h3><div class="mktabs">${[['d','วันนี้','Today'],['w','สัปดาห์นี้','This week'],['a','ทั้งหมด','All']].map(([k,th,en])=>`<button type="button" data-fv="${k}" class="${FV===k?'on':''}">${TT(th,en)}</button>`).join('')}</div></div>
+ b.innerHTML=`<div class="nh"><div class="mktabs">${[['d','วันนี้','Today'],['w','สัปดาห์นี้','This week'],['a','ทั้งหมด','All']].map(([k,th,en])=>`<button type="button" data-fv="${k}" class="${FV===k?'on':''}">${TT(th,en)}</button>`).join('')}</div></div>
  <div class="fo-kp">${[[dToday,TT('นัดโทรกลับวันนี้','Call-backs today'),'#0096d6'],[od,TT('เลยเวลานัด','Overdue'),'#e03131'],[fus.length,TT('งานติดตามลูกค้า','Client follow-ups'),'#f08a24'],[doneN,TT('โทรแล้ววันนี้','Called today'),'#2f9e44']].map(([v,l,c])=>`<div class="fo-k" style="--c:${c}"><b>${NFm(v)}</b><span>${l}</span></div>`).join('')}</div>
  <div class="fo-g2"><div class="pn"><h3>${TT('นัดโทรกลับ','Call-backs')}</h3>${L.length?L.map(row).join(''):`<div class="sub" style="padding:14px 0;text-align:center">${TT('ไม่มีนัดโทรกลับ','No call-backs')}</div>`}${FV==='d'&&done.length?`<div class="fo-sec">${TT('โทรแล้ววันนี้','Called today')}</div>`+done.slice(0,8).map(drow).join(''):''}</div>
  <div class="pn"><h3>${TT('งานติดตามลูกค้า','Client follow-ups')}</h3>${fus.length?fus.map(d=>{const n=DD(d).next,s=stOf(d);return `<div class="fuo" data-dl="${d.id}"><div class="d${n.d<t?' late':''}">${n.d===t?TT('วันนี้','Today'):fmtD(n.d)}</div><div style="flex:1;min-width:0"><h4>${esc(d.company||'')}</h4><div class="s">${esc(n.t||'')}</div></div>${s[0]?`<span class="so2-chip" style="--c:${s[1]}">${esc(TT(s[0],s[0]))}</span>`:''}</div>`}).join(''):`<div class="sub" style="padding:14px 0;text-align:center">${TT('ไม่มีงานติดตาม','No follow-ups')}</div>`}</div></div>`}
 const NFm=v=>Math.round(+v||0).toLocaleString('en-US');
 const soHM2=x=>{if(!x)return'';const d=new Date(x);return hm(d)};
 const ago=ms=>{const m=Math.round(ms/60e3);return m<60?m+TT(' นาที',' min'):m<1440?Math.floor(m/60)+TT(' ชม.',' h'):Math.floor(m/1440)+TT(' วัน',' d')};
-const _rf=renderFu;renderFu=function(){const off=isOff(),b=ensure();[...$('vF').children].forEach(ch=>{if(ch!==b)ch.classList.toggle('hid-off',off)});b.classList.toggle('hid',!off);if(!off)return _rf();$('fnb').classList.add('hid');offRender();if(!SO.calls||!SO.calls.length)window.soCallsLoad&&window.soCallsLoad().then(()=>{if(!$('vF').classList.contains('hid'))offRender()}).catch(()=>{})};
+const _rf=renderFu;renderFu=function(){const off=isOff(),b=ensure();[...$('vF').children].forEach(ch=>{if(ch!==b&&!ch.classList.contains('hbrow'))ch.classList.toggle('hid-off',off)});b.classList.toggle('hid',!off);if(!off)return _rf();$('fnb').classList.add('hid');offRender();if(!SO.calls||!SO.calls.length)window.soCallsLoad&&window.soCallsLoad().then(()=>{if(!$('vF').classList.contains('hid'))offRender()}).catch(()=>{})};
 const _fb=fuBadge;fuBadge=function(){if(isOff())return offBadge();return _fb()};
 /* reminders */
 const SHOWN=new Set();
@@ -7083,14 +7084,19 @@ window.HB_roles=()=>{};
 window.pvSales=()=>{const w=$('hbrw'),sel=$('hbr');const on=!!(PVR&&PVR.role==='admin'&&profile&&profile!==PVR&&profile.role==='sales');w.classList.toggle('on',on);if(!on)return;const L=[...new Set((OPTS.sales||[]).filter(o=>o.value&&(!profile.team||o.team===profile.team)).map(o=>o.value))];sel.innerHTML=L.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');if(!L.includes(profile.name)&&L.length)profile.name=L[0];sel.value=profile.name};
 $('hbr').onchange=e=>{profile.name=e.target.value;applyRoleUI(profile);reload();const f=$('hbf');if(f&&f.getAttribute('src'))f.src=f.getAttribute('src').split('?')[0]+'?v='+Date.now()};
 const isS=()=>!!(profile&&profile.role==='sales');
-$('hbsub').addEventListener('click',e=>{const b=e.target.closest('[data-hp]');if(!b||b.dataset.hp==='my')return;tab('HB');const go=()=>{try{$('hbf').contentWindow.hbPage(b.dataset.hp)}catch(er){setTimeout(go,300)}};go()});
-const hmF=()=>ok();function hbSub(){const r=(profile||{}).role,boss=r==='admin'||r==='sales_lead',dt=boss||(profile&&profile.team==='A')||['EARTH','MIND','OAT'].includes(sCode((profile||{}).name));
- $('hbsub').innerHTML=[['home','ภาพรวม'],['job','งานปิดการขาย'],...(boss?[['rep','รายงานรายเดือน']]:[]),['my','งานของฉัน'],...(dt?[['duty','ตารางเวร']]:[])].map(([k,t])=>`<button type="button"${k==='my'?' class="on"':''} data-hp="${k}">${t}</button>`).join('');
+window.hbSo=x=>{tab('SO');const b=document.querySelector('#vSO .soNav [data-so="'+x+'"]');if(b)b.click();soHbSync()};
+function soHbSync(){const v=$('vSO'),off=isOffSales();v.classList.toggle('offhb',off);let w=$('soHb');if(!off){if(w)w.remove();return}
+ if(!w){w=document.createElement('div');w.id='soHb';w.className='hbrow';v.prepend(w)}const a=(document.querySelector('#vSO .soNav button.on')||{}).dataset||{};
+ w.innerHTML=`<div class="seg" style="width:max-content;margin:0">${hbList().map(([k,t])=>`<button type="button"${k==='so:'+(a.so||'')?' class="on"':''} data-hp="${k}">${t}</button>`).join('')}</div><span class="hbdt">${$('hbdt').textContent}</span>`;$('tSO').classList.add('hid');$('tHB').classList.add('on')}
+document.addEventListener('click',e=>{const b=e.target.closest('#hbsub [data-hp],#soHb [data-hp]');if(!b)return;const k=b.dataset.hp;if(k==='my'){tab('F');return}if(k.startsWith('so:')){hbSo(k.slice(3));return}tab('HB');const go=()=>{try{$('hbf').contentWindow.hbPage(k)}catch(er){setTimeout(go,300)}};go()});
+const hmF=()=>ok();function hbList(){const r=(profile||{}).role,boss=r==='admin'||r==='sales_lead',dt=boss||(profile&&profile.team==='A')||['EARTH','MIND','OAT'].includes(sCode((profile||{}).name));return [['home','ภาพรวม'],['job','งานปิดการขาย'],...(boss?[['rep','รายงานรายเดือน']]:[]),['my','งานของฉัน'],...(dt?[['duty','ตารางเวร']]:[]),...(isOffSales()?[['so:TS','Tele sales'],['so:T','Clients'],['so:P','Pipeline'],['so:D','ภาพรวมทีม']]:[])]}
+function hbSub(){
+ $('hbsub').innerHTML=hbList().map(([k,t])=>`<button type="button"${k==='my'?' class="on"':''} data-hp="${k}">${t}</button>`).join('');
  $('hbdt').textContent=new Date().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}const gate=()=>{const li=!!profile;if(li)hbSub();$('tHB').classList.toggle('hid',!li);$('tF').classList.toggle('hid',li);$('hbsub').classList.toggle('hid',!hmF());{const d=$('fdot');if(d&&d.parentElement!==$('tHB'))$('tHB').appendChild(d)}if(!ok()&&!$('vHB').classList.contains('hid'))tab('F')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
 const fit=()=>{const n=document.querySelector('nav.tabs');if(!n)return;const b=n.getBoundingClientRect();document.documentElement.style.setProperty('--hbl',Math.round(b.right)+'px');document.documentElement.style.setProperty('--hbt',Math.round(b.bottom)+'px')};addEventListener('resize',fit);try{new ResizeObserver(fit).observe(document.querySelector('nav.tabs'))}catch(e){}
 const _t=tab;tab=function(k){document.body.classList.toggle('hbon',k==='HB'&&ok());if(k==='HB')fit();if(k==='HB'){if(!ok())return tab('F');document.querySelectorAll('main>[id^="v"]').forEach(v=>v.classList.toggle('hid',v.id!=='vHB'));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.id==='tHB'));const f=$('fnb');if(f)f.classList.add('hid');const fr=$('hbf');if(!fr.src||fr.dataset.at&&Date.now()-fr.dataset.at>300000){fr.src='beta.html?v='+Date.now();fr.dataset.at=Date.now()}return}
- $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'){$('tHB').classList.add('on');$('hbsub').classList.toggle('hid',!hmF())}return rv};
+ $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'){$('tHB').classList.add('on');$('hbsub').classList.toggle('hid',!hmF())}if(k==='SO')soHbSync();return rv};
 $('tHB').onclick=()=>tab('HB');gate();
 })();
 
