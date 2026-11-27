@@ -455,12 +455,12 @@ const FI={tag:'<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"
 const fgSel=(l,id,O,v,ic)=>`<div class="fg"><span class="fg-l"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><span>${l}</span></span><div class="fg-b"><select id="${id}" class="one">${O.map(([k,t])=>`<option value="${k}"${v===k?' selected':''}>${t}</option>`).join('')}</select></div></div>`;
 
 /* ---------- duty roster (CPL-Inter social channels) ---------- */
-const DT_P=['EARTH','MIND','OAT'],DT_ANCHOR='2026-11-27',DT_TASK=[['fb','Facebook'],['line','LINE'],['call','Call-in · Mail · Booking ERP']];
+const DT_P=['EARTH','MIND','OAT'],DT_B=['MIND','EARTH','OAT'],DT_ANCHOR='2026-11-27',DT_TASK=[['fb','Facebook'],['line','LINE'],['call','Call-in · Mail · Booking ERP']];
 const dutyOk=()=>{const m=me();return m?(m.tm==='A'||DT_P.includes(m.id)):true};
 let DTM='';
 const wdIndex=d=>{const a=new Date(DT_ANCHOR+'T00:00:00'),b=new Date(d+'T00:00:00');let n=0;const s=a<=b?1:-1;const x=new Date(a);while(x.toISOString().slice(0,10)!==b.toISOString().slice(0,10)&&Math.abs(n)<4000){x.setDate(x.getDate()+s);const w=x.getDay();if(w!==0&&w!==6)n+=s}return n};
 const mod=(a,n)=>((a%n)+n)%n;
-const dutyOf=d=>{const n=wdIndex(d),o={};DT_TASK.forEach(([k],i)=>o[k]=DT_P[mod(i-n,3)]);o.imthai=mod(n,2)?'MIND':'EARTH';o.clmv=mod(n,2)?'EARTH':'MIND';o.deu='EARTH';o.usa='MIND';return o};
+const dutyOf=d=>{const n=wdIndex(d),o={};DT_TASK.forEach(([k],i)=>o[k]=DT_B[mod(i-n,3)]);o.imthai=mod(n,2)?'MIND':'EARTH';o.clmv=mod(n,2)?'EARTH':'MIND';o.deu='EARTH';o.usa='MIND';return o};
 const dKey=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
 const DCOL={EARTH:'#0096d6',MIND:'#8e5bd6',OAT:'#e07a1f'};
 const pchip=(n,mine)=>`<span class="pchip${mine?' me':''}" style="--c:${DCOL[n]||'var(--mu)'}">${esc(n)}</span>`;
@@ -470,7 +470,7 @@ function pageDuty(){
  const mine=cols.filter(([k])=>t[k]===me_);
  const card=([k,l,b])=>`<div class="dcard${t[k]===me_?' me':''}"><span class="dl">${l}${b?` <small>${b}</small>`:''}</span>${pchip(t[k],t[k]===me_)}</div>`;
  const m=DTM||today.slice(0,7),[y,mo]=m.split('-').map(Number),days=[];for(let d=new Date(y,mo-1,1);d.getMonth()===mo-1;d.setDate(d.getDate()+1)){const w=d.getDay();if(w!==0&&w!==6)days.push(dKey(d))}
- const MO=[];{const d=new Date();for(let i=-2;i<=2;i++){const x=new Date(d.getFullYear(),d.getMonth()+i,1);MO.push(dKey(x).slice(0,7))}}
+ const MO=[];{const d=new Date();for(let i=-(d.getMonth()+(d.getFullYear()-2026)*12);i<=6;i++){const x=new Date(d.getFullYear(),d.getMonth()+i,1);MO.push(dKey(x).slice(0,7))}}
  return `<div class="pn"><h3>เวรวันนี้ · ${new Date(today+'T00:00:00').toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}${isWE?' <span class="etag gy" style="margin-left:8px">วันหยุด</span>':''}</h3>${isWE?'<div class="empty">เสาร์-อาทิตย์ไม่มีเวร</div>':`${me_&&mine.length?`<div class="dme">เวรของฉัน: <b>${mine.map(x=>x[1]).join(', ')}</b></div>`:''}<div class="dgrid">${cols.map(card).join('')}</div>`}</div>
  <div class="pn" style="margin-top:14px"><h3>ตารางเวร <select class="msel" id="dt_m" aria-label="เดือน">${MO.map(k=>`<option value="${k}"${k===m?' selected':''}>${new Date(+k.slice(0,4),+k.slice(5)-1,1).toLocaleDateString('th-TH',{month:'long',year:'numeric'})}</option>`).join('')}</select></h3>
  <div class="scroll"><table class="jt dtt"><thead><tr><th>วันที่</th>${cols.map(([k,l,b])=>`<th>${l}${b?`<div class="sub">${b}</div>`:''}</th>`).join('')}</tr></thead><tbody>${days.map(d=>{const o=dutyOf(d);return `<tr class="${d===today?'today':''}"><td>${new Date(d+'T00:00:00').toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})}</td>${cols.map(([k])=>`<td>${pchip(o[k],o[k]===me_)}</td>`).join('')}</tr>`}).join('')}</tbody></table></div></div>`}
