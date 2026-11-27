@@ -374,7 +374,7 @@ function homeSales(){
  const head=``;
  const k=kpi([[N(M.length),'งานเดือนนี้','','job|all'],[N(M.filter(j=>j.no==='ใหม่').length),'ลูกค้าใหม่เดือนนี้','','job|new'],[pd.length+' · '+B(pd.reduce((a,j)=>a+(+j.net||+j.inc||0),0)),'ค้างชำระ',pd.length?'var(--dgr)':'','job|p'],[N(nl.length),'ยังไม่ผูก Lead','','job|nl']]);
  const NC=A.filter(j=>!j.close&&j.st!=='CANCELED').sort((a,b)=>(b.open||'').localeCompare(a.open||'')),OP=NC.slice(0,5);
- const jobs=`<div class="pn col"><h3>งานที่ยังไม่ปิด · ${N(NC.length)}${NC.length>OP.length?'<button class="r" data-kp="job|nc">ดูทั้งหมด</button>':''}</h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานที่ยังไม่ใส่ Close Date</div>'}</div>`;
+ const jobs=`<div class="pn col"><h3>ยังไม่มี Close Date · ${N(NC.length)}${NC.length>OP.length?'<button class="r" data-kp="job|nc">ดูทั้งหมด</button>':''}</h3>${OP.map(jobRow).join('')||'<div class="empty">ไม่มีงานที่ยังไม่ใส่ Close Date</div>'}</div>`;
  const myL=LD.filter(l=>l.s===s.id&&l.st!==ST.Y&&!J.some(j=>String(j.lead)===String(l.id))).slice(0,6);
  const ld=myL.length?`<div class="pn"><h3>Lead ที่กำลังดูแล<button class="r" data-go="lead">ดูทั้งหมด</button></h3><div>${myL.map(l=>`<div class="row"><div class="t">${fd(l.in).slice(0,5)}</div><div style="flex:1;min-width:0"><h4><button class="lk" data-ld2="${l.id}">${esc(l.n)}</button></h4><div class="s">${esc(l.ads)} · ${esc(l.st)}</div></div><div class="a"><button class="btn sm" data-lj="${l.id}">ปิดการขาย</button></div></div>`).join('')}</div></div>`:'';
  return head+dutyToday()+crAlert(A)+k+`<div class="grid g2e">${target(s)}${payCard(A,5)}</div>${ld?`<div class="grid g2e">${jobs}${ld}</div>`:jobs}`+erpAlert(A)+leadAlert(s.id);
