@@ -504,7 +504,7 @@ const subTabs=()=>`<div class="seg tabs2" style="margin-bottom:16px" role="tabli
 function render(){try{erpSync()}catch(e){}
  renderNav();
  const c=$('ct');
- c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${isBoss()?`<label class="vsel"><span>เซลล์</span><select id="vs_r" aria-label="เลือกเซลล์">${[['HEAD','ทุกคน'],...SALES.map(x=>[x.id,x.id+' · '+x.team])].map(([k,t])=>`<option value="${esc(k)}"${ROLE===k||(k==='HEAD'&&!isSales())?' selected':''}>${esc(t)}</option>`).join('')}</select></label>`:(PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':'')}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
+ c.innerHTML=`<div class="topr">${subTabs()}<span class="dtop">${DLBL}</span>${isBoss()?`<label class="vsel"><span>เซลล์</span><select id="vs_r" aria-label="เลือกเซลล์">${[['HEAD','ทุกคน'],...SALES.map(x=>[x.id,x.id+' · '+x.team])].map(([k,t])=>`<option value="${esc(k)}"${ROLE===k||(k==='HEAD'&&!isSales())?' selected':''}>${esc(t)}</option>`).join('')}</select></label>${PAGE==='job'?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':''}`:(PAGE==='job'||(PAGE==='home'&&isSales())?'<button class="btn p" data-nj>+ ลงงานปิดการขาย</button>':'')}</div>`+(PAGE==='duty'?pageDuty():PAGE==='job'?pageJob():PAGE==='rep'?pageRep():PAGE==='lead'?pageLead():PAGE==='cus'?pageCus():PAGE==='db'?pageDb():isSales()?homeSales():ROLE==='HEAD'?homeHead():homeCeo());
 }
 
 /* ---------- job entry ---------- */
