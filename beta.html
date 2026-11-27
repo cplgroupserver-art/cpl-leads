@@ -555,7 +555,7 @@ const fld=(l,html,o={})=>`<label class="f${o.c?' c'+o.c:''}"><span>${l}${o.rq?' 
 const dIn=(id,v)=>`<input class="in" id="${id}" data-dmy autocomplete="off" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" value="${fd(v)}">`;
 function drawJob(){
  erpSync();const isI=F.st==='ISSUE',sec=(n,t,b,cls)=>`<fieldset class="js${cls?' '+cls:''}"><legend><span class="js-n">${n}</span>${t}</legend><div class="two">${b}</div></fieldset>`;
- const erpF=ERP_ON?fld('สถานะ ERP',`<select class="in" id="jerp">${opt([['','ยังไม่ระบุ'],['follow','ต้องตาม Booking ปิด ERP'],['closed','Closed job ERP']],F.erp||'')}</select>`,{c:2}):'';
+ const erpF=ERP_ON?fld('สถานะ ERP',`<select class="in" id="jerp">${opt([['','ยังไม่ระบุ'],['follow','ต้องตาม Booking ปิด ERP'],['closed','Closed job ERP']],F.erp||'')}</select>`):'';
  $('fj').innerHTML=`<div class="js-hd"><h2 id="djt">${F._edit?'แก้ไขงาน '+esc(F.job):'ลงงานปิดการขาย'}</h2>${F.s?`<span class="js-tm">${esc(F.s)}</span>`:''}</div>
  <div class="js-bd"><div class="js-col">
  ${sec(1,'ข้อมูลงาน',`<div class="f sug c2"><span>Customer Name <b class="rq">*</b></span><input class="in" id="jcus" autocomplete="off" value="${esc(F.cus)}"><ul id="jsug" hidden></ul>${F.lead?`<div class="lchip"><b>Lead</b>${esc(F._ln||'#'+F.lead)}<button type="button" data-unl aria-label="ยกเลิก Lead" title="ยกเลิก Lead">✕</button></div>`:''}</div>
@@ -566,18 +566,17 @@ function drawJob(){
   ${fld('Open Date',dIn('jopen',F.open))}
   ${fld('Closed Date',dIn('jclose',F.close),{rq:1})}
   ${fld('AWB/BL No.',`<input class="in mono" id="jawb" value="${esc(F.awb)}">`,{c:2})}
-  ${erpF}
   ${fld('Remark',`<input class="in" id="jrem" value="${esc(F.remark)}">`,{c:2,rq:isI})}`)}
+ ${sec(3,'ERP &amp; Financial Check',`${erpF}${fld('ตรวจยอดกับบัญชี',`<select class="in" id="jfin">${opt([['','ยังไม่ตรวจ'],['ok','ตรงกับบัญชี'],['diff','ไม่ตรงบัญชี']],F.fin||'')}</select>`)}`)}
  </div><div class="js-col">
  ${sec(2,'ยอดเงินและผู้รับผิดชอบ',`${fld('Sales',`<select class="in" id="jsl">${opt(withV(SALES.map(x=>x.id),F.s),F.s)}</select>`,{rq:1})}
   ${fld('Assist',`<select class="in" id="jas">${opt(SALES.filter(x=>x.id!==F.s).map(x=>x.id),F.as,'—')}</select>`)}
   ${fld('Income',`<span class="nf" data-u="บาท"><input class="in" id="jinc" inputmode="decimal" value="${F.inc?N(F.inc,2):''}"></span><span class="split" id="jsplit">${F.as&&F.inc?`Net · ${F.s} ${N(F.inc/2,2)} / ${F.as} ${N(F.inc/2,2)}`:''}</span>`,{c:2})}
   ${fld('สถานะการชำระเงิน',`<select class="in" id="jpay">${opt([['p','Pending'],['d','Done']],F.pay)}</select>`)}
-  ${fld('ตรวจยอดกับบัญชี',`<select class="in" id="jfin">${opt([['','ยังไม่ตรวจ'],['ok','ตรงกับบัญชี'],['diff','ไม่ตรงบัญชี']],F.fin||'')}</select>`,{c:2})}
   ${fld('ชำระแบบ',`<select class="in" id="jcr">${opt([['','เงินสด / โอน'],['1','เครดิต']],F.cr?'1':'')}</select>`)}
   ${F.cr?fld('ครบกำหนดชำระ',dIn('jcdue',F.cdue),{rq:1,c:2}):''}
   ${fld('โปรโมชันที่ใช้',`<select class="in" id="jpromo">${opt(withV(prList(),F.promo),F.promo||'','ไม่ได้ใช้โปรโมชัน')}</select>`,{c:2})}`)}
- ${sec(3,'ข้อมูลจาก Lead',`${fld('ประเภทลูกค้า',`<select class="in" id="jnew">${opt([['New','New'],['Active','Active'],['Win-back','Win-back'],...(F.no==='เก่า'?[['เก่า','เก่า (ไม่ระบุ)']]:[])],F.no||'New')}</select>`)}
+ ${sec(4,'ข้อมูลจาก Lead',`${fld('ประเภทลูกค้า',`<select class="in" id="jnew">${opt([['New','New'],['Active','Active'],['Win-back','Win-back'],...(F.no==='เก่า'?[['เก่า','เก่า (ไม่ระบุ)']]:[])],F.no||'New')}</select>`)}
   ${fld('ช่องทาง',`<select class="in" id="jch">${opt(withV(chList().filter(c=>c!=='Walk-in'||/CPLEx/i.test((SALES.find(x=>x.id===F.s)||{}).team||'')),F.ch),F.ch,'—')}</select>`)}
   ${fld('Brand',`<select class="in" id="jbrand">${opt(withV(brList(),F.br2),F.br2,'—')}</select>`,{c:2})}`,'auto')}
  </div></div>
