@@ -7087,16 +7087,17 @@ const isS=()=>!!(profile&&profile.role==='sales');
 window.hbSo=x=>{tab('SO');const b=document.querySelector('#vSO .soNav [data-so="'+x+'"]');if(b)b.click();soHbSync()};
 function soHbSync(){const v=$('vSO'),off=isOffSales();v.classList.toggle('offhb',off);let w=$('soHb');if(!off){if(w)w.remove();return}
  if(!w){w=document.createElement('div');w.id='soHb';w.className='hbrow';v.prepend(w)}const a=(document.querySelector('#vSO .soNav button.on')||{}).dataset||{};
- w.innerHTML=`<div class="seg" style="width:max-content;margin:0">${hbList().map(([k,t])=>`<button type="button"${k==='so:'+(a.so||'')?' class="on"':''} data-hp="${k}">${t}</button>`).join('')}</div><span class="hbdt">${$('hbdt').textContent}</span>`;$('tSO').classList.add('hid');$('tHB').classList.add('on')}
+ w.innerHTML=`<div class="seg" style="width:max-content;margin:0">${hbTabsNow().map(([k,t])=>`<button type="button"${k==='so:'+(a.so||'')?' class="on"':''} data-hp="${k}">${t}</button>`).join('')}</div><span class="hbdt">${$('hbdt').textContent}</span>`;$('tSO').classList.add('hid');$('tHB').classList.add('on')}
 document.addEventListener('click',e=>{const b=e.target.closest('#hbsub [data-hp],#soHb [data-hp]');if(!b)return;const k=b.dataset.hp;if(k==='my'){tab('F');return}if(k.startsWith('so:')){hbSo(k.slice(3));return}tab('HB');const go=()=>{try{$('hbf').contentWindow.hbPage(k)}catch(er){setTimeout(go,300)}};go()});
 const hmF=()=>ok();function hbList(){const r=(profile||{}).role,boss=r==='admin'||r==='sales_lead',dt=boss||(profile&&profile.team==='A')||['EARTH','MIND','OAT'].includes(sCode((profile||{}).name));return [['home','ภาพรวม'],['job','งานปิดการขาย'],...(boss?[['rep','รายงานรายเดือน']]:[]),['my','งานของฉัน'],...(dt?[['duty','ตารางเวร']]:[]),...(isOffSales()?[['so:TS','Tele sales'],['so:T','Clients'],['so:P','Pipeline'],['so:D','ภาพรวมทีม']]:[])]}
+function hbTabsNow(){try{const w=$('hbf').contentWindow;if(w&&typeof w.hbTabs==='function'){const L=w.hbTabs();if(L&&L.length)return L}}catch(_){}return hbList()}
 function hbSub(){
- $('hbsub').innerHTML=hbList().map(([k,t])=>`<button type="button"${k==='my'?' class="on"':''} data-hp="${k}">${t}</button>`).join('');
+ $('hbsub').innerHTML=hbTabsNow().map(([k,t])=>`<button type="button"${k==='my'?' class="on"':''} data-hp="${k}">${t}</button>`).join('');
  $('hbdt').textContent=new Date().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}const gate=()=>{const li=!!profile;if(li)hbSub();$('tHB').classList.toggle('hid',!li);$('tF').classList.toggle('hid',li);$('hbsub').classList.toggle('hid',!hmF());{const d=$('fdot');if(d&&d.parentElement!==$('tHB'))$('tHB').appendChild(d)}if(!ok()&&!$('vHB').classList.contains('hid'))tab('F')};
 const _ar=applyRoleUI;applyRoleUI=function(p){_ar(p);gate()};
 const fit=()=>{const n=document.querySelector('nav.tabs');if(!n)return;const b=n.getBoundingClientRect();document.documentElement.style.setProperty('--hbl',Math.round(b.right)+'px');document.documentElement.style.setProperty('--hbt',Math.round(b.bottom)+'px')};addEventListener('resize',fit);try{new ResizeObserver(fit).observe(document.querySelector('nav.tabs'))}catch(e){}
 const _t=tab;tab=function(k){document.body.classList.toggle('hbon',k==='HB'&&ok());if(k==='HB')fit();if(k==='HB'){if(!ok())return tab('F');document.querySelectorAll('main>[id^="v"]').forEach(v=>v.classList.toggle('hid',v.id!=='vHB'));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.id==='tHB'));const f=$('fnb');if(f)f.classList.add('hid');const fr=$('hbf');if(!fr.src||fr.dataset.at&&Date.now()-fr.dataset.at>300000){fr.src='beta.html?v='+Date.now();fr.dataset.at=Date.now()}return}
- $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'){$('tHB').classList.add('on');$('hbsub').classList.toggle('hid',!hmF())}if(k==='SO')soHbSync();return rv};
+ $('vHB').classList.add('hid');$('tHB').classList.remove('on');const rv=_t(k);if(k==='F'){$('tHB').classList.add('on');if(profile)hbSub();$('hbsub').classList.toggle('hid',!hmF())}if(k==='SO')soHbSync();return rv};
 $('tHB').onclick=()=>tab('HB');gate();
 })();
 
