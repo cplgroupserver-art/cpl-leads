@@ -98,8 +98,8 @@ button.st{font:inherit;color:inherit;text-align:left;cursor:pointer;transition:.
 /* Rows / lists */
 .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.row:last-child{border:0}
 .row .t{width:52px;flex:none;font-weight:600;font-size:13px;color:var(--inf)}.row .t.l{color:var(--dgr)}
-.row h4{margin:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .s{font-size:13px;color:var(--mu)}.row .a{margin-left:auto;display:flex;gap:6px;flex:none;align-items:center}
+.row h4{min-width:0;margin:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .a{margin-left:auto;display:flex;gap:6px;flex:none;align-items:center}
 .empty{color:var(--mu);font-size:13px;padding:8px 0}
 .due{width:60px;flex:none;text-align:center;border-radius:var(--r-sm);padding:4px 0;line-height:1.25;background:var(--gyb);color:var(--gy)}
 .due b{display:block;font-size:14px;font-weight:700}.due span{font-size:11px;font-weight:600}
@@ -112,7 +112,7 @@ button.jst,button.pay{cursor:pointer}
 .tag.ok,.jst.ok,.pay.d{background:var(--okb);color:var(--ok)}.tag.wn,.jst.wn{background:var(--wnb);color:var(--wn)}.tag.er,.jst.er,.pay.p{background:var(--erb);color:var(--er)}.tag.gy,.jst.gy{background:var(--gyb);color:var(--gy)}.tag.inf,.jst.inf,.shr{background:var(--infb);color:var(--inf)}
 .shr{display:inline-block;padding:1px 8px;border-radius:var(--r-pill);font-size:12px;font-weight:500;white-space:nowrap}
 .code{display:inline-block;font:600 12px/1.5 ui-monospace,Menlo,monospace;border-radius:var(--r-xs);padding:1px 6px;background:var(--gyb);color:var(--c,var(--gy))}
-.jno{font:600 12px/1.5 ui-monospace,Menlo,monospace;background:var(--gyb);color:var(--tx);border-radius:var(--r-xs);padding:1px 6px;white-space:nowrap}
+.jno{flex:none;font:600 12px/1.5 ui-monospace,Menlo,monospace;background:var(--gyb);color:var(--tx);border-radius:var(--r-xs);padding:1px 6px;white-space:nowrap}
 .ro{font-size:11px;font-weight:600;color:var(--inf);background:var(--infb);border-radius:var(--r-pill);padding:1px 8px;white-space:nowrap}
 .chip{display:inline-block;font-size:12px;font-weight:500;border-radius:var(--r-pill);padding:2px 10px;background:var(--gyb);color:var(--c,var(--gy));white-space:nowrap}
 .lk{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}.lk:hover{color:var(--pr)}
@@ -337,7 +337,7 @@ const dueTxt=d=>d==null?'ยังไม่กำหนด':d<0?`เลย ${-d}
 const dueCol=d=>d==null?'var(--mu)':d<0?'var(--dgr)':d<=1?'var(--wn)':'var(--inf)';const dueCls=d=>d==null?'':d<0?'er':d<=1?'wn':'inf';
 const ERP_T=['EARTH'];let ERP_ON=true;const erpSync=()=>{ERP_ON=true};
 const cleft=j=>j.cdue?Math.round((Date.parse(j.cdue)-Date.parse(TODAY))/864e5):null;
-const erpTag=j=>!(ERP_T.includes(j.s)&&(ERP_T.includes(ROLE)||ROLE==='HEAD'))?'':j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
+const erpTag=j=>j.erp==='closed'?'<div><span class="etag ok">ERP ✓</span></div>':j.erp==='follow'?'<div><span class="etag er">ตาม Booking ปิด ERP</span></div>':'';
 const finCell=j=>j.fin==='ok'?'<span class="etag ok">ตรงกับบัญชี</span>':j.fin==='diff'?'<span class="etag er">ไม่ตรงบัญชี</span>':'<span class="etag gy">ยังไม่ตรวจ</span>';
 const erpCell=j=>j.erp==='closed'?'<span class="etag ok">Closed ERP</span>':j.erp==='follow'?'<span class="etag er">ตาม Booking</span>':'<span class="etag gy">ยังไม่ปิด ERP</span>';
 const crTag=j=>{if(!j.cr)return '';const d=cleft(j),c=j.pay==='d'?'gy':d==null?'wn':d<0?'er':d<=7?'wn':'inf';return `<div><span class="etag ${c}">เครดิต${j.cdue?' · '+fd(j.cdue).slice(0,5):''}${j.pay!=='d'&&d!=null?' · '+dueTxt(d):''}</span></div>`};
@@ -365,7 +365,7 @@ function payCard(L,cap){cap=cap||5;const pd=L.filter(j=>j.pay==='p'&&j.inc),dn=L
  ${pd.sort((a,b)=>(a.close||'9').localeCompare(b.close||'9')).slice(0,cap).map(j=>{const a=age(j);return `<div class="row"><div style="flex:1"><h4>${esc(j.cus)}</h4><div class="s">${jnoB(j)} · Close Date ${j.close?fd(j.close):'—'}</div></div><b style="white-space:nowrap">${B(j.inc)}</b><div class="a"><button class="btn sm ok" data-pay="${j.id}">รับชำระแล้ว</button></div></div>`}).join('')||'<div class="empty">ไม่มียอดค้างชำระ</div>'}</div>`}
 const jnoB=j=>j.ro?`<span class="ro">Lead</span>`:`<span class="jno">${j.job}</span>`;
 const cusB=j=>j.cid?`<button class="lk" data-cu2="${j.cid}">${esc(j.cus)}</button>`:esc(j.cus);
-const jobRow=j=>`<div class="row"><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><div style="flex:1"><div style="display:flex;gap:6px;align-items:center">${jnoB(j)}<h4>${cusB(j)}</h4></div><div class="s">${j.as?shTag(j)+' ':''}${c3h(j.cty)} · ${j.inc?B(j.inc):'ยังไม่ใส่ยอด'} · Close Date ${j.close?fd(j.close):'—'}</div></div><div class="a"><button class="jst ${STC[j.st]}" data-adv="${j.id}" title="กดเพื่อเลื่อนสถานะ">${j.st}</button><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></div></div>`;
+const jobRow=j=>`<div class="row"><span class="code" style="--c:${SCOL(j.sv)}">${j.sv}</span><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center">${jnoB(j)}<h4>${cusB(j)}</h4></div><div class="s">${j.as?shTag(j)+' ':''}${c3h(j.cty)} · ${j.inc?B(j.inc):'ยังไม่ใส่ยอด'} · Close Date ${j.close?fd(j.close):'—'}</div></div><div class="a"><button class="jst ${STC[j.st]}" data-adv="${j.id}" title="กดเพื่อเลื่อนสถานะ">${j.st}</button><button class="pay ${j.pay}" data-pay="${j.id}">${j.pay==='d'?'ชำระแล้ว':'ค้างชำระ'}</button><button class="btn sm" data-ej="${j.id}">${j.inc?'แก้ไข':'ใส่ยอด'}</button></div></div>`;
 function checklist(br){const L=CKD[br==='CPLExJJ'?'BR':'HO'];return `<div class="pn"><h3>Checklist วันนี้<span class="sub" style="margin-left:auto;font-weight:400">${L.filter(x=>x[1]>=x[2]).length}/${L.length} เสร็จ</span></h3>${L.map(([t,a,b],i)=>`<div class="ck${a>=b?' y':''}" data-ck="${i}"><i>${a>=b?'✓':''}</i>${t}<span class="pb"><b style="width:${Math.min(100,a/b*100)}%"></b></span><em>${a}/${b}</em></div>`).join('')}</div>`}
 
 /* ---------- homes ---------- */
